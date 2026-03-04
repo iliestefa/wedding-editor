@@ -1,16 +1,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useEditorContext } from '../../../context/EditorContext';
+import { TEMPLATES, DEFAULT_TEMPLATE } from '../../../constants/templateRegistry';
 import EditorPanel from '../EditorPanel/EditorPanel';
-import Navigation from '@iliestefa/wedding-soho/components/Navigation/Navigation';
-import Hero from '@iliestefa/wedding-soho/components/Hero/Hero';
-import Story from '@iliestefa/wedding-soho/components/Story/Story';
-import Countdown from '@iliestefa/wedding-soho/components/Countdown/Countdown';
-import Events from '@iliestefa/wedding-soho/components/Events/Events';
-import Schedule from '@iliestefa/wedding-soho/components/Schedule/Schedule';
-import DressCode from '@iliestefa/wedding-soho/components/DressCode/DressCode';
-import GiftRegistry from '@iliestefa/wedding-soho/components/GiftRegistry/GiftRegistry';
-import RsvpForm from '@iliestefa/wedding-soho/components/RsvpForm/RsvpForm';
-import Footer from '@iliestefa/wedding-soho/components/Footer/Footer';
 import './EditorLayout.scss';
 
 const SectionWrapper = ({ id, activeSection, children }) => (
@@ -29,7 +21,6 @@ SectionWrapper.propTypes = {
 };
 SectionWrapper.defaultProps = { activeSection: null };
 
-// Overlay shown over the preview after successful submission
 const SuccessOverlay = () => (
   <div className="editor-layout__success-overlay">
     <div className="editor-layout__success-card">
@@ -45,21 +36,28 @@ const SuccessOverlay = () => (
   </div>
 );
 
-const EditorLayout = () => {
-  const [showPreview, setShowPreview]   = useState(false);
+const EditorLayout = ({ templateSlug }) => {
+  const [showPreview, setShowPreview]     = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
-  const [submitted, setSubmitted]       = useState(false);
-  const [navScrolled, setNavScrolled]   = useState(false);
+  const [submitted, setSubmitted]         = useState(false);
+  const [navScrolled, setNavScrolled]     = useState(false);
   const previewRef = useRef(null);
   const canvasRef  = useRef(null);
 
-  // Sync canvas scroll position to nav appearance
-  // (nav listens to window.scroll which never fires inside our overflow-y div)
+  const { liveData } = useEditorContext();
+
+  const slug = TEMPLATES[templateSlug] ? templateSlug : DEFAULT_TEMPLATE;
+  const { TemplateProvider, components } = TEMPLATES[slug];
+  const {
+    Navigation, Hero, Story, Countdown,
+    Events, Schedule, DressCode, GiftRegistry, RsvpForm, Footer,
+  } = components;
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const update = () => setNavScrolled(canvas.scrollTop > 60);
-    update(); // read initial scrollTop on mount
+    update();
     canvas.addEventListener('scroll', update, { passive: true });
     return () => canvas.removeEventListener('scroll', update);
   }, []);
@@ -94,36 +92,40 @@ const EditorLayout = () => {
           className={`editor-layout__preview-canvas${navScrolled ? ' editor-layout__preview-canvas--scrolled' : ''}`}
         >
           {submitted && <SuccessOverlay />}
-          <div ref={previewRef} className="editor-layout__preview-inner">
-            <Navigation />
-            <SectionWrapper id="hero" activeSection={activeSection}>
-              <Hero />
-            </SectionWrapper>
-            <SectionWrapper id="historia" activeSection={activeSection}>
-              <Story />
-            </SectionWrapper>
-            <SectionWrapper id="countdown" activeSection={activeSection}>
-              <Countdown />
-            </SectionWrapper>
-            <SectionWrapper id="eventos" activeSection={activeSection}>
-              <Events />
-            </SectionWrapper>
-            <SectionWrapper id="cronograma" activeSection={activeSection}>
-              <Schedule />
-            </SectionWrapper>
-            <SectionWrapper id="vestimenta" activeSection={activeSection}>
-              <DressCode />
-            </SectionWrapper>
-            <SectionWrapper id="regalos" activeSection={activeSection}>
-              <GiftRegistry />
-            </SectionWrapper>
-            <SectionWrapper id="rsvp" activeSection={activeSection}>
-              <RsvpForm />
-            </SectionWrapper>
-            <SectionWrapper id="footer" activeSection={activeSection}>
-              <Footer />
-            </SectionWrapper>
-          </div>
+          <TemplateProvider data={liveData}>
+            <div ref={previewRef} className="editor-layout__preview-inner">
+              <Navigation />
+              <SectionWrapper id="hero" activeSection={activeSection}>
+                <Hero />
+              </SectionWrapper>
+              {Story && (
+                <SectionWrapper id="historia" activeSection={activeSection}>
+                  <Story />
+                </SectionWrapper>
+              )}
+              <SectionWrapper id="countdown" activeSection={activeSection}>
+                <Countdown />
+              </SectionWrapper>
+              <SectionWrapper id="eventos" activeSection={activeSection}>
+                <Events />
+              </SectionWrapper>
+              <SectionWrapper id="cronograma" activeSection={activeSection}>
+                <Schedule />
+              </SectionWrapper>
+              <SectionWrapper id="vestimenta" activeSection={activeSection}>
+                <DressCode />
+              </SectionWrapper>
+              <SectionWrapper id="regalos" activeSection={activeSection}>
+                <GiftRegistry />
+              </SectionWrapper>
+              <SectionWrapper id="rsvp" activeSection={activeSection}>
+                <RsvpForm />
+              </SectionWrapper>
+              <SectionWrapper id="footer" activeSection={activeSection}>
+                <Footer />
+              </SectionWrapper>
+            </div>
+          </TemplateProvider>
         </div>
       </main>
 
@@ -137,6 +139,13 @@ const EditorLayout = () => {
       </aside>
     </div>
   );
+};
+
+EditorLayout.propTypes = {
+  templateSlug: PropTypes.string,
+};
+EditorLayout.defaultProps = {
+  templateSlug: DEFAULT_TEMPLATE,
 };
 
 export default EditorLayout;

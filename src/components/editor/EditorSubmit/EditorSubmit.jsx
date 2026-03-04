@@ -10,6 +10,7 @@ const EditorSubmit = ({ onSuccess }) => {
   const { data } = useEditor();
   const [status, setStatus] = useState(SEND_STATUS.IDLE);
   const [errors, setErrors] = useState([]);
+  const [sendError, setSendError] = useState('');
 
   const validate = () => {
     const missing = [];
@@ -33,7 +34,9 @@ const EditorSubmit = ({ onSuccess }) => {
       await sendEditorData(data);
       setStatus(SEND_STATUS.SUCCESS);
       onSuccess?.();
-    } catch {
+    } catch (err) {
+      const msg = err?.text || err?.message || JSON.stringify(err) || 'Error desconocido';
+      setSendError(msg);
       setStatus(SEND_STATUS.ERROR);
     }
   };
@@ -69,7 +72,7 @@ const EditorSubmit = ({ onSuccess }) => {
 
       {status === SEND_STATUS.ERROR && (
         <p className="editor-submit__error-msg">
-          Ocurrió un error al enviar. Intenta de nuevo o contáctanos directamente.
+          Error: {sendError}
         </p>
       )}
     </div>

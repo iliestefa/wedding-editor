@@ -1,6 +1,5 @@
 import { createContext, useContext, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
-import { TemplateProvider } from '@iliestefa/wedding-soho/context';
 
 import {
   BRIDE_NAME, GROOM_NAME, COUPLE_NAMES,
@@ -157,9 +156,7 @@ export const EditorProvider = ({ children }) => {
       addDressCodeColor,
       removeDressCodeColor,
     }}>
-      <TemplateProvider data={liveData}>
-        {children}
-      </TemplateProvider>
+      {children}
     </EditorContext.Provider>
   );
 };
@@ -174,4 +171,5 @@ export const useEditor = () => {
   return ctx;
 };
 
+export const useEditorContext = useEditor;
 export const useWeddingData = () => useEditor().data;
