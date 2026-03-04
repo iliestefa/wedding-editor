@@ -117,11 +117,97 @@ $bar-border: rgba(141, 184, 154, 0.2);
   }
 }
 
+// ── Success overlay (shown over preview after submit) ──────────────
+.editor-layout__success-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(30, 42, 34, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  backdrop-filter: blur(6px);
+}
+
+.editor-layout__success-card {
+  background: #243029;
+  border: 1px solid rgba(141, 184, 154, 0.25);
+  border-radius: 12px;
+  padding: 3rem 2.5rem;
+  max-width: 480px;
+  text-align: center;
+  color: #d8ede1;
+}
+
+.editor-layout__success-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(141, 184, 154, 0.15);
+  border: 2px solid #8db89a;
+  font-size: 1.75rem;
+  color: #8db89a;
+  margin: 0 auto 1.5rem;
+}
+
+.editor-layout__success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: #d8ede1;
+  margin: 0 0 1rem;
+  letter-spacing: 0.02em;
+}
+
+.editor-layout__success-body {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: rgba(216, 237, 225, 0.8);
+  line-height: 1.7;
+  margin: 0 0 0.75rem;
+}
+
+.editor-layout__success-note {
+  font-size: 0.85rem;
+  color: rgba(216, 237, 225, 0.55);
+  line-height: 1.6;
+  margin: 0;
+
+  strong {
+    color: #8db89a;
+    font-weight: 600;
+  }
+}
+
 // ── Active section highlight ───────────────────────────────────────
 .is-active-section {
   outline: 2px solid rgba(141, 184, 154, 0.7);
   outline-offset: 0;
   border-radius: 2px;
+}
+
+// ── Story timeline line fix ────────────────────────────────────────
+// The ::before line is position:absolute on .story__timeline.
+// Force it visible and ensure no ancestor clips or hides it.
+.editor-layout__preview-canvas {
+  .story__timeline {
+    overflow: visible !important;
+
+    &::before {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      z-index: 0 !important;
+    }
+  }
+
+  .story-item__connector {
+    z-index: 1 !important;
+  }
 }
 
 // ── Reveal animations fix ─────────────────────────────────────────

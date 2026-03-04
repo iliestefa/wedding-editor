@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { useState } from 'react';
 import { useEditor } from '../../../context/EditorContext';
 import { sendEditorData } from '../../../services/editorService';
@@ -5,18 +6,18 @@ import './EditorSubmit.scss';
 
 const SEND_STATUS = { IDLE: 'idle', LOADING: 'loading', SUCCESS: 'success', ERROR: 'error' };
 
-const EditorSubmit = () => {
+const EditorSubmit = ({ onSuccess }) => {
   const { data } = useEditor();
   const [status, setStatus] = useState(SEND_STATUS.IDLE);
   const [errors, setErrors] = useState([]);
 
   const validate = () => {
     const missing = [];
-    if (!data.brideName.trim())            missing.push('Nombre de la novia');
-    if (!data.groomName.trim())            missing.push('Nombre del novio');
-    if (!data.weddingDateIso.trim())       missing.push('Fecha de la boda');
-    if (!data.ceremonyVenueName.trim())    missing.push('Lugar de la ceremonia');
-    if (!data.receptionVenueName.trim())   missing.push('Lugar de la recepción');
+    if (!data.brideName.trim())         missing.push('Nombre de la novia');
+    if (!data.groomName.trim())         missing.push('Nombre del novio');
+    if (!data.weddingDateIso.trim())    missing.push('Fecha de la boda');
+    if (!data.ceremonyVenueName.trim()) missing.push('Lugar de la ceremonia');
+    if (!data.receptionVenueName.trim()) missing.push('Lugar de la recepción');
     return missing;
   };
 
@@ -31,6 +32,7 @@ const EditorSubmit = () => {
     try {
       await sendEditorData(data);
       setStatus(SEND_STATUS.SUCCESS);
+      onSuccess?.();
     } catch {
       setStatus(SEND_STATUS.ERROR);
     }
@@ -42,7 +44,7 @@ const EditorSubmit = () => {
         <span className="editor-submit__icon" aria-hidden="true">✓</span>
         <p className="editor-submit__title">¡Datos enviados!</p>
         <p className="editor-submit__message">
-          Recibimos tu información. Recibirás tu web personalizada en 24–48 hs.
+          Tu web está en construcción. Mira el preview para más detalles.
         </p>
       </div>
     );
@@ -72,6 +74,14 @@ const EditorSubmit = () => {
       )}
     </div>
   );
+};
+
+EditorSubmit.propTypes = {
+  onSuccess: PropTypes.func,
+};
+
+EditorSubmit.defaultProps = {
+  onSuccess: null,
 };
 
 export default EditorSubmit;

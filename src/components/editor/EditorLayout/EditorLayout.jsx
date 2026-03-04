@@ -23,28 +23,41 @@ const SectionWrapper = ({ id, activeSection, children }) => (
 );
 
 SectionWrapper.propTypes = {
-  id: PropTypes.string.isRequired,
+  id:            PropTypes.string.isRequired,
   activeSection: PropTypes.string,
-  children: PropTypes.node.isRequired,
+  children:      PropTypes.node.isRequired,
 };
-
 SectionWrapper.defaultProps = { activeSection: null };
 
+// Overlay shown over the preview after successful submission
+const SuccessOverlay = () => (
+  <div className="editor-layout__success-overlay">
+    <div className="editor-layout__success-card">
+      <span className="editor-layout__success-icon" aria-hidden="true">✓</span>
+      <h2 className="editor-layout__success-title">¡Tu web está en construcción!</h2>
+      <p className="editor-layout__success-body">
+        Recibimos todos tus datos. Estamos preparando tu invitación personalizada.
+      </p>
+      <p className="editor-layout__success-note">
+        Te enviaremos un mail cuando esté lista — puede tomar de <strong>24 a 48 horas</strong>.
+      </p>
+    </div>
+  </div>
+);
+
 const EditorLayout = () => {
-  const [showPreview, setShowPreview] = useState(false);
-  const [activeSection, setActiveSection] = useState(null);
+  const [showPreview, setShowPreview]   = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [submitted, setSubmitted]       = useState(false);
   const previewRef = useRef(null);
 
   const scrollToSection = useCallback((sectionId) => {
     const el = previewRef.current?.querySelector(`[data-section="${sectionId}"]`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, []);
 
   const handleSectionChange = useCallback((sectionId) => {
     setActiveSection(sectionId);
-    // Only scroll — don't force preview open on mobile
     scrollToSection(sectionId);
   }, [scrollToSection]);
 
@@ -64,6 +77,7 @@ const EditorLayout = () => {
       {/* ── Preview (left on desktop) ── */}
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
         <div className="editor-layout__preview-canvas">
+          {submitted && <SuccessOverlay />}
           <div ref={previewRef} className="editor-layout__preview-inner">
             <SectionWrapper id="hero" activeSection={activeSection}>
               <Navigation />
@@ -100,6 +114,7 @@ const EditorLayout = () => {
         <EditorPanel
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
+          onSubmitSuccess={() => setSubmitted(true)}
         />
       </aside>
     </div>

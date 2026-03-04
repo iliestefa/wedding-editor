@@ -88,14 +88,14 @@ DatePicker.propTypes = {
 };
 
 // ── Main panel ──────────────────────────────────────────────────────────────
-const EditorPanel = ({ activeSection, onSectionChange }) => {
+const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
   const {
     data,
     setField,
     setStoryItem, addStoryItem, removeStoryItem,
     setScheduleItem, addScheduleItem, removeScheduleItem,
     setBankAccount,
-    setDressCodeColor,
+    setDressCodeColor, setDressCodeColorLabel, addDressCodeColor, removeDressCodeColor,
     setActiveField,
   } = useEditor();
 
@@ -151,17 +151,6 @@ const EditorPanel = ({ activeSection, onSectionChange }) => {
         {activeSection === 'historia' && (
           <div className="editor-panel__section">
             <EditorField label="Texto introductorio" fieldKey="storyIntro" multiline placeholder="Frase de bienvenida..." />
-
-            <p className="editor-panel__group-label">Foto de historia</p>
-            <EditorField label="URL de la imagen" fieldKey="imageStory" placeholder="https://..." />
-            {data.imageStory && (
-              <img
-                className="editor-panel__img-preview"
-                src={data.imageStory}
-                alt="Preview historia"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
-            )}
 
             <p className="editor-panel__group-label">Momentos</p>
             {data.storyItems.map((item, i) => (
@@ -304,23 +293,46 @@ const EditorPanel = ({ activeSection, onSectionChange }) => {
             <EditorField label="Indicaciones Damas"  fieldKey="dressCodeWomen"       multiline placeholder="Vestido de cóctel..." />
             <EditorField label="Indicaciones Caballeros" fieldKey="dressCodeMen"     multiline placeholder="Traje con corbata..." />
 
-            <p className="editor-panel__group-label">Paleta de colores</p>
+            <p className="editor-panel__group-label">
+              Paleta de colores
+              {data.dressCodePalette.length < 8 && (
+                <button className="editor-panel__group-add-btn" onClick={addDressCodeColor}>
+                  + Agregar
+                </button>
+              )}
+            </p>
             <div className="editor-panel__color-grid">
               {data.dressCodePalette.map((color, i) => (
                 <div key={color.id} className="editor-panel__color-item">
-                  <label
-                    className="editor-panel__color-swatch"
-                    style={{ background: color.hex }}
-                    title={color.label}
-                  >
-                    <input
-                      type="color"
-                      className="editor-panel__color-input"
-                      value={color.hex}
-                      onChange={(e) => setDressCodeColor(i, e.target.value)}
-                    />
-                  </label>
-                  <span className="editor-panel__color-label">{color.label}</span>
+                  <div className="editor-panel__color-swatch-wrap">
+                    <label
+                      className="editor-panel__color-swatch"
+                      style={{ background: color.hex }}
+                      title={color.label}
+                    >
+                      <input
+                        type="color"
+                        className="editor-panel__color-input"
+                        value={color.hex}
+                        onChange={(e) => setDressCodeColor(i, e.target.value)}
+                      />
+                    </label>
+                    {data.dressCodePalette.length > 1 && (
+                      <button
+                        className="editor-panel__color-remove-btn"
+                        onClick={() => removeDressCodeColor(i)}
+                        aria-label="Eliminar color"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    className="editor-panel__color-name-input"
+                    value={color.label}
+                    maxLength={12}
+                    onChange={(e) => setDressCodeColorLabel(i, e.target.value)}
+                  />
                 </div>
               ))}
             </div>
@@ -397,7 +409,7 @@ const EditorPanel = ({ activeSection, onSectionChange }) => {
         )}
       </div>
 
-      <EditorSubmit />
+      <EditorSubmit onSuccess={onSubmitSuccess} />
     </aside>
   );
 };
@@ -405,10 +417,12 @@ const EditorPanel = ({ activeSection, onSectionChange }) => {
 EditorPanel.propTypes = {
   activeSection:   PropTypes.string,
   onSectionChange: PropTypes.func.isRequired,
+  onSubmitSuccess: PropTypes.func,
 };
 
 EditorPanel.defaultProps = {
-  activeSection: null,
+  activeSection:   null,
+  onSubmitSuccess: null,
 };
 
 export default EditorPanel;

@@ -98,6 +98,21 @@ const editorReducer = (state, action) => {
       );
       return { ...state, dressCodePalette: updated };
     }
+    case 'ADD_DRESS_CODE_COLOR': {
+      if (state.dressCodePalette.length >= 8) return state;
+      const newColor = { id: `color-${Date.now()}`, label: 'Nuevo', hex: '#cccccc' };
+      return { ...state, dressCodePalette: [...state.dressCodePalette, newColor] };
+    }
+    case 'REMOVE_DRESS_CODE_COLOR': {
+      if (state.dressCodePalette.length <= 1) return state;
+      return { ...state, dressCodePalette: state.dressCodePalette.filter((_, i) => i !== action.index) };
+    }
+    case 'SET_DRESS_CODE_COLOR_LABEL': {
+      const updated = state.dressCodePalette.map((c, i) =>
+        i === action.index ? { ...c, label: action.label } : c
+      );
+      return { ...state, dressCodePalette: updated };
+    }
 
     default:
       return state;
@@ -117,6 +132,9 @@ export const EditorProvider = ({ children }) => {
   const removeScheduleItem = (index) => dispatch({ type: 'REMOVE_SCHEDULE_ITEM', index });
   const setBankAccount = (index, key, value) => dispatch({ type: 'SET_BANK_ACCOUNT', index, key, value });
   const setDressCodeColor = (index, hex) => dispatch({ type: 'SET_DRESS_CODE_COLOR', index, hex });
+  const setDressCodeColorLabel = (index, label) => dispatch({ type: 'SET_DRESS_CODE_COLOR_LABEL', index, label });
+  const addDressCodeColor = () => dispatch({ type: 'ADD_DRESS_CODE_COLOR' });
+  const removeDressCodeColor = (index) => dispatch({ type: 'REMOVE_DRESS_CODE_COLOR', index });
 
   const coupleNames = `${data.brideName} & ${data.groomName}`;
   const liveData = { ...data, coupleNames };
@@ -135,6 +153,9 @@ export const EditorProvider = ({ children }) => {
       removeScheduleItem,
       setBankAccount,
       setDressCodeColor,
+      setDressCodeColorLabel,
+      addDressCodeColor,
+      removeDressCodeColor,
     }}>
       <TemplateProvider data={liveData}>
         {children}
