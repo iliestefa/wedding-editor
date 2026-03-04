@@ -1,0 +1,58 @@
+.form-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  animation: fadeUp 0.4s $ease-out;
+  margin-top: 1.5rem;
+
+  &__icon {
+    font-size: 1rem;
+    line-height: 1.5;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+  }
+
+  &__message {
+    font-family: $font-body;
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.6;
+    margin: 0;
+    padding-top: 0.15rem;
+  }
+
+  &--success {
+    background-color: rgba(196, 152, 90, 0.08);
+    border-left: 2px solid $color-gold;
+
+    .form-status__icon {
+      background: $color-gold;
+      color: $color-white;
+    }
+
+    .form-status__message {
+      color: $color-text;
+    }
+  }
+
+  &--error {
+    background-color: rgba(193, 112, 71, 0.08);
+    border-left: 2px solid $color-terracotta;
+
+    .form-status__icon {
+      background: $color-terracotta;
+      color: $color-white;
+    }
+
+    .form-status__message {
+      color: $color-text;
+    }
+  }
+}

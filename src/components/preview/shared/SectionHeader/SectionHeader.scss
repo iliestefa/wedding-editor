@@ -1,0 +1,45 @@
+.section-header {
+  margin-bottom: 4rem;
+
+  &--centered {
+    text-align: center;
+  }
+
+  &__eyebrow {
+    @include eyebrow;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-family: $font-display;
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    font-weight: 400;
+    color: $color-text;
+    line-height: 1.2;
+    margin: 0 0 1.5rem;
+  }
+
+  &__rule {
+    @include gold-rule(56px);
+    display: block;
+  }
+
+  &--light {
+    .section-header__title {
+      color: $color-gold-pale;
+    }
+
+    .section-header__eyebrow {
+      color: $color-gold-light;
+    }
+
+    .section-header__rule {
+      background: $color-gold;
+    }
+  }
+
+  @include tablet {
+    margin-bottom: 3rem;
+  }
+}

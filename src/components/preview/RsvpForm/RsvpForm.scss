@@ -1,0 +1,41 @@
+.rsvp {
+  background-color: $color-bg;
+  @include section-padding;
+
+  &__inner {
+    @include section-inner;
+    max-width: 600px;
+  }
+
+  &__form {
+    @include reveal-ready;
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+  }
+
+  &__submit-row {
+    display: flex;
+    justify-content: center;
+    padding-top: 1rem;
+  }
+
+  &__submit {
+    @include btn-gold-solid;
+    min-width: 280px;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      &:hover {
+        background-color: $color-gold;
+        border-color: $color-gold;
+      }
+    }
+
+    @include mobile {
+      min-width: 100%;
+    }
+  }
+}

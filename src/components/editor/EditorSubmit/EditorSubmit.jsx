@@ -1,0 +1,77 @@
+import { useState } from 'react';
+import { useEditor } from '../../../context/EditorContext';
+import { sendEditorData } from '../../../services/editorService';
+import './EditorSubmit.scss';
+
+const SEND_STATUS = { IDLE: 'idle', LOADING: 'loading', SUCCESS: 'success', ERROR: 'error' };
+
+const EditorSubmit = () => {
+  const { data } = useEditor();
+  const [status, setStatus] = useState(SEND_STATUS.IDLE);
+  const [errors, setErrors] = useState([]);
+
+  const validate = () => {
+    const missing = [];
+    if (!data.brideName.trim())            missing.push('Nombre de la novia');
+    if (!data.groomName.trim())            missing.push('Nombre del novio');
+    if (!data.weddingDateIso.trim())       missing.push('Fecha de la boda');
+    if (!data.ceremonyVenueName.trim())    missing.push('Lugar de la ceremonia');
+    if (!data.receptionVenueName.trim())   missing.push('Lugar de la recepción');
+    return missing;
+  };
+
+  const handleSend = async () => {
+    const missing = validate();
+    if (missing.length > 0) {
+      setErrors(missing);
+      return;
+    }
+    setErrors([]);
+    setStatus(SEND_STATUS.LOADING);
+    try {
+      await sendEditorData(data);
+      setStatus(SEND_STATUS.SUCCESS);
+    } catch {
+      setStatus(SEND_STATUS.ERROR);
+    }
+  };
+
+  if (status === SEND_STATUS.SUCCESS) {
+    return (
+      <div className="editor-submit editor-submit--success">
+        <span className="editor-submit__icon" aria-hidden="true">✓</span>
+        <p className="editor-submit__title">¡Datos enviados!</p>
+        <p className="editor-submit__message">
+          Recibimos tu información. Recibirás tu web personalizada en 24–48 hs.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="editor-submit">
+      {errors.length > 0 && (
+        <ul className="editor-submit__errors">
+          <li className="editor-submit__errors-title">Completa estos campos obligatorios:</li>
+          {errors.map((e) => <li key={e}>— {e}</li>)}
+        </ul>
+      )}
+
+      <button
+        className="editor-submit__btn"
+        onClick={handleSend}
+        disabled={status === SEND_STATUS.LOADING}
+      >
+        {status === SEND_STATUS.LOADING ? 'Enviando...' : 'Enviar mis datos'}
+      </button>
+
+      {status === SEND_STATUS.ERROR && (
+        <p className="editor-submit__error-msg">
+          Ocurrió un error al enviar. Intenta de nuevo o contáctanos directamente.
+        </p>
+      )}
+    </div>
+  );
+};
+
+export default EditorSubmit;

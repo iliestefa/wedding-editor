@@ -1,0 +1,42 @@
+.palette-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+  justify-content: center;
+}
+
+.palette-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+
+  &__color {
+    display: block;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(30, 22, 16, 0.12), 0 0 0 1px $color-border;
+    transition: transform $dur-base $ease-out, box-shadow $dur-base $ease-out;
+
+    &:hover {
+      transform: scale(1.12);
+      box-shadow: 0 4px 16px rgba(30, 22, 16, 0.18), 0 0 0 2px $color-gold;
+    }
+
+    @include mobile {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  &__label {
+    font-family: $font-body;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: $color-text-muted;
+  }
+}

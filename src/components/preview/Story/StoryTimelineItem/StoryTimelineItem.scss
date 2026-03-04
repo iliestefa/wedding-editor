@@ -1,0 +1,91 @@
+.story-item {
+  @include reveal-ready;
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr;
+  gap: 0 2rem;
+  margin-bottom: 3.5rem;
+  align-items: start;
+
+  &__connector {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    padding-top: 0.25rem;
+  }
+
+  &__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: $color-gold;
+    border: 2px solid $color-bg;
+    box-shadow: 0 0 0 1px $color-gold;
+    flex-shrink: 0;
+    margin-top: 0.55rem; // aligns with the eyebrow year text baseline
+  }
+
+  &__line {
+    display: none;
+  }
+
+  &__card {
+    padding: 0.25rem 0 2rem;
+  }
+
+  &__year {
+    @include eyebrow;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  &__label {
+    font-family: $font-display;
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: $color-text;
+    margin: 0 0 0.75rem;
+  }
+
+  &__text {
+    font-family: $font-body;
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: $color-text-muted;
+    line-height: 1.75;
+    margin: 0;
+  }
+
+  // Left items: card on right side
+  &--left {
+    .story-item__connector { order: 1; }
+    .story-item__card       { order: 2; grid-column: 3; }
+  }
+
+  // Right items: card on left side
+  &--right {
+    .story-item__connector { order: 2; }
+    .story-item__card       { order: 1; grid-column: 1; text-align: right; }
+  }
+
+  @include tablet {
+    grid-template-columns: 20px 1fr;
+    gap: 0 1.5rem;
+
+    &__connector {
+      grid-column: 1;
+      order: 1 !important;
+    }
+
+    &--left,
+    &--right {
+      .story-item__card {
+        grid-column: 2;
+        order: 2 !important;
+        text-align: left;
+      }
+    }
+  }
+}

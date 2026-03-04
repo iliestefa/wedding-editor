@@ -1,0 +1,35 @@
+.scroll-indicator {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color $dur-base $ease-out;
+
+  &:hover {
+    color: $color-gold;
+  }
+
+  &__line {
+    display: block;
+    width: 1px;
+    height: 48px;
+    background: currentColor;
+    animation: scrollLineDrop 2s ease-in-out infinite;
+    transform-origin: top;
+  }
+
+  &__label {
+    font-family: $font-body;
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    animation: scrollDotBounce 2s ease-in-out infinite;
+  }
+}

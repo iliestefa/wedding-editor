@@ -1,0 +1,66 @@
+// ─── CSS Custom Properties (runtime) ────────────────────────────────────────
+:root {
+  --color-bg:          #faf5ef;
+  --color-bg-alt:      #f3ede4;
+  --color-bg-dark:     #2a221a;
+  --color-text:        #1e1610;
+  --color-text-muted:  #7a6f64;
+  --color-gold:        #c4985a;
+  --color-gold-light:  #ddb87a;
+  --color-gold-pale:   #f0e0c4;
+  --color-terracotta:  #c17047;
+  --color-border:      #e0d8cc;
+  --color-border-gold: #c4985a;
+
+  --font-display: 'Playfair Display', 'Georgia', serif;
+  --font-script:  'Cormorant Garamond', 'Palatino', serif;
+  --font-body:    'Lato', 'Helvetica Neue', Arial, sans-serif;
+
+  --max-width:   1140px;
+  --col-width:   700px;
+  --gutter:      2rem;
+  --section-v:   7rem;
+
+  --ease-out:      cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in-out:   cubic-bezier(0.4, 0.0, 0.2, 1);
+  --dur-fast:      0.2s;
+  --dur-base:      0.4s;
+  --dur-slow:      0.7s;
+}
+
+// ─── SCSS Variables (compile-time) ──────────────────────────────────────────
+$color-bg:          #faf5ef;
+$color-bg-alt:      #f3ede4;
+$color-bg-dark:     #2a221a;
+$color-text:        #1e1610;
+$color-text-muted:  #7a6f64;
+$color-gold:        #c4985a;
+$color-gold-light:  #ddb87a;
+$color-gold-pale:   #f0e0c4;
+$color-terracotta:  #c17047;
+$color-border:      #e0d8cc;
+$color-border-gold: #c4985a;
+$color-white:       #ffffff;
+
+$font-display: 'Playfair Display', 'Georgia', serif;
+$font-script:  'Cormorant Garamond', 'Palatino', serif;
+$font-body:    'Lato', 'Helvetica Neue', Arial, sans-serif;
+
+$max-width:   1140px;
+$col-width:   700px;
+$gutter:      2rem;
+$section-v:   7rem;
+
+$ease-out:    cubic-bezier(0.0, 0.0, 0.2, 1);
+$ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+$dur-fast:    0.2s;
+$dur-base:    0.4s;
+$dur-slow:    0.7s;
+
+$border-thin: 1px solid $color-border;
+$border-gold: 1px solid $color-gold;
+
+// Breakpoints
+$bp-mobile:  480px;
+$bp-tablet:  768px;
+$bp-desktop: 1024px;

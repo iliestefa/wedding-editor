@@ -1,0 +1,40 @@
+.countdown {
+  background-color: $color-bg-dark;
+  @include section-padding;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(196, 152, 90, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  &__inner {
+    @include reveal-ready;
+    @include section-inner;
+    text-align: center;
+    position: relative;
+  }
+
+  &__grid {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    @include mobile {
+      gap: 1rem;
+    }
+  }
+
+  &__expired {
+    font-family: $font-script;
+    font-style: italic;
+    font-size: 1.5rem;
+    color: $color-gold;
+    margin-top: 2rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+}

@@ -1,0 +1,33 @@
+.editor-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #faf5ef;
+
+  &__preview {
+    flex: 1;
+    overflow-y: auto;
+    height: 100vh;
+    position: relative;
+  }
+
+  &__preview-inner {
+    // The wedding template renders here at 70% scale for a bird's-eye view
+    transform-origin: top left;
+
+    @media (max-width: 900px) {
+      transform: none;
+    }
+  }
+}
+
+// Highlight system: when a field is active, the matching preview element glows
+[data-preview-field] {
+  transition: outline 0.2s, box-shadow 0.2s;
+}
+
+[data-preview-field].is-highlighted {
+  outline: 2px solid #c4985a;
+  outline-offset: 4px;
+  box-shadow: 0 0 12px rgba(196, 152, 90, 0.4);
+  border-radius: 2px;
+}

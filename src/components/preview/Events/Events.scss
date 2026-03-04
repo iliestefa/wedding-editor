@@ -1,0 +1,35 @@
+.events {
+  background-color: $color-bg-alt;
+  @include section-padding;
+
+  &__inner {
+    @include section-inner;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 0 4rem;
+    align-items: start;
+
+    @include tablet {
+      grid-template-columns: 1fr;
+      gap: 4rem 0;
+    }
+  }
+
+  &__col {
+    min-width: 0;
+  }
+
+  &__divider {
+    background: $color-border;
+    height: 100%;
+    min-height: 400px;
+    align-self: stretch;
+
+    @include tablet {
+      display: none;
+    }
+  }
+}

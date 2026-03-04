@@ -1,0 +1,134 @@
+// ─── Layout ──────────────────────────────────────────────────────────────────
+@mixin section-padding {
+  padding: $section-v $gutter;
+
+  @media (max-width: $bp-tablet) {
+    padding: 5rem $gutter;
+  }
+
+  @media (max-width: $bp-mobile) {
+    padding: 4rem 1.25rem;
+  }
+}
+
+@mixin section-inner {
+  max-width: $max-width;
+  margin: 0 auto;
+}
+
+@mixin text-column {
+  max-width: $col-width;
+  margin-inline: auto;
+}
+
+// ─── Typography ──────────────────────────────────────────────────────────────
+@mixin eyebrow {
+  font-family: $font-body;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: $color-gold;
+}
+
+@mixin eyebrow-script {
+  font-family: $font-script;
+  font-style: italic;
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: $color-gold;
+}
+
+// ─── Decorative ──────────────────────────────────────────────────────────────
+@mixin gold-rule($width: 48px) {
+  display: block;
+  width: $width;
+  height: 1px;
+  background: $color-gold;
+  margin: 1.25rem auto;
+}
+
+@mixin gold-border-bottom {
+  border-bottom: $border-gold;
+}
+
+// ─── Animations ──────────────────────────────────────────────────────────────
+@mixin reveal-ready {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity $dur-slow $ease-out, transform $dur-slow $ease-out;
+
+  &.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@mixin stagger-children($delay: 0.12s, $max: 8) {
+  @for $i from 1 through $max {
+    &:nth-child(#{$i}) {
+      transition-delay: #{($i - 1) * $delay};
+    }
+  }
+}
+
+// ─── Interactive ─────────────────────────────────────────────────────────────
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid $color-gold;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@mixin btn-base {
+  display: inline-block;
+  font-family: $font-body;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 1rem 2.5rem;
+  border: $border-gold;
+  cursor: pointer;
+  transition: background-color $dur-base $ease-out, color $dur-base $ease-out;
+  @include focus-ring;
+}
+
+@mixin btn-gold {
+  @include btn-base;
+  background-color: transparent;
+  color: $color-gold;
+
+  &:hover {
+    background-color: $color-gold;
+    color: $color-bg;
+  }
+}
+
+@mixin btn-gold-solid {
+  @include btn-base;
+  background-color: $color-gold;
+  color: $color-bg;
+  border-color: $color-gold;
+
+  &:hover {
+    background-color: $color-gold-light;
+    border-color: $color-gold-light;
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+@mixin mobile {
+  @media (max-width: $bp-mobile) { @content; }
+}
+
+@mixin tablet {
+  @media (max-width: $bp-tablet) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: $bp-desktop) { @content; }
+}
