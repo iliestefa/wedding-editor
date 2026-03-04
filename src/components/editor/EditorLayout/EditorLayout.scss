@@ -251,27 +251,37 @@ $bar-border: rgba(141, 184, 154, 0.2);
 // The wedding nav uses position:fixed and listens to window.scroll.
 // Inside the editor canvas (overflow-y: auto div), window never scrolls,
 // so nav--scrolled class is never applied and the nav stays transparent.
-// Fix: override to sticky, always show the scrolled (opaque) state.
+// Fix: override to sticky. Track canvas scroll in EditorLayout and toggle
+// --scrolled class on the canvas. Nav inherits appearance from that class.
 .editor-layout__preview-canvas {
   .nav {
     position: sticky !important;
     top: 0 !important;
     z-index: 10 !important;
-    // Always apply the scrolled appearance (background + text colors)
-    background-color: rgba(250, 245, 239, 0.95) !important;
-    backdrop-filter: blur(12px) !important;
-    box-shadow: 0 1px 0 rgba(196, 152, 90, 0.15) !important;
+    // Default: transparent (same as original over hero image)
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
 
-    .nav__link {
-      color: #2a221a !important;
-    }
+  // When canvas has scrolled past 60px, simulate nav--scrolled
+  &--scrolled {
+    .nav {
+      background-color: rgba(250, 245, 239, 0.95) !important;
+      backdrop-filter: blur(12px) !important;
+      box-shadow: 0 1px 0 rgba(196, 152, 90, 0.15) !important;
 
-    .nav__monogram-text {
-      color: #c4985a !important;
-    }
+      .nav__link {
+        color: #2a221a !important;
+      }
 
-    .nav__burger span {
-      background: #2a221a !important;
+      .nav__monogram-text {
+        color: #c4985a !important;
+      }
+
+      .nav__burger span {
+        background: #2a221a !important;
+      }
     }
   }
 }

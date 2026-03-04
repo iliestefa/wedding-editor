@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import EditorPanel from '../EditorPanel/EditorPanel';
 import Navigation from '@iliestefa/wedding-soho/components/Navigation/Navigation';
@@ -49,7 +49,19 @@ const EditorLayout = () => {
   const [showPreview, setShowPreview]   = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const [submitted, setSubmitted]       = useState(false);
+  const [navScrolled, setNavScrolled]   = useState(false);
   const previewRef = useRef(null);
+  const canvasRef  = useRef(null);
+
+  // Sync canvas scroll position to nav appearance
+  // (nav listens to window.scroll which never fires inside our overflow-y div)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const handleCanvasScroll = () => setNavScrolled(canvas.scrollTop > 60);
+    canvas.addEventListener('scroll', handleCanvasScroll, { passive: true });
+    return () => canvas.removeEventListener('scroll', handleCanvasScroll);
+  }, []);
 
   const scrollToSection = useCallback((sectionId) => {
     const el = previewRef.current?.querySelector(`[data-section="${sectionId}"]`);
@@ -76,7 +88,10 @@ const EditorLayout = () => {
 
       {/* ── Preview (left on desktop) ── */}
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
-        <div className="editor-layout__preview-canvas">
+        <div
+          ref={canvasRef}
+          className={`editor-layout__preview-canvas${navScrolled ? ' editor-layout__preview-canvas--scrolled' : ''}`}
+        >
           {submitted && <SuccessOverlay />}
           <div ref={previewRef} className="editor-layout__preview-inner">
             <SectionWrapper id="hero" activeSection={activeSection}>
