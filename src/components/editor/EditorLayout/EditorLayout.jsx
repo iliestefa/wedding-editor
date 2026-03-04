@@ -58,9 +58,10 @@ const EditorLayout = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const handleCanvasScroll = () => setNavScrolled(canvas.scrollTop > 60);
-    canvas.addEventListener('scroll', handleCanvasScroll, { passive: true });
-    return () => canvas.removeEventListener('scroll', handleCanvasScroll);
+    const update = () => setNavScrolled(canvas.scrollTop > 60);
+    update(); // read initial scrollTop on mount
+    canvas.addEventListener('scroll', update, { passive: true });
+    return () => canvas.removeEventListener('scroll', update);
   }, []);
 
   const scrollToSection = useCallback((sectionId) => {
@@ -94,8 +95,8 @@ const EditorLayout = () => {
         >
           {submitted && <SuccessOverlay />}
           <div ref={previewRef} className="editor-layout__preview-inner">
+            <Navigation />
             <SectionWrapper id="hero" activeSection={activeSection}>
-              <Navigation />
               <Hero />
             </SectionWrapper>
             <SectionWrapper id="historia" activeSection={activeSection}>

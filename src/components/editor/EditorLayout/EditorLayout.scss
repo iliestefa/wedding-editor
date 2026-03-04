@@ -251,8 +251,10 @@ $bar-border: rgba(141, 184, 154, 0.2);
 // The wedding nav uses position:fixed and listens to window.scroll.
 // Inside the editor canvas (overflow-y: auto div), window never scrolls,
 // so nav--scrolled class is never applied and the nav stays transparent.
-// Fix: override to sticky. Track canvas scroll in EditorLayout and toggle
-// --scrolled class on the canvas. Nav inherits appearance from that class.
+// Fix: override to sticky. Nav is pulled out of the hero SectionWrapper
+// so it doesn't push hero content down. Hero gets negative margin-top
+// equal to the nav height so it slides behind the sticky nav, matching
+// the original fixed-nav layout visually.
 .editor-layout__preview-canvas {
   .nav {
     position: sticky !important;
@@ -262,6 +264,11 @@ $bar-border: rgba(141, 184, 154, 0.2);
     background-color: transparent !important;
     backdrop-filter: none !important;
     box-shadow: none !important;
+  }
+
+  // Hero slides up behind the sticky nav (mirrors position:fixed behavior)
+  .hero {
+    margin-top: -72px !important;
   }
 
   // When canvas has scrolled past 60px, simulate nav--scrolled
