@@ -1,26 +1,187 @@
+$panel-width: 400px;
+$toolbar-height: 48px;
+$mobile-bar-height: 48px;
+
 .editor-layout {
   display: flex;
+  flex-direction: row;
   min-height: 100vh;
-  background: #faf5ef;
+  background: #f0ebe4;
 
+  // ── Mobile top bar ──────────────────────────────────────────────
+  &__mobile-bar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    height: $mobile-bar-height;
+    background: #2c2318;
+    padding: 0 1rem;
+    align-items: center;
+    justify-content: flex-end;
+    border-bottom: 1px solid rgba(196, 152, 90, 0.25);
+
+    @media (max-width: 900px) {
+      display: flex;
+    }
+  }
+
+  &__mobile-toggle {
+    background: rgba(196, 152, 90, 0.15);
+    border: 1px solid rgba(196, 152, 90, 0.4);
+    border-radius: 6px;
+    color: #c4985a;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+    letter-spacing: 0.05em;
+    padding: 0.4rem 1rem;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: rgba(196, 152, 90, 0.25);
+    }
+  }
+
+  // ── Preview (left column on desktop) ────────────────────────────
   &__preview {
     flex: 1;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
     height: 100vh;
+    overflow: hidden;
+    order: 1;
+
+    @media (max-width: 900px) {
+      position: fixed;
+      inset: $mobile-bar-height 0 0 0;
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      height: auto;
+
+      &--visible {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  &__preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: $toolbar-height;
+    background: #2c2318;
+    border-bottom: 1px solid rgba(196, 152, 90, 0.2);
+    flex-shrink: 0;
+
+    @media (max-width: 900px) {
+      display: none;
+    }
+  }
+
+  &__preview-canvas {
+    flex: 1;
+    overflow-y: auto;
     position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(196, 152, 90, 0.3) transparent;
+
+    // Fix for Navigation position:fixed — contain it inside preview
+    isolation: isolate;
+
+    &::-webkit-scrollbar { width: 5px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(196, 152, 90, 0.3);
+      border-radius: 3px;
+    }
   }
 
   &__preview-inner {
-    // The wedding template renders here at 70% scale for a bird's-eye view
-    transform-origin: top left;
+    transition: width 0.3s ease;
+  }
+
+  // ── Editor panel (right column on desktop) ───────────────────────
+  &__panel {
+    width: $panel-width;
+    min-width: $panel-width;
+    order: 2;
+    height: 100vh;
+    overflow: hidden;
 
     @media (max-width: 900px) {
-      transform: none;
+      width: 100%;
+      min-width: 0;
+      position: fixed;
+      inset: $mobile-bar-height 0 0 0;
+      z-index: 100;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      height: auto;
+
+      &--visible {
+        transform: translateX(0);
+      }
     }
   }
 }
 
-// Highlight system: when a field is active, the matching preview element glows
+// ── Viewport switcher ──────────────────────────────────────────────
+.editor-layout__viewport-switcher {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.editor-layout__viewport-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: rgba(232, 221, 208, 0.5);
+  cursor: pointer;
+  font-size: 1rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+
+  &:hover {
+    color: rgba(232, 221, 208, 0.85);
+    border-color: rgba(196, 152, 90, 0.3);
+  }
+
+  &--active {
+    background: rgba(196, 152, 90, 0.15);
+    border-color: rgba(196, 152, 90, 0.5);
+    color: #c4985a;
+  }
+}
+
+// ── Active section highlight ───────────────────────────────────────
+.is-active-section {
+  outline: 2px solid rgba(196, 152, 90, 0.6);
+  outline-offset: 0;
+  border-radius: 2px;
+}
+
+// ── Story timeline line fix ────────────────────────────────────────
+// The ::before pseudo uses position:absolute — ensure it's not clipped
+.editor-layout__preview-canvas {
+  .story__timeline {
+    overflow: visible;
+  }
+
+  .story__inner {
+    overflow: visible;
+  }
+}
+
+// ── Field highlight (when input is focused in editor) ─────────────
 [data-preview-field] {
   transition: outline 0.2s, box-shadow 0.2s;
 }
@@ -30,4 +191,27 @@
   outline-offset: 4px;
   box-shadow: 0 0 12px rgba(196, 152, 90, 0.4);
   border-radius: 2px;
+}
+
+// ── Navigation fix ────────────────────────────────────────────────
+// The wedding nav uses position:fixed relative to viewport.
+// Force it to sticky so it sticks inside the scrollable canvas.
+.editor-layout__preview-canvas {
+  .nav {
+    position: sticky !important;
+    top: 0 !important;
+    // Always show the solid background (transparent by default until scrolled)
+    background-color: rgba(250, 245, 239, 0.95) !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 1px 0 rgba(196, 152, 90, 0.15) !important;
+
+    // Nav links are white by default (for hero photo overlay) — make them dark
+    .nav__link {
+      color: #2a221a !important;
+    }
+
+    .nav__burger span {
+      background: #2a221a !important;
+    }
+  }
 }

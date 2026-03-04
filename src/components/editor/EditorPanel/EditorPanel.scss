@@ -1,87 +1,92 @@
+// Editor panel — slate blue-grey palette
+$ep-bg:          #1e2433;
+$ep-bg-alt:      #252c3e;
+$ep-border:      rgba(148, 174, 214, 0.12);
+$ep-accent:      #94aed6;
+$ep-accent-glow: rgba(148, 174, 214, 0.2);
+$ep-text:        #dce5f0;
+$ep-text-muted:  rgba(220, 229, 240, 0.5);
+
 .editor-panel {
   display: flex;
   flex-direction: column;
-  width: 380px;
-  min-width: 380px;
-  height: 100vh;
-  background: #1a1410;
-  color: #e8ddd0;
+  width: 100%;
+  height: 100%;
+  background: $ep-bg;
+  color: $ep-text;
   overflow: hidden;
-  position: sticky;
-  top: 0;
 
   &__header {
-    padding: 1.5rem 1.5rem 1rem;
-    border-bottom: 1px solid rgba(196, 152, 90, 0.2);
+    padding: 1.25rem 1.5rem 1rem;
+    border-bottom: 1px solid $ep-border;
     flex-shrink: 0;
+    background: #1a1f2e;
   }
 
-  &__monogram {
+  &__logo {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 300;
-    letter-spacing: 0.15em;
-    color: #c4985a;
+    letter-spacing: 0.2em;
+    color: $ep-accent;
     text-transform: uppercase;
   }
 
   &__subtitle {
-    font-size: 0.75rem;
-    color: rgba(232, 221, 208, 0.6);
-    margin-top: 0.25rem;
+    font-size: 0.72rem;
+    color: $ep-text-muted;
+    margin-top: 0.2rem;
     letter-spacing: 0.03em;
   }
 
+  // ── Section tabs ──────────────────────────────────────────────────
   &__tabs {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem;
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid rgba(196, 152, 90, 0.15);
+    gap: 0.2rem;
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid $ep-border;
     flex-shrink: 0;
+    background: $ep-bg-alt;
   }
 
   &__tab {
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 4px;
-    color: rgba(232, 221, 208, 0.55);
+    border-radius: 5px;
+    color: $ep-text-muted;
     cursor: pointer;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    padding: 0.3rem 0.65rem;
+    font-size: 0.68rem;
+    font-family: inherit;
+    letter-spacing: 0.07em;
+    padding: 0.28rem 0.6rem;
     text-transform: uppercase;
-    transition: color 0.2s, border-color 0.2s, background 0.2s;
+    transition: color 0.18s, border-color 0.18s, background 0.18s;
 
     &:hover {
-      color: #e8ddd0;
-      border-color: rgba(196, 152, 90, 0.3);
+      color: $ep-text;
+      border-color: rgba(148, 174, 214, 0.3);
     }
 
     &--active {
-      background: rgba(196, 152, 90, 0.15);
-      border-color: rgba(196, 152, 90, 0.5);
-      color: #c4985a;
+      background: $ep-accent-glow;
+      border-color: rgba(148, 174, 214, 0.45);
+      color: $ep-accent;
     }
   }
 
+  // ── Body (scrollable) ─────────────────────────────────────────────
   &__body {
     flex: 1;
     overflow-y: auto;
-    padding: 1.25rem 1.5rem 1.5rem;
+    padding: 1.25rem 1.25rem 1.5rem;
     scrollbar-width: thin;
-    scrollbar-color: rgba(196, 152, 90, 0.3) transparent;
+    scrollbar-color: rgba(148, 174, 214, 0.25) transparent;
 
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-track { background: transparent; }
     &::-webkit-scrollbar-thumb {
-      background: rgba(196, 152, 90, 0.3);
+      background: rgba(148, 174, 214, 0.25);
       border-radius: 2px;
     }
   }
@@ -89,132 +94,129 @@
   &__section {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
-  &__section-label {
-    font-size: 0.68rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
+  &__group-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #c4985a;
-    margin: 1rem 0 0.4rem;
+    color: $ep-accent;
+    margin: 1rem 0 0.35rem;
 
     &:first-child {
       margin-top: 0;
     }
   }
 
-  // Story items
-  &__story-item {
+  // ── Cards (story items, schedule items, bank accounts) ────────────
+  &__card {
     padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 6px;
-    border: 1px solid rgba(196, 152, 90, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 7px;
+    border: 1px solid $ep-border;
     margin-bottom: 0.5rem;
   }
 
-  // Schedule items
-  &__schedule-item {
-    padding: 0.6rem 0.75rem;
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 6px;
-    border: 1px solid rgba(196, 152, 90, 0.1);
-    margin-bottom: 0.4rem;
+  &__card-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $ep-accent;
+    margin-bottom: 0.6rem;
   }
 
-  // Bank items
-  &__bank-item {
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 6px;
-    border: 1px solid rgba(196, 152, 90, 0.1);
-    margin-bottom: 0.5rem;
-  }
-
+  // ── Bank account row ──────────────────────────────────────────────
   &__bank-row {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
+    &:last-child { margin-bottom: 0; }
   }
 
-  // Row / col layout for inline fields
+  // ── Row / col layout for inline fields ───────────────────────────
   &__row {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
 
-  &__col-sm {
-    flex: 0 0 80px;
-  }
+  &__col-sm { flex: 0 0 72px; }
+  &__col-lg { flex: 1; }
 
-  &__col-lg {
-    flex: 1;
-  }
-
-  // Inline labels + inputs (for story/schedule/bank)
+  // ── Inline labels + inputs ────────────────────────────────────────
   &__inline-label {
     display: block;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(232, 221, 208, 0.5);
-    margin-bottom: 0.25rem;
+    color: $ep-text-muted;
+    margin-bottom: 0.22rem;
     white-space: nowrap;
   }
 
   &__inline-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(196, 152, 90, 0.2);
-    border-radius: 4px;
-    color: #e8ddd0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(148, 174, 214, 0.18);
+    border-radius: 5px;
+    color: $ep-text;
     font-size: 0.82rem;
-    padding: 0.35rem 0.5rem;
-    transition: border-color 0.2s;
+    font-family: inherit;
+    padding: 0.32rem 0.5rem;
+    transition: border-color 0.18s, background 0.18s;
     box-sizing: border-box;
 
-    &::placeholder {
-      color: rgba(232, 221, 208, 0.25);
-    }
+    &::placeholder { color: rgba(220, 229, 240, 0.2); }
 
     &:focus {
       outline: none;
-      border-color: #c4985a;
-      background: rgba(196, 152, 90, 0.08);
+      border-color: $ep-accent;
+      background: $ep-accent-glow;
     }
   }
 
   &__inline-textarea {
     width: 100%;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(196, 152, 90, 0.2);
-    border-radius: 4px;
-    color: #e8ddd0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(148, 174, 214, 0.18);
+    border-radius: 5px;
+    color: $ep-text;
     font-size: 0.82rem;
+    font-family: inherit;
+    line-height: 1.55;
     padding: 0.35rem 0.5rem;
     resize: vertical;
-    font-family: inherit;
-    line-height: 1.5;
-    transition: border-color 0.2s;
+    transition: border-color 0.18s, background 0.18s;
     box-sizing: border-box;
-    margin-top: 0.4rem;
+    margin-top: 0.3rem;
 
-    &::placeholder {
-      color: rgba(232, 221, 208, 0.25);
-    }
+    &::placeholder { color: rgba(220, 229, 240, 0.2); }
 
     &:focus {
       outline: none;
-      border-color: #c4985a;
-      background: rgba(196, 152, 90, 0.08);
+      border-color: $ep-accent;
+      background: $ep-accent-glow;
+    }
+  }
+
+  // ── Empty state ───────────────────────────────────────────────────
+  &__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    text-align: center;
+
+    p {
+      font-size: 0.82rem;
+      color: $ep-text-muted;
+      line-height: 1.6;
     }
   }
 }

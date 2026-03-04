@@ -1,80 +1,72 @@
-import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useEditor } from '../../../context/EditorContext';
 import EditorField from '../EditorField/EditorField';
 import EditorSubmit from '../EditorSubmit/EditorSubmit';
 import './EditorPanel.scss';
 
-const TABS = [
-  { id: 'pareja',    label: 'Pareja' },
-  { id: 'fecha',     label: 'Fecha & Lugar' },
-  { id: 'historia',  label: 'Historia' },
-  { id: 'programa',  label: 'Programa' },
-  { id: 'vestimenta',label: 'Vestimenta' },
-  { id: 'extras',    label: 'Extras' },
+const SECTIONS = [
+  { id: 'hero',       label: 'Portada' },
+  { id: 'historia',   label: 'Historia' },
+  { id: 'eventos',    label: 'Eventos' },
+  { id: 'cronograma', label: 'Cronograma' },
+  { id: 'vestimenta', label: 'Vestimenta' },
+  { id: 'regalos',    label: 'Regalos' },
+  { id: 'rsvp',       label: 'RSVP' },
+  { id: 'footer',     label: 'Footer' },
 ];
 
-const EditorPanel = () => {
-  const [activeTab, setActiveTab] = useState('pareja');
+const EditorPanel = ({ activeSection, onSectionChange }) => {
   const { data, setStoryItem, setScheduleItem, setBankAccount, setActiveField } = useEditor();
 
   return (
     <aside className="editor-panel">
       <header className="editor-panel__header">
-        <div className="editor-panel__monogram" aria-hidden="true">Editor</div>
+        <div className="editor-panel__logo">Editor</div>
         <p className="editor-panel__subtitle">Personaliza tu invitación en tiempo real</p>
       </header>
 
-      <nav className="editor-panel__tabs" aria-label="Secciones del editor">
-        {TABS.map((tab) => (
+      <nav className="editor-panel__tabs" aria-label="Secciones">
+        {SECTIONS.map((sec) => (
           <button
-            key={tab.id}
-            className={`editor-panel__tab ${activeTab === tab.id ? 'editor-panel__tab--active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
+            key={sec.id}
+            className={`editor-panel__tab ${activeSection === sec.id ? 'editor-panel__tab--active' : ''}`}
+            onClick={() => onSectionChange(sec.id)}
           >
-            {tab.label}
+            {sec.label}
           </button>
         ))}
       </nav>
 
       <div className="editor-panel__body">
 
-        {/* ── Pareja ── */}
-        {activeTab === 'pareja' && (
+        {/* ── Portada / Hero ── */}
+        {activeSection === 'hero' && (
           <div className="editor-panel__section">
-            <EditorField label="Nombre de la novia"  fieldKey="brideName"  placeholder="Ej: Sofia" />
-            <EditorField label="Nombre del novio"    fieldKey="groomName"  placeholder="Ej: Alejandro" />
-            <EditorField label="Mensaje de la historia" fieldKey="storyIntro" multiline placeholder="Frase de bienvenida..." />
-            <EditorField label="Mensaje del footer"  fieldKey="footerMessage" multiline placeholder="Frase final..." />
-          </div>
-        )}
+            <p className="editor-panel__group-label">Nombres</p>
+            <EditorField label="Nombre de la novia" fieldKey="brideName" placeholder="Ej: Sofia" />
+            <EditorField label="Nombre del novio"   fieldKey="groomName" placeholder="Ej: Alejandro" />
 
-        {/* ── Fecha & Lugar ── */}
-        {activeTab === 'fecha' && (
-          <div className="editor-panel__section">
-            <p className="editor-panel__section-label">Fecha</p>
+            <p className="editor-panel__group-label">Fecha</p>
             <EditorField label="Fecha (ISO)"     fieldKey="weddingDateIso"     placeholder="2026-09-05" />
             <EditorField label="Fecha (display)" fieldKey="weddingDateDisplay" placeholder="05 · 09 · 2026" />
 
-            <p className="editor-panel__section-label">Ceremonia</p>
-            <EditorField label="Hora"      fieldKey="ceremonyTime"          placeholder="17:00 hrs" />
-            <EditorField label="Lugar"     fieldKey="ceremonyVenueName"     placeholder="Nombre de la iglesia" />
-            <EditorField label="Dirección" fieldKey="ceremonyVenueAddress"  placeholder="Calle, ciudad" />
-            <EditorField label="Link Google Maps" fieldKey="ceremonyMapsLink" placeholder="https://maps.google.com/..." />
-
-            <p className="editor-panel__section-label">Recepción</p>
-            <EditorField label="Hora"      fieldKey="receptionTime"         placeholder="20:00 hrs" />
-            <EditorField label="Lugar"     fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
-            <EditorField label="Dirección" fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
-            <EditorField label="Link Google Maps" fieldKey="receptionMapsLink" placeholder="https://maps.google.com/..." />
+            <p className="editor-panel__group-label">Foto de portada</p>
+            <EditorField label="URL de la foto"  fieldKey="imageHero"  placeholder="https://..." />
           </div>
         )}
 
-        {/* ── Historia ── */}
-        {activeTab === 'historia' && (
+        {/* ── Nuestra Historia ── */}
+        {activeSection === 'historia' && (
           <div className="editor-panel__section">
+            <EditorField label="Texto introductorio" fieldKey="storyIntro" multiline placeholder="Frase de bienvenida..." />
+
+            <p className="editor-panel__group-label">Foto de historia</p>
+            <EditorField label="URL de la foto" fieldKey="imageStory" placeholder="https://..." />
+
+            <p className="editor-panel__group-label">Momentos</p>
             {data.storyItems.map((item, i) => (
-              <div key={item.id} className="editor-panel__story-item">
-                <p className="editor-panel__section-label">Momento {i + 1}</p>
+              <div key={item.id} className="editor-panel__card">
+                <p className="editor-panel__card-title">Momento {i + 1}</p>
                 <div className="editor-panel__row">
                   <div className="editor-panel__col-sm">
                     <label className="editor-panel__inline-label">Año</label>
@@ -113,11 +105,28 @@ const EditorPanel = () => {
           </div>
         )}
 
-        {/* ── Programa ── */}
-        {activeTab === 'programa' && (
+        {/* ── Eventos (Ceremonia & Recepción) ── */}
+        {activeSection === 'eventos' && (
+          <div className="editor-panel__section">
+            <p className="editor-panel__group-label">Ceremonia</p>
+            <EditorField label="Hora"             fieldKey="ceremonyTime"          placeholder="17:00 hrs" />
+            <EditorField label="Lugar"            fieldKey="ceremonyVenueName"     placeholder="Nombre de la iglesia" />
+            <EditorField label="Dirección"        fieldKey="ceremonyVenueAddress"  placeholder="Calle, ciudad" />
+            <EditorField label="Link Google Maps" fieldKey="ceremonyMapsLink"      placeholder="https://maps.google.com/..." />
+
+            <p className="editor-panel__group-label">Recepción</p>
+            <EditorField label="Hora"             fieldKey="receptionTime"         placeholder="20:00 hrs" />
+            <EditorField label="Lugar"            fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
+            <EditorField label="Dirección"        fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
+            <EditorField label="Link Google Maps" fieldKey="receptionMapsLink"     placeholder="https://maps.google.com/..." />
+          </div>
+        )}
+
+        {/* ── Cronograma ── */}
+        {activeSection === 'cronograma' && (
           <div className="editor-panel__section">
             {data.scheduleItems.map((item, i) => (
-              <div key={item.id} className="editor-panel__schedule-item">
+              <div key={item.id} className="editor-panel__card">
                 <div className="editor-panel__row">
                   <div className="editor-panel__col-sm">
                     <label className="editor-panel__inline-label">Hora</label>
@@ -158,20 +167,27 @@ const EditorPanel = () => {
           </div>
         )}
 
-        {/* ── Vestimenta & Regalos ── */}
-        {activeTab === 'vestimenta' && (
+        {/* ── Vestimenta / Dress Code ── */}
+        {activeSection === 'vestimenta' && (
           <div className="editor-panel__section">
-            <p className="editor-panel__section-label">Código de Vestimenta</p>
-            <EditorField label="Estilo"               fieldKey="dressCodeStyle"       placeholder="Cocktail Elegante" />
-            <EditorField label="Descripción"          fieldKey="dressCodeDescription" multiline placeholder="Descripción general..." />
-            <EditorField label="Indicaciones Damas"   fieldKey="dressCodeWomen"       multiline placeholder="Vestido de cóctel..." />
-            <EditorField label="Indicaciones Caballeros" fieldKey="dressCodeMen"      multiline placeholder="Traje con corbata..." />
+            <EditorField label="Estilo"              fieldKey="dressCodeStyle"       placeholder="Cocktail Elegante" />
+            <EditorField label="Descripción"         fieldKey="dressCodeDescription" multiline placeholder="Descripción general..." />
+            <EditorField label="Indicaciones Damas"  fieldKey="dressCodeWomen"       multiline placeholder="Vestido de cóctel..." />
+            <EditorField label="Indicaciones Caballeros" fieldKey="dressCodeMen"     multiline placeholder="Traje con corbata..." />
 
-            <p className="editor-panel__section-label">Cuentas para Regalo</p>
+            <p className="editor-panel__group-label">Foto de vestimenta</p>
+            <EditorField label="URL de la foto" fieldKey="imageDressCode" placeholder="https://..." />
+          </div>
+        )}
+
+        {/* ── Regalos / Gift Registry ── */}
+        {activeSection === 'regalos' && (
+          <div className="editor-panel__section">
             <EditorField label="Texto introductorio" fieldKey="giftRegistryIntro" multiline />
+
             {data.bankAccounts.map((acc, i) => (
-              <div key={acc.id} className="editor-panel__bank-item">
-                <p className="editor-panel__section-label">Cuenta {i + 1}</p>
+              <div key={acc.id} className="editor-panel__card">
+                <p className="editor-panel__card-title">Cuenta {i + 1}</p>
                 {[
                   ['Banco',    'bankName'],
                   ['Titular',  'ownerName'],
@@ -195,10 +211,24 @@ const EditorPanel = () => {
           </div>
         )}
 
-        {/* ── Extras ── */}
-        {activeTab === 'extras' && (
+        {/* ── RSVP ── */}
+        {activeSection === 'rsvp' && (
           <div className="editor-panel__section">
             <EditorField label="Fecha límite RSVP" fieldKey="rsvpDeadline" placeholder="01 de Julio 2026" />
+          </div>
+        )}
+
+        {/* ── Footer ── */}
+        {activeSection === 'footer' && (
+          <div className="editor-panel__section">
+            <EditorField label="Mensaje del footer" fieldKey="footerMessage" multiline placeholder="Frase final..." />
+          </div>
+        )}
+
+        {/* ── Empty state ── */}
+        {!activeSection && (
+          <div className="editor-panel__empty">
+            <p>Selecciona una sección para empezar a editar</p>
           </div>
         )}
       </div>
@@ -206,6 +236,15 @@ const EditorPanel = () => {
       <EditorSubmit />
     </aside>
   );
+};
+
+EditorPanel.propTypes = {
+  activeSection: PropTypes.string,
+  onSectionChange: PropTypes.func.isRequired,
+};
+
+EditorPanel.defaultProps = {
+  activeSection: null,
 };
 
 export default EditorPanel;
