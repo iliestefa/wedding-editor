@@ -1,0 +1,12 @@
+export { default as Navigation } from '@iliestefa/wedding-soho/components/Navigation/Navigation';
+export { default as Hero } from '@iliestefa/wedding-soho/components/Hero/Hero';
+export { default as Story } from '@iliestefa/wedding-soho/components/Story/Story';
+export { default as Countdown } from '@iliestefa/wedding-soho/components/Countdown/Countdown';
+export { default as Events } from '@iliestefa/wedding-soho/components/Events/Events';
+export { default as Schedule } from '@iliestefa/wedding-soho/components/Schedule/Schedule';
+export { default as DressCode } from '@iliestefa/wedding-soho/components/DressCode/DressCode';
+export { default as GiftRegistry } from '@iliestefa/wedding-soho/components/GiftRegistry/GiftRegistry';
+export { default as RsvpForm } from '@iliestefa/wedding-soho/components/RsvpForm/RsvpForm';
+export { default as Footer } from '@iliestefa/wedding-soho/components/Footer/Footer';
+export { TemplateProvider } from '@iliestefa/wedding-soho/context';
+export const hasStory = true;

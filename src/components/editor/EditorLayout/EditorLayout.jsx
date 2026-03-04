@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useEditorContext } from '../../../context/EditorContext';
+import { useEditor } from '../../../context/EditorContext';
 import { TEMPLATES, DEFAULT_TEMPLATE } from '../../../constants/templateRegistry';
 import EditorPanel from '../EditorPanel/EditorPanel';
 import './EditorLayout.scss';
@@ -36,22 +36,76 @@ const SuccessOverlay = () => (
   </div>
 );
 
-const EditorLayout = ({ templateSlug }) => {
-  const [showPreview, setShowPreview]     = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
-  const [submitted, setSubmitted]         = useState(false);
-  const [navScrolled, setNavScrolled]     = useState(false);
-  const previewRef = useRef(null);
-  const canvasRef  = useRef(null);
-
-  const { liveData } = useEditorContext();
-
-  const slug = TEMPLATES[templateSlug] ? templateSlug : DEFAULT_TEMPLATE;
-  const { TemplateProvider, components } = TEMPLATES[slug];
+// Renders the preview once the template module is loaded
+const TemplatePreview = ({ templateModule, activeSection, previewRef }) => {
   const {
     Navigation, Hero, Story, Countdown,
     Events, Schedule, DressCode, GiftRegistry, RsvpForm, Footer,
-  } = components;
+    TemplateProvider,
+  } = templateModule;
+
+  const { data } = useEditor();
+
+  return (
+    <TemplateProvider data={data}>
+      <div ref={previewRef} className="editor-layout__preview-inner">
+        <Navigation />
+        <SectionWrapper id="hero" activeSection={activeSection}>
+          <Hero />
+        </SectionWrapper>
+        {Story && (
+          <SectionWrapper id="historia" activeSection={activeSection}>
+            <Story />
+          </SectionWrapper>
+        )}
+        <SectionWrapper id="countdown" activeSection={activeSection}>
+          <Countdown />
+        </SectionWrapper>
+        <SectionWrapper id="eventos" activeSection={activeSection}>
+          <Events />
+        </SectionWrapper>
+        <SectionWrapper id="cronograma" activeSection={activeSection}>
+          <Schedule />
+        </SectionWrapper>
+        <SectionWrapper id="vestimenta" activeSection={activeSection}>
+          <DressCode />
+        </SectionWrapper>
+        <SectionWrapper id="regalos" activeSection={activeSection}>
+          <GiftRegistry />
+        </SectionWrapper>
+        <SectionWrapper id="rsvp" activeSection={activeSection}>
+          <RsvpForm />
+        </SectionWrapper>
+        <SectionWrapper id="footer" activeSection={activeSection}>
+          <Footer />
+        </SectionWrapper>
+      </div>
+    </TemplateProvider>
+  );
+};
+
+TemplatePreview.propTypes = {
+  templateModule: PropTypes.object.isRequired,
+  activeSection:  PropTypes.string,
+  previewRef:     PropTypes.object.isRequired,
+};
+TemplatePreview.defaultProps = { activeSection: null };
+
+const EditorLayout = ({ templateSlug }) => {
+  const [showPreview, setShowPreview]       = useState(false);
+  const [activeSection, setActiveSection]   = useState('hero');
+  const [submitted, setSubmitted]           = useState(false);
+  const [navScrolled, setNavScrolled]       = useState(false);
+  const [templateModule, setTemplateModule] = useState(null);
+  const previewRef = useRef(null);
+  const canvasRef  = useRef(null);
+
+  const slug = TEMPLATES[templateSlug] ? templateSlug : DEFAULT_TEMPLATE;
+
+  // Load template module once on mount
+  useEffect(() => {
+    TEMPLATES[slug].load().then(setTemplateModule);
+  }, [slug]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -75,7 +129,6 @@ const EditorLayout = ({ templateSlug }) => {
   return (
     <div className="editor-layout">
 
-      {/* ── Mobile top bar ── */}
       <div className="editor-layout__mobile-bar">
         <button
           className="editor-layout__mobile-toggle"
@@ -85,51 +138,24 @@ const EditorLayout = ({ templateSlug }) => {
         </button>
       </div>
 
-      {/* ── Preview (left on desktop) ── */}
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
         <div
           ref={canvasRef}
           className={`editor-layout__preview-canvas${navScrolled ? ' editor-layout__preview-canvas--scrolled' : ''}`}
         >
           {submitted && <SuccessOverlay />}
-          <TemplateProvider data={liveData}>
-            <div ref={previewRef} className="editor-layout__preview-inner">
-              <Navigation />
-              <SectionWrapper id="hero" activeSection={activeSection}>
-                <Hero />
-              </SectionWrapper>
-              {Story && (
-                <SectionWrapper id="historia" activeSection={activeSection}>
-                  <Story />
-                </SectionWrapper>
-              )}
-              <SectionWrapper id="countdown" activeSection={activeSection}>
-                <Countdown />
-              </SectionWrapper>
-              <SectionWrapper id="eventos" activeSection={activeSection}>
-                <Events />
-              </SectionWrapper>
-              <SectionWrapper id="cronograma" activeSection={activeSection}>
-                <Schedule />
-              </SectionWrapper>
-              <SectionWrapper id="vestimenta" activeSection={activeSection}>
-                <DressCode />
-              </SectionWrapper>
-              <SectionWrapper id="regalos" activeSection={activeSection}>
-                <GiftRegistry />
-              </SectionWrapper>
-              <SectionWrapper id="rsvp" activeSection={activeSection}>
-                <RsvpForm />
-              </SectionWrapper>
-              <SectionWrapper id="footer" activeSection={activeSection}>
-                <Footer />
-              </SectionWrapper>
-            </div>
-          </TemplateProvider>
+          {templateModule ? (
+            <TemplatePreview
+              templateModule={templateModule}
+              activeSection={activeSection}
+              previewRef={previewRef}
+            />
+          ) : (
+            <div className="editor-layout__loading">Cargando template…</div>
+          )}
         </div>
       </main>
 
-      {/* ── Editor panel (right on desktop) ── */}
       <aside className={`editor-layout__panel ${!showPreview ? 'editor-layout__panel--visible' : ''}`}>
         <EditorPanel
           activeSection={activeSection}
