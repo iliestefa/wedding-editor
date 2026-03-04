@@ -83,9 +83,11 @@ const EditorLayout = () => {
               <Navigation />
               <Hero />
             </SectionWrapper>
-            <Countdown />
             <SectionWrapper id="historia" activeSection={activeSection}>
               <Story />
+            </SectionWrapper>
+            <SectionWrapper id="countdown" activeSection={activeSection}>
+              <Countdown />
             </SectionWrapper>
             <SectionWrapper id="eventos" activeSection={activeSection}>
               <Events />

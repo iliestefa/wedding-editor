@@ -248,19 +248,26 @@ $bar-border: rgba(141, 184, 154, 0.2);
 }
 
 // ── Navigation fix ────────────────────────────────────────────────
-// The wedding nav uses position:fixed. Override to sticky inside the
-// scrollable canvas so it stays visible and contained.
+// The wedding nav uses position:fixed and listens to window.scroll.
+// Inside the editor canvas (overflow-y: auto div), window never scrolls,
+// so nav--scrolled class is never applied and the nav stays transparent.
+// Fix: override to sticky, always show the scrolled (opaque) state.
 .editor-layout__preview-canvas {
   .nav {
     position: sticky !important;
     top: 0 !important;
+    z-index: 10 !important;
+    // Always apply the scrolled appearance (background + text colors)
     background-color: rgba(250, 245, 239, 0.95) !important;
     backdrop-filter: blur(12px) !important;
     box-shadow: 0 1px 0 rgba(196, 152, 90, 0.15) !important;
-    z-index: 10 !important;
 
     .nav__link {
       color: #2a221a !important;
+    }
+
+    .nav__monogram-text {
+      color: #c4985a !important;
     }
 
     .nav__burger span {
