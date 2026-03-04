@@ -13,36 +13,24 @@ import RsvpForm from '@iliestefa/wedding-soho/components/RsvpForm/RsvpForm';
 import Footer from '@iliestefa/wedding-soho/components/Footer/Footer';
 import './EditorLayout.scss';
 
-const VIEWPORTS = [
-  { id: 'desktop', label: 'Escritorio', icon: '🖥', width: null },
-  { id: 'tablet',  label: 'Tablet',     icon: '⬜', width: 768 },
-  { id: 'mobile',  label: 'Móvil',      icon: '📱', width: 390 },
-];
-
-const SECTION_IDS = ['hero', 'historia', 'eventos', 'cronograma', 'vestimenta', 'regalos', 'rsvp', 'footer'];
-
-const ViewportSwitcher = ({ viewport, onChange }) => (
-  <div className="editor-layout__viewport-switcher">
-    {VIEWPORTS.map((v) => (
-      <button
-        key={v.id}
-        className={`editor-layout__viewport-btn ${viewport === v.id ? 'editor-layout__viewport-btn--active' : ''}`}
-        title={v.label}
-        onClick={() => onChange(v.id)}
-      >
-        {v.icon}
-      </button>
-    ))}
+const SectionWrapper = ({ id, activeSection, children }) => (
+  <div
+    data-section={id}
+    className={activeSection === id ? 'is-active-section' : ''}
+  >
+    {children}
   </div>
 );
 
-ViewportSwitcher.propTypes = {
-  viewport: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+SectionWrapper.propTypes = {
+  id: PropTypes.string.isRequired,
+  activeSection: PropTypes.string,
+  children: PropTypes.node.isRequired,
 };
 
+SectionWrapper.defaultProps = { activeSection: null };
+
 const EditorLayout = () => {
-  const [viewport, setViewport] = useState('desktop');
   const [showPreview, setShowPreview] = useState(false);
   const [activeSection, setActiveSection] = useState(null);
   const previewRef = useRef(null);
@@ -56,15 +44,12 @@ const EditorLayout = () => {
 
   const handleSectionChange = useCallback((sectionId) => {
     setActiveSection(sectionId);
+    // Only scroll — don't force preview open on mobile
     scrollToSection(sectionId);
-    // On mobile, switch to preview to see the section
-    setShowPreview(true);
   }, [scrollToSection]);
 
-  const viewportWidth = VIEWPORTS.find((v) => v.id === viewport)?.width;
-
   return (
-    <div className={`editor-layout ${showPreview ? 'editor-layout--preview-mode' : ''}`}>
+    <div className="editor-layout">
 
       {/* ── Mobile top bar ── */}
       <div className="editor-layout__mobile-bar">
@@ -76,45 +61,36 @@ const EditorLayout = () => {
         </button>
       </div>
 
-      {/* ── Preview (left on desktop, full on mobile when toggled) ── */}
+      {/* ── Preview (left on desktop) ── */}
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
-        {/* Desktop viewport switcher */}
-        <div className="editor-layout__preview-toolbar">
-          <ViewportSwitcher viewport={viewport} onChange={setViewport} />
-        </div>
-
         <div className="editor-layout__preview-canvas">
-          <div
-            ref={previewRef}
-            className="editor-layout__preview-inner"
-            style={viewportWidth ? { width: viewportWidth, margin: '0 auto' } : undefined}
-          >
-            <div data-section="hero">
+          <div ref={previewRef} className="editor-layout__preview-inner">
+            <SectionWrapper id="hero" activeSection={activeSection}>
               <Navigation />
               <Hero />
-            </div>
+            </SectionWrapper>
             <Countdown />
-            <div data-section="historia" className={activeSection === 'historia' ? 'is-active-section' : ''}>
+            <SectionWrapper id="historia" activeSection={activeSection}>
               <Story />
-            </div>
-            <div data-section="eventos" className={activeSection === 'eventos' ? 'is-active-section' : ''}>
+            </SectionWrapper>
+            <SectionWrapper id="eventos" activeSection={activeSection}>
               <Events />
-            </div>
-            <div data-section="cronograma" className={activeSection === 'cronograma' ? 'is-active-section' : ''}>
+            </SectionWrapper>
+            <SectionWrapper id="cronograma" activeSection={activeSection}>
               <Schedule />
-            </div>
-            <div data-section="vestimenta" className={activeSection === 'vestimenta' ? 'is-active-section' : ''}>
+            </SectionWrapper>
+            <SectionWrapper id="vestimenta" activeSection={activeSection}>
               <DressCode />
-            </div>
-            <div data-section="regalos" className={activeSection === 'regalos' ? 'is-active-section' : ''}>
+            </SectionWrapper>
+            <SectionWrapper id="regalos" activeSection={activeSection}>
               <GiftRegistry />
-            </div>
-            <div data-section="rsvp" className={activeSection === 'rsvp' ? 'is-active-section' : ''}>
+            </SectionWrapper>
+            <SectionWrapper id="rsvp" activeSection={activeSection}>
               <RsvpForm />
-            </div>
-            <div data-section="footer" className={activeSection === 'footer' ? 'is-active-section' : ''}>
+            </SectionWrapper>
+            <SectionWrapper id="footer" activeSection={activeSection}>
               <Footer />
-            </div>
+            </SectionWrapper>
           </div>
         </div>
       </main>

@@ -56,24 +56,49 @@ const editorReducer = (state, action) => {
   switch (action.type) {
     case 'SET_FIELD':
       return { ...state, [action.field]: action.value };
+
     case 'SET_STORY_ITEM': {
-      const updatedStory = state.storyItems.map((item, i) =>
+      const updated = state.storyItems.map((item, i) =>
         i === action.index ? { ...item, [action.key]: action.value } : item
       );
-      return { ...state, storyItems: updatedStory };
+      return { ...state, storyItems: updated };
     }
+    case 'ADD_STORY_ITEM': {
+      const newItem = { id: `momento-${Date.now()}`, year: '', label: '', text: '' };
+      return { ...state, storyItems: [...state.storyItems, newItem] };
+    }
+    case 'REMOVE_STORY_ITEM': {
+      return { ...state, storyItems: state.storyItems.filter((_, i) => i !== action.index) };
+    }
+
     case 'SET_SCHEDULE_ITEM': {
-      const updatedSchedule = state.scheduleItems.map((item, i) =>
+      const updated = state.scheduleItems.map((item, i) =>
         i === action.index ? { ...item, [action.key]: action.value } : item
       );
-      return { ...state, scheduleItems: updatedSchedule };
+      return { ...state, scheduleItems: updated };
     }
+    case 'ADD_SCHEDULE_ITEM': {
+      const newItem = { id: `actividad-${Date.now()}`, time: '', label: '', icon: '✨' };
+      return { ...state, scheduleItems: [...state.scheduleItems, newItem] };
+    }
+    case 'REMOVE_SCHEDULE_ITEM': {
+      return { ...state, scheduleItems: state.scheduleItems.filter((_, i) => i !== action.index) };
+    }
+
     case 'SET_BANK_ACCOUNT': {
-      const updatedAccounts = state.bankAccounts.map((acc, i) =>
+      const updated = state.bankAccounts.map((acc, i) =>
         i === action.index ? { ...acc, [action.key]: action.value } : acc
       );
-      return { ...state, bankAccounts: updatedAccounts };
+      return { ...state, bankAccounts: updated };
     }
+
+    case 'SET_DRESS_CODE_COLOR': {
+      const updated = state.dressCodePalette.map((c, i) =>
+        i === action.index ? { ...c, hex: action.hex } : c
+      );
+      return { ...state, dressCodePalette: updated };
+    }
+
     default:
       return state;
   }
@@ -85,12 +110,15 @@ export const EditorProvider = ({ children }) => {
 
   const setField = (field, value) => dispatch({ type: 'SET_FIELD', field, value });
   const setStoryItem = (index, key, value) => dispatch({ type: 'SET_STORY_ITEM', index, key, value });
+  const addStoryItem = () => dispatch({ type: 'ADD_STORY_ITEM' });
+  const removeStoryItem = (index) => dispatch({ type: 'REMOVE_STORY_ITEM', index });
   const setScheduleItem = (index, key, value) => dispatch({ type: 'SET_SCHEDULE_ITEM', index, key, value });
+  const addScheduleItem = () => dispatch({ type: 'ADD_SCHEDULE_ITEM' });
+  const removeScheduleItem = (index) => dispatch({ type: 'REMOVE_SCHEDULE_ITEM', index });
   const setBankAccount = (index, key, value) => dispatch({ type: 'SET_BANK_ACCOUNT', index, key, value });
+  const setDressCodeColor = (index, hex) => dispatch({ type: 'SET_DRESS_CODE_COLOR', index, hex });
 
-  // Derived: couple names auto-updates when either name changes
   const coupleNames = `${data.brideName} & ${data.groomName}`;
-
   const liveData = { ...data, coupleNames };
 
   return (
@@ -100,8 +128,13 @@ export const EditorProvider = ({ children }) => {
       setActiveField,
       setField,
       setStoryItem,
+      addStoryItem,
+      removeStoryItem,
       setScheduleItem,
+      addScheduleItem,
+      removeScheduleItem,
       setBankAccount,
+      setDressCodeColor,
     }}>
       <TemplateProvider data={liveData}>
         {children}
@@ -120,5 +153,4 @@ export const useEditor = () => {
   return ctx;
 };
 
-// Hook for preview components — returns live data from context
 export const useWeddingData = () => useEditor().data;

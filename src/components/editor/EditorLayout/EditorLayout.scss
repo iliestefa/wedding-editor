@@ -1,6 +1,10 @@
 $panel-width: 400px;
-$toolbar-height: 48px;
 $mobile-bar-height: 48px;
+
+// Pastel green palette for mobile bar (matches editor panel)
+$bar-bg:     #1e2a22;
+$bar-accent: #8db89a;
+$bar-border: rgba(141, 184, 154, 0.2);
 
 .editor-layout {
   display: flex;
@@ -17,11 +21,11 @@ $mobile-bar-height: 48px;
     right: 0;
     z-index: 200;
     height: $mobile-bar-height;
-    background: #2c2318;
+    background: $bar-bg;
     padding: 0 1rem;
     align-items: center;
     justify-content: flex-end;
-    border-bottom: 1px solid rgba(196, 152, 90, 0.25);
+    border-bottom: 1px solid $bar-border;
 
     @media (max-width: 900px) {
       display: flex;
@@ -29,19 +33,19 @@ $mobile-bar-height: 48px;
   }
 
   &__mobile-toggle {
-    background: rgba(196, 152, 90, 0.15);
-    border: 1px solid rgba(196, 152, 90, 0.4);
+    background: rgba(141, 184, 154, 0.15);
+    border: 1px solid rgba(141, 184, 154, 0.4);
     border-radius: 6px;
-    color: #c4985a;
+    color: $bar-accent;
     cursor: pointer;
     font-size: 0.8rem;
     font-family: inherit;
     letter-spacing: 0.05em;
     padding: 0.4rem 1rem;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s;
 
     &:hover {
-      background: rgba(196, 152, 90, 0.25);
+      background: rgba(141, 184, 154, 0.25);
     }
   }
 
@@ -69,29 +73,12 @@ $mobile-bar-height: 48px;
     }
   }
 
-  &__preview-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: $toolbar-height;
-    background: #2c2318;
-    border-bottom: 1px solid rgba(196, 152, 90, 0.2);
-    flex-shrink: 0;
-
-    @media (max-width: 900px) {
-      display: none;
-    }
-  }
-
   &__preview-canvas {
     flex: 1;
     overflow-y: auto;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: rgba(196, 152, 90, 0.3) transparent;
-
-    // Fix for Navigation position:fixed — contain it inside preview
-    isolation: isolate;
 
     &::-webkit-scrollbar { width: 5px; }
     &::-webkit-scrollbar-track { background: transparent; }
@@ -102,7 +89,7 @@ $mobile-bar-height: 48px;
   }
 
   &__preview-inner {
-    transition: width 0.3s ease;
+    // intentionally empty — full-width
   }
 
   // ── Editor panel (right column on desktop) ───────────────────────
@@ -130,54 +117,35 @@ $mobile-bar-height: 48px;
   }
 }
 
-// ── Viewport switcher ──────────────────────────────────────────────
-.editor-layout__viewport-switcher {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.editor-layout__viewport-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: rgba(232, 221, 208, 0.5);
-  cursor: pointer;
-  font-size: 1rem;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-
-  &:hover {
-    color: rgba(232, 221, 208, 0.85);
-    border-color: rgba(196, 152, 90, 0.3);
-  }
-
-  &--active {
-    background: rgba(196, 152, 90, 0.15);
-    border-color: rgba(196, 152, 90, 0.5);
-    color: #c4985a;
-  }
-}
-
 // ── Active section highlight ───────────────────────────────────────
 .is-active-section {
-  outline: 2px solid rgba(196, 152, 90, 0.6);
+  outline: 2px solid rgba(141, 184, 154, 0.7);
   outline-offset: 0;
   border-radius: 2px;
 }
 
-// ── Story timeline line fix ────────────────────────────────────────
-// The ::before pseudo uses position:absolute — ensure it's not clipped
+// ── Reveal animations fix ─────────────────────────────────────────
+// Template components use IntersectionObserver + opacity:0 by default,
+// revealing via .is-visible. In the editor the observer targets the
+// viewport (not the scrollable canvas), so elements never become visible.
+// Override: make all reveal-ready elements visible inside the editor.
 .editor-layout__preview-canvas {
-  .story__timeline {
-    overflow: visible;
-  }
-
-  .story__inner {
-    overflow: visible;
+  // These classes come from @mixin reveal-ready in the template
+  .story-item,
+  .story__intro,
+  [class*='__inner'],
+  [class*='reveal'],
+  .section-header,
+  .section-header__eyebrow,
+  .section-header__title,
+  .countdown__number,
+  .event-card,
+  .schedule__item,
+  .dress-code__col,
+  .gift-registry__card,
+  .rsvp-form {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -187,25 +155,24 @@ $mobile-bar-height: 48px;
 }
 
 [data-preview-field].is-highlighted {
-  outline: 2px solid #c4985a;
+  outline: 2px solid #8db89a;
   outline-offset: 4px;
-  box-shadow: 0 0 12px rgba(196, 152, 90, 0.4);
+  box-shadow: 0 0 12px rgba(141, 184, 154, 0.4);
   border-radius: 2px;
 }
 
 // ── Navigation fix ────────────────────────────────────────────────
-// The wedding nav uses position:fixed relative to viewport.
-// Force it to sticky so it sticks inside the scrollable canvas.
+// The wedding nav uses position:fixed. Override to sticky inside the
+// scrollable canvas so it stays visible and contained.
 .editor-layout__preview-canvas {
   .nav {
     position: sticky !important;
     top: 0 !important;
-    // Always show the solid background (transparent by default until scrolled)
     background-color: rgba(250, 245, 239, 0.95) !important;
     backdrop-filter: blur(12px) !important;
     box-shadow: 0 1px 0 rgba(196, 152, 90, 0.15) !important;
+    z-index: 10 !important;
 
-    // Nav links are white by default (for hero photo overlay) — make them dark
     .nav__link {
       color: #2a221a !important;
     }

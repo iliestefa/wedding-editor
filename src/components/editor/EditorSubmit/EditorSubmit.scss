@@ -1,6 +1,6 @@
 .editor-submit {
   padding: 1.25rem 1.25rem 1.5rem;
-  border-top: 1px solid rgba(148, 174, 214, 0.12);
+  border-top: 1px solid rgba(141, 184, 154, 0.14);
   flex-shrink: 0;
 
   &--success {
@@ -11,21 +11,21 @@
   &__icon {
     display: block;
     font-size: 2rem;
-    color: #94aed6;
+    color: #8db89a;
     margin-bottom: 0.75rem;
   }
 
   &__title {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.1rem;
-    color: #dce5f0;
+    color: #d8ede1;
     margin: 0 0 0.5rem;
   }
 
   &__message {
     font-size: 0.85rem;
     font-weight: 300;
-    color: rgba(220, 229, 240, 0.6);
+    color: rgba(216, 237, 225, 0.6);
     line-height: 1.6;
     margin: 0;
   }
@@ -54,8 +54,8 @@
     font-weight: 700;
     letter-spacing: 0.28em;
     text-transform: uppercase;
-    color: #1e2433;
-    background: #94aed6;
+    color: #1e2a22;
+    background: #8db89a;
     border: none;
     border-radius: 5px;
     padding: 0.9rem;
@@ -63,7 +63,7 @@
     transition: background-color 0.2s, opacity 0.2s;
 
     &:hover:not(:disabled) {
-      background: #aac3e4;
+      background: #a3c9ad;
     }
 
     &:disabled {
