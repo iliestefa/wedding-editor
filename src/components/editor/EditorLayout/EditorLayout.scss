@@ -77,6 +77,8 @@ $bar-border: rgba(141, 184, 154, 0.2);
     flex: 1;
     overflow-y: auto;
     position: relative;
+    // Match the hero dark background so no gap is visible above the sticky nav
+    background: #1a1410;
     scrollbar-width: thin;
     scrollbar-color: rgba(196, 152, 90, 0.3) transparent;
 
