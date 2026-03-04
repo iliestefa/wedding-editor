@@ -5,13 +5,23 @@ import path from 'path';
 export default defineConfig({
   base: '/wedding-editor/',
   plugins: [react()],
+  resolve: {
+    dedupe: ['react', 'react-dom', 'prop-types'],
+    alias: {
+      react: path.resolve(__dirname, 'node_modules/react'),
+      'react-dom': path.resolve(__dirname, 'node_modules/react-dom'),
+    },
+  },
   css: {
     preprocessorOptions: {
       scss: {
-        loadPaths: [path.resolve(__dirname, 'src')],
+        loadPaths: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'node_modules/@iliestefa/wedding-soho/src'),
+        ],
         silenceDeprecations: ['import'],
         additionalData: (content, filename) => {
-          if (filename.includes('src/styles/')) return content;
+          if (filename.includes('/styles/')) return content;
           return `
             @import 'styles/variables';
             @import 'styles/mixins';
