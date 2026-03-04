@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
+import { TemplateProvider } from '@iliestefa/wedding-soho/context';
 
 import {
   BRIDE_NAME, GROOM_NAME, COUPLE_NAMES,
@@ -90,9 +91,11 @@ export const EditorProvider = ({ children }) => {
   // Derived: couple names auto-updates when either name changes
   const coupleNames = `${data.brideName} & ${data.groomName}`;
 
+  const liveData = { ...data, coupleNames };
+
   return (
     <EditorContext.Provider value={{
-      data: { ...data, coupleNames },
+      data: liveData,
       activeField,
       setActiveField,
       setField,
@@ -100,7 +103,9 @@ export const EditorProvider = ({ children }) => {
       setScheduleItem,
       setBankAccount,
     }}>
-      {children}
+      <TemplateProvider data={liveData}>
+        {children}
+      </TemplateProvider>
     </EditorContext.Provider>
   );
 };
