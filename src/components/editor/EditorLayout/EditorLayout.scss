@@ -75,6 +75,7 @@ $bar-border: rgba(141, 184, 154, 0.2);
 
   &__preview-canvas {
     flex: 1;
+    overflow-x: hidden;
     overflow-y: auto;
     position: relative;
     // Match the hero dark background so no gap is visible above the sticky nav
@@ -262,11 +263,17 @@ $bar-border: rgba(141, 184, 154, 0.2);
     background-color: transparent !important;
     backdrop-filter: none !important;
     box-shadow: none !important;
+    overflow: visible !important;
   }
 
-  // Hero slides up behind the sticky nav
+  // Hero slides up behind the sticky nav (soho nav ~72px, elegant nav 64px)
+  // Use negative margin equal to nav height so hero fills top
   .hero {
     margin-top: -72px !important;
+
+    @media (max-width: 900px) {
+      margin-top: -58px !important;
+    }
   }
 }
 
@@ -292,6 +299,15 @@ $bar-border: rgba(141, 184, 154, 0.2);
       background-color: rgba(17, 15, 13, 0.92) !important;
       backdrop-filter: blur(16px) !important;
       border-bottom-color: rgba(201, 169, 110, 0.2) !important;
+    }
+  }
+
+  // Elegant nav is always 64px
+  .hero {
+    margin-top: -64px !important;
+
+    @media (max-width: 900px) {
+      margin-top: -64px !important;
     }
   }
 }
