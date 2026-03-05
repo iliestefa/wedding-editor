@@ -1,9 +1,11 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useEditor } from '../../../context/EditorContext';
 import { TEMPLATES, DEFAULT_TEMPLATE } from '../../../constants/templateRegistry';
 import EditorPanel from '../EditorPanel/EditorPanel';
 import './EditorLayout.scss';
+
+const DESIGN_WIDTH = 1280; // px — template is designed for this viewport width
 
 const SectionWrapper = ({ id, activeSection, children }) => (
   <div
@@ -51,7 +53,7 @@ const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolle
       <div
         ref={previewRef}
         className="editor-layout__preview-inner"
-        style={scale < 1 ? { zoom: scale } : {}}
+        style={scale < 1 ? { width: `${DESIGN_WIDTH}px`, zoom: scale } : {}}
       >
         <Navigation forceScrolled={navScrolled} />
         <SectionWrapper id="hero" activeSection={activeSection}>
@@ -96,8 +98,6 @@ TemplatePreview.propTypes = {
   scale:          PropTypes.number,
 };
 TemplatePreview.defaultProps = { activeSection: null, navScrolled: false, scale: 1 };
-
-const DESIGN_WIDTH = 1280; // px — template is designed for this viewport width
 
 const EditorLayout = ({ templateSlug }) => {
   const [showPreview, setShowPreview]       = useState(false);
