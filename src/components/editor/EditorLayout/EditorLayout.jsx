@@ -5,8 +5,6 @@ import { TEMPLATES, DEFAULT_TEMPLATE } from '../../../constants/templateRegistry
 import EditorPanel from '../EditorPanel/EditorPanel';
 import './EditorLayout.scss';
 
-const DESIGN_WIDTH = 1280; // px — template is designed for this viewport width
-
 const SectionWrapper = ({ id, activeSection, children }) => (
   <div
     data-section={id}
@@ -39,7 +37,7 @@ const SuccessOverlay = () => (
 );
 
 // Renders the preview once the template module is loaded
-const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolled, scale }) => {
+const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolled }) => {
   const {
     Navigation, Hero, Story, Countdown,
     Events, Schedule, DressCode, GiftRegistry, RsvpForm, Footer,
@@ -50,11 +48,7 @@ const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolle
 
   return (
     <TemplateProvider data={data}>
-      <div
-        ref={previewRef}
-        className="editor-layout__preview-inner"
-        style={scale < 1 ? { width: `${DESIGN_WIDTH}px`, zoom: scale } : {}}
-      >
+      <div ref={previewRef} className="editor-layout__preview-inner">
         <Navigation forceScrolled={navScrolled} />
         <SectionWrapper id="hero" activeSection={activeSection}>
           <Hero />
@@ -95,23 +89,21 @@ TemplatePreview.propTypes = {
   activeSection:  PropTypes.string,
   previewRef:     PropTypes.object.isRequired,
   navScrolled:    PropTypes.bool,
-  scale:          PropTypes.number,
 };
-TemplatePreview.defaultProps = { activeSection: null, navScrolled: false, scale: 1 };
+TemplatePreview.defaultProps = { activeSection: null, navScrolled: false };
 
 const EditorLayout = ({ templateSlug }) => {
   const [showPreview, setShowPreview]       = useState(false);
+  const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [activeSection, setActiveSection]   = useState('hero');
   const [submitted, setSubmitted]           = useState(false);
   const [navScrolled, setNavScrolled]       = useState(false);
   const [templateModule, setTemplateModule] = useState(null);
-  const [previewScale, setPreviewScale]     = useState(1);
   const previewRef = useRef(null);
   const canvasRef  = useRef(null);
 
   const slug = TEMPLATES[templateSlug] ? templateSlug : DEFAULT_TEMPLATE;
 
-  // Load template module once on mount
   useEffect(() => {
     TEMPLATES[slug].load().then(setTemplateModule);
   }, [slug]);
@@ -123,20 +115,6 @@ const EditorLayout = ({ templateSlug }) => {
     update();
     canvas.addEventListener('scroll', update, { passive: true });
     return () => canvas.removeEventListener('scroll', update);
-  }, []);
-
-  // Scale preview-inner so the template always renders at full design width
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const updateScale = () => {
-      const scale = Math.min(1, canvas.clientWidth / DESIGN_WIDTH);
-      setPreviewScale(scale);
-    };
-    updateScale();
-    const ro = new ResizeObserver(updateScale);
-    ro.observe(canvas);
-    return () => ro.disconnect();
   }, []);
 
   const scrollToSection = useCallback((sectionId) => {
@@ -152,6 +130,7 @@ const EditorLayout = ({ templateSlug }) => {
   return (
     <div className="editor-layout">
 
+      {/* Mobile top bar */}
       <div className="editor-layout__mobile-bar">
         <button
           className="editor-layout__mobile-toggle"
@@ -161,6 +140,16 @@ const EditorLayout = ({ templateSlug }) => {
         </button>
       </div>
 
+      {/* Desktop panel toggle (tab anchored to panel left edge) */}
+      <button
+        className={`editor-toggle${panelCollapsed ? ' editor-toggle--collapsed' : ''}`}
+        onClick={() => setPanelCollapsed((v) => !v)}
+        aria-label={panelCollapsed ? 'Abrir editor' : 'Cerrar editor'}
+      >
+        {panelCollapsed ? 'EDITOR' : 'CERRAR'}
+      </button>
+
+      {/* Full-viewport preview */}
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
         <div
           ref={canvasRef}
@@ -173,7 +162,6 @@ const EditorLayout = ({ templateSlug }) => {
               activeSection={activeSection}
               previewRef={previewRef}
               navScrolled={navScrolled}
-              scale={previewScale}
             />
           ) : (
             <div className="editor-layout__loading">Cargando template…</div>
@@ -181,7 +169,8 @@ const EditorLayout = ({ templateSlug }) => {
         </div>
       </main>
 
-      <aside className={`editor-layout__panel ${!showPreview ? 'editor-layout__panel--visible' : ''}`}>
+      {/* Editor panel — fixed overlay on right */}
+      <aside className={`editor-layout__panel${panelCollapsed ? ' editor-layout__panel--collapsed' : ''}${!showPreview ? ' editor-layout__panel--visible' : ''}`}>
         <EditorPanel
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
