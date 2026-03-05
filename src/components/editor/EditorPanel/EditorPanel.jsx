@@ -13,6 +13,7 @@ const SECTIONS_SOHO = [
   { id: 'regalos',    label: 'Regalos' },
   { id: 'rsvp',       label: 'RSVP' },
   { id: 'footer',     label: 'Footer' },
+  { id: 'extras',     label: 'Extras' },
 ];
 
 const SECTIONS_ELEGANT = [
@@ -23,6 +24,7 @@ const SECTIONS_ELEGANT = [
   { id: 'regalos',    label: 'Regalos' },
   { id: 'rsvp',       label: 'RSVP' },
   { id: 'footer',     label: 'Footer' },
+  { id: 'extras',     label: 'Extras' },
 ];
 
 const MONTHS = [
@@ -321,49 +323,53 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
             <EditorField label="Indicaciones Damas"  fieldKey="dressCodeWomen"       multiline placeholder="Vestido de cóctel..." />
             <EditorField label="Indicaciones Caballeros" fieldKey="dressCodeMen"     multiline placeholder="Traje con corbata..." />
 
-            <p className="editor-panel__group-label">
-              Paleta de colores
-              {data.dressCodePalette.length < 8 && (
-                <button className="editor-panel__group-add-btn" onClick={addDressCodeColor}>
-                  + Agregar
-                </button>
-              )}
-            </p>
-            <div className="editor-panel__color-grid">
-              {data.dressCodePalette.map((color, i) => (
-                <div key={color.id} className="editor-panel__color-item">
-                  <div className="editor-panel__color-swatch-wrap">
-                    <label
-                      className="editor-panel__color-swatch"
-                      style={{ background: color.hex }}
-                      title={color.label}
-                    >
+            {!isElegant && (
+              <>
+                <p className="editor-panel__group-label">
+                  Paleta de colores
+                  {data.dressCodePalette.length < 8 && (
+                    <button className="editor-panel__group-add-btn" onClick={addDressCodeColor}>
+                      + Agregar
+                    </button>
+                  )}
+                </p>
+                <div className="editor-panel__color-grid">
+                  {data.dressCodePalette.map((color, i) => (
+                    <div key={color.id} className="editor-panel__color-item">
+                      <div className="editor-panel__color-swatch-wrap">
+                        <label
+                          className="editor-panel__color-swatch"
+                          style={{ background: color.hex }}
+                          title={color.label}
+                        >
+                          <input
+                            type="color"
+                            className="editor-panel__color-input"
+                            value={color.hex}
+                            onChange={(e) => setDressCodeColor(i, e.target.value)}
+                          />
+                        </label>
+                        {data.dressCodePalette.length > 1 && (
+                          <button
+                            className="editor-panel__color-remove-btn"
+                            onClick={() => removeDressCodeColor(i)}
+                            aria-label="Eliminar color"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
                       <input
-                        type="color"
-                        className="editor-panel__color-input"
-                        value={color.hex}
-                        onChange={(e) => setDressCodeColor(i, e.target.value)}
+                        className="editor-panel__color-name-input"
+                        value={color.label}
+                        maxLength={12}
+                        onChange={(e) => setDressCodeColorLabel(i, e.target.value)}
                       />
-                    </label>
-                    {data.dressCodePalette.length > 1 && (
-                      <button
-                        className="editor-panel__color-remove-btn"
-                        onClick={() => removeDressCodeColor(i)}
-                        aria-label="Eliminar color"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    className="editor-panel__color-name-input"
-                    value={color.label}
-                    maxLength={12}
-                    onChange={(e) => setDressCodeColorLabel(i, e.target.value)}
-                  />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            )}
 
             <p className="editor-panel__group-label">Foto de vestimenta</p>
             <EditorField label="URL de la imagen" fieldKey="imageDressCode" placeholder="https://..." />
@@ -426,6 +432,23 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
         {activeSection === 'footer' && (
           <div className="editor-panel__section">
             <EditorField label="Mensaje del footer" fieldKey="footerMessage" multiline placeholder="Frase final..." />
+          </div>
+        )}
+
+        {/* ── Extras ── */}
+        {activeSection === 'extras' && (
+          <div className="editor-panel__section">
+            <p className="editor-panel__extras-hint">
+              ¿Hay algo que no puedas configurar desde el editor? Escribilo acá y lo haremos manualmente.
+            </p>
+            <label className="editor-panel__inline-label">Notas adicionales</label>
+            <textarea
+              className="editor-panel__extras-textarea"
+              rows={8}
+              placeholder="Ej: quiero cambiar la fuente del título, agregar una sección de fotos, modificar los colores del footer..."
+              value={data.extraNotes ?? ''}
+              onChange={(e) => setField('extraNotes', e.target.value)}
+            />
           </div>
         )}
 

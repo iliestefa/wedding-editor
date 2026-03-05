@@ -74,6 +74,7 @@ export const sendEditorData = async (weddingData) => {
     bride_name:     brideName,
     groom_name:     groomName,
     wedding_date:   weddingData.weddingDateDisplay,
+    extra_notes:    weddingData.extraNotes || '(sin notas adicionales)',
     constants_file: buildConstantsFile(weddingData),
     data_json:      JSON.stringify(weddingData, null, 2),
   };

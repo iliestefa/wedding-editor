@@ -15,7 +15,7 @@ export const CEREMONY_MAPS_LINK      = 'https://maps.google.com/?q=Iglesia+Nuest
 export const CEREMONY_MAPS_EMBED_SRC = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.168839143649!2d-58.39340898477058!3d-34.58760218046614!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcca7e9bc3c1a5%3A0x8b1c17b4f5c2c4a0!2sIglesia%20de%20Nuestra%20Se%C3%B1ora%20del%20Pilar!5e0!3m2!1ses!2sar!4v1700000000000';
 
 export const RECEPTION_TIME           = '20:00 hrs';
-export const RECEPTION_VENUE_NAME     = 'Palacio Duhau Park Hyatt';
+export const RECEPTION_VENUE_NAME     = 'Palacio Duhau';
 export const RECEPTION_VENUE_ADDRESS  = 'Av. Alvear 1661, Recoleta, Buenos Aires';
 export const RECEPTION_MAPS_LINK      = 'https://maps.google.com/?q=Park+Hyatt+Buenos+Aires+Palacio+Duhau';
 export const RECEPTION_MAPS_EMBED_SRC = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.3290060978736!2d-58.38766678477066!3d-34.58393378046617!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcca7bb0fc14ab%3A0x49b9fbb3caaf99c2!2sPark%20Hyatt%20Buenos%20Aires!5e0!3m2!1ses!2sar!4v1700000000001';
