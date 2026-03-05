@@ -1,55 +1,60 @@
 import { createContext, useContext, useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 
-import {
-  BRIDE_NAME, GROOM_NAME, COUPLE_NAMES,
-  WEDDING_DATE_ISO, WEDDING_DATE_DISPLAY, WEDDING_YEAR,
-  CEREMONY_TIME, CEREMONY_VENUE_NAME, CEREMONY_VENUE_ADDRESS, CEREMONY_MAPS_LINK, CEREMONY_MAPS_EMBED_SRC,
-  RECEPTION_TIME, RECEPTION_VENUE_NAME, RECEPTION_VENUE_ADDRESS, RECEPTION_MAPS_LINK, RECEPTION_MAPS_EMBED_SRC,
-  STORY_INTRO, STORY_ITEMS,
-  SCHEDULE_ITEMS,
-  DRESS_CODE_STYLE, DRESS_CODE_DESCRIPTION, DRESS_CODE_WOMEN, DRESS_CODE_MEN, DRESS_CODE_PALETTE,
-  GIFT_REGISTRY_INTRO, BANK_ACCOUNTS,
-  RSVP_DEADLINE, FOOTER_MESSAGE,
-  IMAGE_HERO, IMAGE_STORY, IMAGE_DRESS_CODE, IMAGE_RINGS,
-} from '../constants/weddingDefaults';
+import * as SohoDefaults from '../constants/weddingDefaults';
+import * as ElegantDefaults from '../constants/weddingDefaultsElegant';
 
 const EditorContext = createContext(null);
 
-const buildInitialState = () => ({
-  brideName:              BRIDE_NAME,
-  groomName:              GROOM_NAME,
-  coupleNames:            COUPLE_NAMES,
-  weddingDateIso:         WEDDING_DATE_ISO,
-  weddingDateDisplay:     WEDDING_DATE_DISPLAY,
-  weddingYear:            WEDDING_YEAR,
-  ceremonyTime:           CEREMONY_TIME,
-  ceremonyVenueName:      CEREMONY_VENUE_NAME,
-  ceremonyVenueAddress:   CEREMONY_VENUE_ADDRESS,
-  ceremonyMapsLink:       CEREMONY_MAPS_LINK,
-  ceremonyMapsEmbedSrc:   CEREMONY_MAPS_EMBED_SRC,
-  receptionTime:          RECEPTION_TIME,
-  receptionVenueName:     RECEPTION_VENUE_NAME,
-  receptionVenueAddress:  RECEPTION_VENUE_ADDRESS,
-  receptionMapsLink:      RECEPTION_MAPS_LINK,
-  receptionMapsEmbedSrc:  RECEPTION_MAPS_EMBED_SRC,
-  storyIntro:             STORY_INTRO,
-  storyItems:             STORY_ITEMS,
-  scheduleItems:          SCHEDULE_ITEMS,
-  dressCodeStyle:         DRESS_CODE_STYLE,
-  dressCodeDescription:   DRESS_CODE_DESCRIPTION,
-  dressCodeWomen:         DRESS_CODE_WOMEN,
-  dressCodeMen:           DRESS_CODE_MEN,
-  dressCodePalette:       DRESS_CODE_PALETTE,
-  giftRegistryIntro:      GIFT_REGISTRY_INTRO,
-  bankAccounts:           BANK_ACCOUNTS,
-  rsvpDeadline:           RSVP_DEADLINE,
-  footerMessage:          FOOTER_MESSAGE,
-  imageHero:              IMAGE_HERO,
-  imageStory:             IMAGE_STORY,
-  imageDressCode:         IMAGE_DRESS_CODE,
-  imageRings:             IMAGE_RINGS,
-});
+const buildInitialState = (slug) => {
+  const D = slug === 'elegant' ? ElegantDefaults : SohoDefaults;
+  const base = {
+    brideName:            D.BRIDE_NAME,
+    groomName:            D.GROOM_NAME,
+    coupleNames:          D.COUPLE_NAMES,
+    weddingDateIso:       D.WEDDING_DATE_ISO,
+    weddingDateDisplay:   D.WEDDING_DATE_DISPLAY,
+    weddingYear:          D.WEDDING_YEAR,
+    ceremonyTime:         D.CEREMONY_TIME,
+    ceremonyVenueName:    D.CEREMONY_VENUE_NAME,
+    ceremonyVenueAddress: D.CEREMONY_VENUE_ADDRESS,
+    ceremonyMapsLink:     D.CEREMONY_MAPS_LINK,
+    ceremonyMapsEmbedSrc: D.CEREMONY_MAPS_EMBED_SRC,
+    receptionTime:        D.RECEPTION_TIME,
+    receptionVenueName:   D.RECEPTION_VENUE_NAME,
+    receptionVenueAddress:D.RECEPTION_VENUE_ADDRESS,
+    receptionMapsLink:    D.RECEPTION_MAPS_LINK,
+    receptionMapsEmbedSrc:D.RECEPTION_MAPS_EMBED_SRC,
+    scheduleItems:        D.SCHEDULE_ITEMS,
+    dressCodeStyle:       D.DRESS_CODE_STYLE,
+    dressCodeDescription: D.DRESS_CODE_DESCRIPTION,
+    dressCodeWomen:       D.DRESS_CODE_WOMEN,
+    dressCodeMen:         D.DRESS_CODE_MEN,
+    dressCodePalette:     D.DRESS_CODE_PALETTE,
+    giftRegistryIntro:    D.GIFT_REGISTRY_INTRO,
+    bankAccounts:         D.BANK_ACCOUNTS,
+    rsvpDeadline:         D.RSVP_DEADLINE,
+    footerMessage:        D.FOOTER_MESSAGE,
+    imageHero:            D.IMAGE_HERO,
+  };
+
+  // Soho-only fields
+  if (slug !== 'elegant') {
+    base.storyIntro    = SohoDefaults.STORY_INTRO;
+    base.storyItems    = SohoDefaults.STORY_ITEMS;
+    base.imageStory    = SohoDefaults.IMAGE_STORY;
+    base.imageDressCode= SohoDefaults.IMAGE_DRESS_CODE;
+    base.imageRings    = SohoDefaults.IMAGE_RINGS;
+  }
+
+  // Elegant-only fields
+  if (slug === 'elegant') {
+    base.imageCeremony = ElegantDefaults.IMAGE_CEREMONY;
+    base.imageDressCode= ElegantDefaults.IMAGE_DRESSCODE;
+  }
+
+  return base;
+};
 
 const editorReducer = (state, action) => {
   switch (action.type) {
@@ -118,22 +123,26 @@ const editorReducer = (state, action) => {
   }
 };
 
-export const EditorProvider = ({ children }) => {
-  const [data, dispatch] = useReducer(editorReducer, null, buildInitialState);
+export const EditorProvider = ({ templateSlug, children }) => {
+  const [data, dispatch] = useReducer(
+    editorReducer,
+    templateSlug,
+    buildInitialState,
+  );
   const [activeField, setActiveField] = useState(null);
 
-  const setField = (field, value) => dispatch({ type: 'SET_FIELD', field, value });
-  const setStoryItem = (index, key, value) => dispatch({ type: 'SET_STORY_ITEM', index, key, value });
-  const addStoryItem = () => dispatch({ type: 'ADD_STORY_ITEM' });
-  const removeStoryItem = (index) => dispatch({ type: 'REMOVE_STORY_ITEM', index });
-  const setScheduleItem = (index, key, value) => dispatch({ type: 'SET_SCHEDULE_ITEM', index, key, value });
-  const addScheduleItem = () => dispatch({ type: 'ADD_SCHEDULE_ITEM' });
-  const removeScheduleItem = (index) => dispatch({ type: 'REMOVE_SCHEDULE_ITEM', index });
-  const setBankAccount = (index, key, value) => dispatch({ type: 'SET_BANK_ACCOUNT', index, key, value });
-  const setDressCodeColor = (index, hex) => dispatch({ type: 'SET_DRESS_CODE_COLOR', index, hex });
-  const setDressCodeColorLabel = (index, label) => dispatch({ type: 'SET_DRESS_CODE_COLOR_LABEL', index, label });
-  const addDressCodeColor = () => dispatch({ type: 'ADD_DRESS_CODE_COLOR' });
-  const removeDressCodeColor = (index) => dispatch({ type: 'REMOVE_DRESS_CODE_COLOR', index });
+  const setField             = (field, value)        => dispatch({ type: 'SET_FIELD', field, value });
+  const setStoryItem         = (index, key, value)   => dispatch({ type: 'SET_STORY_ITEM', index, key, value });
+  const addStoryItem         = ()                    => dispatch({ type: 'ADD_STORY_ITEM' });
+  const removeStoryItem      = (index)               => dispatch({ type: 'REMOVE_STORY_ITEM', index });
+  const setScheduleItem      = (index, key, value)   => dispatch({ type: 'SET_SCHEDULE_ITEM', index, key, value });
+  const addScheduleItem      = ()                    => dispatch({ type: 'ADD_SCHEDULE_ITEM' });
+  const removeScheduleItem   = (index)               => dispatch({ type: 'REMOVE_SCHEDULE_ITEM', index });
+  const setBankAccount       = (index, key, value)   => dispatch({ type: 'SET_BANK_ACCOUNT', index, key, value });
+  const setDressCodeColor    = (index, hex)          => dispatch({ type: 'SET_DRESS_CODE_COLOR', index, hex });
+  const setDressCodeColorLabel = (index, label)      => dispatch({ type: 'SET_DRESS_CODE_COLOR_LABEL', index, label });
+  const addDressCodeColor    = ()                    => dispatch({ type: 'ADD_DRESS_CODE_COLOR' });
+  const removeDressCodeColor = (index)               => dispatch({ type: 'REMOVE_DRESS_CODE_COLOR', index });
 
   const coupleNames = `${data.brideName} & ${data.groomName}`;
   const liveData = { ...data, coupleNames };
@@ -141,6 +150,7 @@ export const EditorProvider = ({ children }) => {
   return (
     <EditorContext.Provider value={{
       data: liveData,
+      templateSlug,
       activeField,
       setActiveField,
       setField,
@@ -162,8 +172,10 @@ export const EditorProvider = ({ children }) => {
 };
 
 EditorProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+  templateSlug: PropTypes.string,
+  children:     PropTypes.node.isRequired,
 };
+EditorProvider.defaultProps = { templateSlug: 'soho' };
 
 export const useEditor = () => {
   const ctx = useContext(EditorContext);

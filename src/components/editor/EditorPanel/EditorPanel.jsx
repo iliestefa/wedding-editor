@@ -4,7 +4,7 @@ import EditorField from '../EditorField/EditorField';
 import EditorSubmit from '../EditorSubmit/EditorSubmit';
 import './EditorPanel.scss';
 
-const SECTIONS = [
+const SECTIONS_SOHO = [
   { id: 'hero',       label: 'Portada' },
   { id: 'historia',   label: 'Historia' },
   { id: 'eventos',    label: 'Eventos' },
@@ -15,7 +15,16 @@ const SECTIONS = [
   { id: 'footer',     label: 'Footer' },
 ];
 
-// Date picker: renders three selects for day/month/year and syncs to ISO + display strings
+const SECTIONS_ELEGANT = [
+  { id: 'hero',       label: 'Portada' },
+  { id: 'eventos',    label: 'Eventos' },
+  { id: 'cronograma', label: 'Cronograma' },
+  { id: 'vestimenta', label: 'Vestimenta' },
+  { id: 'regalos',    label: 'Regalos' },
+  { id: 'rsvp',       label: 'RSVP' },
+  { id: 'footer',     label: 'Footer' },
+];
+
 const MONTHS = [
   'Enero','Febrero','Marzo','Abril','Mayo','Junio',
   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre',
@@ -91,6 +100,7 @@ DatePicker.propTypes = {
 const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
   const {
     data,
+    templateSlug,
     setField,
     setStoryItem, addStoryItem, removeStoryItem,
     setScheduleItem, addScheduleItem, removeScheduleItem,
@@ -98,6 +108,9 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
     setDressCodeColor, setDressCodeColorLabel, addDressCodeColor, removeDressCodeColor,
     setActiveField,
   } = useEditor();
+
+  const isElegant = templateSlug === 'elegant';
+  const sections = isElegant ? SECTIONS_ELEGANT : SECTIONS_SOHO;
 
   return (
     <aside className="editor-panel">
@@ -107,7 +120,7 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
       </header>
 
       <nav className="editor-panel__tabs" aria-label="Secciones">
-        {SECTIONS.map((sec) => (
+        {sections.map((sec) => (
           <button
             key={sec.id}
             className={`editor-panel__tab ${activeSection === sec.id ? 'editor-panel__tab--active' : ''}`}
@@ -147,8 +160,8 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
           </div>
         )}
 
-        {/* ── Nuestra Historia ── */}
-        {activeSection === 'historia' && (
+        {/* ── Nuestra Historia — solo Soho ── */}
+        {activeSection === 'historia' && !isElegant && (
           <div className="editor-panel__section">
             <EditorField label="Texto introductorio" fieldKey="storyIntro" multiline placeholder="Frase de bienvenida..." />
 
@@ -254,17 +267,19 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
                       onChange={(e) => setScheduleItem(i, 'time', e.target.value)}
                     />
                   </div>
-                  <div className="editor-panel__col-sm">
-                    <label className="editor-panel__inline-label">Ícono</label>
-                    <input
-                      className="editor-panel__inline-input"
-                      value={item.icon}
-                      placeholder="💍"
-                      onFocus={() => setActiveField(`scheduleItem-${i}`)}
-                      onBlur={() => setActiveField(null)}
-                      onChange={(e) => setScheduleItem(i, 'icon', e.target.value)}
-                    />
-                  </div>
+                  {!isElegant && (
+                    <div className="editor-panel__col-sm">
+                      <label className="editor-panel__inline-label">Ícono</label>
+                      <input
+                        className="editor-panel__inline-input"
+                        value={item.icon ?? ''}
+                        placeholder="💍"
+                        onFocus={() => setActiveField(`scheduleItem-${i}`)}
+                        onBlur={() => setActiveField(null)}
+                        onChange={(e) => setScheduleItem(i, 'icon', e.target.value)}
+                      />
+                    </div>
+                  )}
                   <div className="editor-panel__col-lg">
                     <label className="editor-panel__inline-label">Actividad</label>
                     <input
@@ -276,6 +291,19 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
                       onChange={(e) => setScheduleItem(i, 'label', e.target.value)}
                     />
                   </div>
+                  {isElegant && (
+                    <div className="editor-panel__col-lg">
+                      <label className="editor-panel__inline-label">Detalle</label>
+                      <input
+                        className="editor-panel__inline-input"
+                        value={item.detail ?? ''}
+                        placeholder="Descripción breve"
+                        onFocus={() => setActiveField(`scheduleItem-${i}`)}
+                        onBlur={() => setActiveField(null)}
+                        onChange={(e) => setScheduleItem(i, 'detail', e.target.value)}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -401,7 +429,6 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
           </div>
         )}
 
-        {/* ── Empty state ── */}
         {!activeSection && (
           <div className="editor-panel__empty">
             <p>Selecciona una sección para empezar a editar</p>

@@ -37,7 +37,7 @@ const SuccessOverlay = () => (
 );
 
 // Renders the preview once the template module is loaded
-const TemplatePreview = ({ templateModule, activeSection, previewRef }) => {
+const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolled }) => {
   const {
     Navigation, Hero, Story, Countdown,
     Events, Schedule, DressCode, GiftRegistry, RsvpForm, Footer,
@@ -49,7 +49,7 @@ const TemplatePreview = ({ templateModule, activeSection, previewRef }) => {
   return (
     <TemplateProvider data={data}>
       <div ref={previewRef} className="editor-layout__preview-inner">
-        <Navigation />
+        <Navigation forceScrolled={navScrolled} />
         <SectionWrapper id="hero" activeSection={activeSection}>
           <Hero />
         </SectionWrapper>
@@ -88,8 +88,9 @@ TemplatePreview.propTypes = {
   templateModule: PropTypes.object.isRequired,
   activeSection:  PropTypes.string,
   previewRef:     PropTypes.object.isRequired,
+  navScrolled:    PropTypes.bool,
 };
-TemplatePreview.defaultProps = { activeSection: null };
+TemplatePreview.defaultProps = { activeSection: null, navScrolled: false };
 
 const EditorLayout = ({ templateSlug }) => {
   const [showPreview, setShowPreview]       = useState(false);
@@ -149,6 +150,7 @@ const EditorLayout = ({ templateSlug }) => {
               templateModule={templateModule}
               activeSection={activeSection}
               previewRef={previewRef}
+              navScrolled={navScrolled}
             />
           ) : (
             <div className="editor-layout__loading">Cargando template…</div>

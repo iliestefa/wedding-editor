@@ -1,0 +1,58 @@
+// ─── Default values for Elegant template (Champagne & Charcoal) ──────────────
+
+export const BRIDE_NAME    = 'Sofía';
+export const GROOM_NAME    = 'Alejandro';
+export const COUPLE_NAMES  = `${BRIDE_NAME} & ${GROOM_NAME}`;
+
+export const WEDDING_DATE_ISO     = '2026-09-05';
+export const WEDDING_DATE_DISPLAY = '05 · 09 · 2026';
+export const WEDDING_YEAR         = '2026';
+
+export const CEREMONY_TIME           = '17:00 hrs';
+export const CEREMONY_VENUE_NAME     = 'Iglesia del Pilar';
+export const CEREMONY_VENUE_ADDRESS  = 'Junín 1904, Recoleta, Buenos Aires';
+export const CEREMONY_MAPS_LINK      = 'https://maps.google.com/?q=Iglesia+Nuestra+Señora+del+Pilar+Buenos+Aires';
+export const CEREMONY_MAPS_EMBED_SRC = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.168839143649!2d-58.39340898477058!3d-34.58760218046614!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcca7e9bc3c1a5%3A0x8b1c17b4f5c2c4a0!2sIglesia%20de%20Nuestra%20Se%C3%B1ora%20del%20Pilar!5e0!3m2!1ses!2sar!4v1700000000000';
+
+export const RECEPTION_TIME           = '20:00 hrs';
+export const RECEPTION_VENUE_NAME     = 'Palacio Duhau Park Hyatt';
+export const RECEPTION_VENUE_ADDRESS  = 'Av. Alvear 1661, Recoleta, Buenos Aires';
+export const RECEPTION_MAPS_LINK      = 'https://maps.google.com/?q=Park+Hyatt+Buenos+Aires+Palacio+Duhau';
+export const RECEPTION_MAPS_EMBED_SRC = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.3290060978736!2d-58.38766678477066!3d-34.58393378046617!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x95bcca7bb0fc14ab%3A0x49b9fbb3caaf99c2!2sPark%20Hyatt%20Buenos%20Aires!5e0!3m2!1ses!2sar!4v1700000000001';
+
+export const SCHEDULE_ITEMS = [
+  { id: 'llegada',   time: '16:30', label: 'Llegada',             detail: 'Les esperamos en la puerta de la iglesia.' },
+  { id: 'ceremonia', time: '17:00', label: 'Ceremonia',           detail: 'Iglesia del Pilar, Recoleta.' },
+  { id: 'fotos',     time: '18:30', label: 'Sesión de fotos',     detail: 'Jardines del Pilar.' },
+  { id: 'recepcion', time: '20:00', label: 'Recepción & Cóctel',  detail: 'Palacio Duhau Park Hyatt.' },
+  { id: 'cena',      time: '21:30', label: 'Cena de gala',        detail: 'Salón principal.' },
+  { id: 'baile',     time: '23:30', label: 'Celebración & Baile', detail: '¡A disfrutar!' },
+];
+
+export const DRESS_CODE_STYLE       = 'Black Tie Optional';
+export const DRESS_CODE_DESCRIPTION = 'Les pedimos acompañar la noche con elegancia. Tonos oscuros y neutros profundos. Por favor evitar el blanco.';
+export const DRESS_CODE_WOMEN       = 'Vestido largo o de cóctel en negro, champagne, burdeos o azul noche.';
+export const DRESS_CODE_MEN         = 'Traje oscuro o smoking. Negro, grafito, azul marino o burdeos.';
+
+export const DRESS_CODE_PALETTE = [
+  { id: 'black',     label: 'Negro',     hex: '#1c1917' },
+  { id: 'champagne', label: 'Champagne', hex: '#e8d5b0' },
+  { id: 'burgundy',  label: 'Burdeos',   hex: '#6b2737' },
+  { id: 'navy',      label: 'Navy',      hex: '#1a2744' },
+  { id: 'graphite',  label: 'Grafito',   hex: '#3d3d3d' },
+  { id: 'gold',      label: 'Dorado',    hex: '#c9a96e' },
+];
+
+export const GIFT_REGISTRY_INTRO = 'Su presencia es nuestro mayor regalo. Si desean obsequiarnos algo, aquí encontrarán nuestras cuentas.';
+
+export const BANK_ACCOUNTS = [
+  { id: 'sofia',     ownerName: 'Sofía Morales',   bankName: 'Banco Pichincha', accountType: 'Cuenta de Ahorros', accountAlias: 'sofia.morales',   cbu: '2200123456789012', accountNumberLabel: 'N° de Cuenta' },
+  { id: 'alejandro', ownerName: 'Alejandro Gómez', bankName: 'Banco Guayaquil', accountType: 'Cuenta Corriente',  accountAlias: 'alejandro.gomez', cbu: '0200987654321098', accountNumberLabel: 'N° de Cuenta' },
+];
+
+export const RSVP_DEADLINE  = '01 de Julio 2026';
+export const FOOTER_MESSAGE = 'Con amor, los esperamos.';
+
+export const IMAGE_HERO      = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80&auto=format&fit=crop';
+export const IMAGE_CEREMONY  = 'https://images.unsplash.com/photo-1606216840721-aeb5c80ad67e?w=900&q=80&auto=format&fit=crop';
+export const IMAGE_DRESSCODE = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=2070&auto=format&fit=crop';
