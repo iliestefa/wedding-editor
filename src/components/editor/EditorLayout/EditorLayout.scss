@@ -250,47 +250,46 @@ $bar-border: rgba(141, 184, 154, 0.2);
 }
 
 // ── Navigation fix ────────────────────────────────────────────────
-// The wedding nav uses position:fixed and listens to window.scroll.
-// Inside the editor canvas (overflow-y: auto div), window never scrolls,
-// so nav--scrolled class is never applied and the nav stays transparent.
-// Fix: override to sticky. Nav is pulled out of the hero SectionWrapper
-// so it doesn't push hero content down. Hero gets negative margin-top
-// equal to the nav height so it slides behind the sticky nav, matching
-// the original fixed-nav layout visually.
+// Nav uses position:fixed + window.scroll — neither works in the canvas.
+// Override to sticky so it scrolls with the canvas content.
 .editor-layout__preview-canvas {
   .nav {
     position: sticky !important;
     top: 0 !important;
-    z-index: 10 !important;
-    // Default: transparent (same as original over hero image)
+    z-index: 200 !important;
     background-color: transparent !important;
     backdrop-filter: none !important;
     box-shadow: none !important;
   }
 
-  // Hero slides up behind the sticky nav (mirrors position:fixed behavior)
+  // Hero slides up behind the sticky nav
   .hero {
     margin-top: -72px !important;
   }
+}
 
-  // When canvas has scrolled past 60px, simulate nav--scrolled
-  &--scrolled {
+// ── Nav scrolled state — Soho template (light) ────────────────────
+.editor-layout__preview-canvas--soho {
+  &.editor-layout__preview-canvas--scrolled {
     .nav {
       background-color: rgba(250, 245, 239, 0.95) !important;
       backdrop-filter: blur(12px) !important;
       box-shadow: 0 1px 0 rgba(196, 152, 90, 0.15) !important;
 
-      .nav__link {
-        color: #2a221a !important;
-      }
+      .nav__link { color: #2a221a !important; }
+      .nav__monogram-text { color: #c4985a !important; }
+      .nav__burger span { background: #2a221a !important; }
+    }
+  }
+}
 
-      .nav__monogram-text {
-        color: #c4985a !important;
-      }
-
-      .nav__burger span {
-        background: #2a221a !important;
-      }
+// ── Nav scrolled state — Elegant template (dark) ──────────────────
+.editor-layout__preview-canvas--elegant {
+  &.editor-layout__preview-canvas--scrolled {
+    .nav {
+      background-color: rgba(17, 15, 13, 0.92) !important;
+      backdrop-filter: blur(16px) !important;
+      border-bottom-color: rgba(201, 169, 110, 0.2) !important;
     }
   }
 }

@@ -142,7 +142,7 @@ const EditorLayout = ({ templateSlug }) => {
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
         <div
           ref={canvasRef}
-          className={`editor-layout__preview-canvas${navScrolled ? ' editor-layout__preview-canvas--scrolled' : ''}`}
+          className={`editor-layout__preview-canvas editor-layout__preview-canvas--${slug}${navScrolled ? ' editor-layout__preview-canvas--scrolled' : ''}`}
         >
           {submitted && <SuccessOverlay />}
           {templateModule ? (
