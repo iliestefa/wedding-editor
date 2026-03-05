@@ -37,7 +37,7 @@ const SuccessOverlay = () => (
 );
 
 // Renders the preview once the template module is loaded
-const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolled }) => {
+const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolled, scale }) => {
   const {
     Navigation, Hero, Story, Countdown,
     Events, Schedule, DressCode, GiftRegistry, RsvpForm, Footer,
@@ -48,7 +48,11 @@ const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolle
 
   return (
     <TemplateProvider data={data}>
-      <div ref={previewRef} className="editor-layout__preview-inner">
+      <div
+        ref={previewRef}
+        className="editor-layout__preview-inner"
+        style={scale < 1 ? { zoom: scale } : {}}
+      >
         <Navigation forceScrolled={navScrolled} />
         <SectionWrapper id="hero" activeSection={activeSection}>
           <Hero />
@@ -89,8 +93,11 @@ TemplatePreview.propTypes = {
   activeSection:  PropTypes.string,
   previewRef:     PropTypes.object.isRequired,
   navScrolled:    PropTypes.bool,
+  scale:          PropTypes.number,
 };
-TemplatePreview.defaultProps = { activeSection: null, navScrolled: false };
+TemplatePreview.defaultProps = { activeSection: null, navScrolled: false, scale: 1 };
+
+const DESIGN_WIDTH = 1280; // px — template is designed for this viewport width
 
 const EditorLayout = ({ templateSlug }) => {
   const [showPreview, setShowPreview]       = useState(false);
@@ -98,6 +105,7 @@ const EditorLayout = ({ templateSlug }) => {
   const [submitted, setSubmitted]           = useState(false);
   const [navScrolled, setNavScrolled]       = useState(false);
   const [templateModule, setTemplateModule] = useState(null);
+  const [previewScale, setPreviewScale]     = useState(1);
   const previewRef = useRef(null);
   const canvasRef  = useRef(null);
 
@@ -115,6 +123,20 @@ const EditorLayout = ({ templateSlug }) => {
     update();
     canvas.addEventListener('scroll', update, { passive: true });
     return () => canvas.removeEventListener('scroll', update);
+  }, []);
+
+  // Scale preview-inner so the template always renders at full design width
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const updateScale = () => {
+      const scale = Math.min(1, canvas.clientWidth / DESIGN_WIDTH);
+      setPreviewScale(scale);
+    };
+    updateScale();
+    const ro = new ResizeObserver(updateScale);
+    ro.observe(canvas);
+    return () => ro.disconnect();
   }, []);
 
   const scrollToSection = useCallback((sectionId) => {
@@ -151,6 +173,7 @@ const EditorLayout = ({ templateSlug }) => {
               activeSection={activeSection}
               previewRef={previewRef}
               navScrolled={navScrolled}
+              scale={previewScale}
             />
           ) : (
             <div className="editor-layout__loading">Cargando template…</div>

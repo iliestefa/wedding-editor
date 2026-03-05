@@ -91,7 +91,9 @@ $bar-border: rgba(141, 184, 154, 0.2);
   }
 
   &__preview-inner {
-    // intentionally empty — full-width
+    // When zoom < 1 is applied via JS, width is set to 100/zoom% so the template
+    // always sees a full-design-width canvas and media queries fire correctly.
+    width: 100%;
   }
 
   // ── Editor panel (right column on desktop) ───────────────────────
