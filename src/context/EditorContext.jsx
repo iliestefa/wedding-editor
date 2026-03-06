@@ -145,7 +145,8 @@ export const EditorProvider = ({ templateSlug, children }) => {
   const removeDressCodeColor = (index)               => dispatch({ type: 'REMOVE_DRESS_CODE_COLOR', index });
 
   const coupleNames = `${data.brideName} & ${data.groomName}`;
-  const liveData = { ...data, coupleNames };
+  const weddingYear = data.weddingDateIso ? data.weddingDateIso.slice(0, 4) : data.weddingYear;
+  const liveData = { ...data, coupleNames, weddingYear };
 
   return (
     <EditorContext.Provider value={{
