@@ -67,5 +67,5 @@ export const FOOTER_MESSAGE  = 'Nos mueve el amor, nos une la familia.';
 
 export const IMAGE_HERO       = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80&auto=format&fit=crop';
 export const IMAGE_STORY      = 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1200&q=80&auto=format&fit=crop';
-export const IMAGE_DRESS_CODE = 'https://images.unsplash.com/photo-1765615191957-eaa2feb8c00d?w=800&q=80&auto=format&fit=crop';
+export const IMAGE_DRESS_CODE = 'https://images.unsplash.com/photo-1765615191957-eaa2feb8c00d?w=1600&q=90&auto=format&fit=crop';
 export const IMAGE_RINGS      = 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=900&q=80&auto=format&fit=crop';

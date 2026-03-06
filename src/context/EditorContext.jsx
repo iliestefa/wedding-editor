@@ -50,8 +50,9 @@ const buildInitialState = (slug) => {
 
   // Elegant-only fields
   if (slug === 'elegant') {
-    base.imageCeremony = ElegantDefaults.IMAGE_CEREMONY;
-    base.imageDressCode= ElegantDefaults.IMAGE_DRESSCODE;
+    base.imageCeremony       = ElegantDefaults.IMAGE_CEREMONY;
+    base.imageDressCodeWomen = ElegantDefaults.IMAGE_DRESSCODE_WOMEN;
+    base.imageDressCodeMen   = ElegantDefaults.IMAGE_DRESSCODE_MEN;
   }
 
   return base;

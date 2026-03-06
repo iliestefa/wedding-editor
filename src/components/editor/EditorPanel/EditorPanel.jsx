@@ -422,15 +422,42 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
               </>
             )}
 
-            <p className="editor-panel__group-label">Foto de vestimenta</p>
-            <EditorField label="URL de la imagen" fieldKey="imageDressCode" placeholder="https://..." />
-            {data.imageDressCode && (
-              <img
-                className="editor-panel__img-preview"
-                src={data.imageDressCode}
-                alt="Preview vestimenta"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
+            {isElegant ? (
+              <>
+                <p className="editor-panel__group-label">Foto — Damas</p>
+                <EditorField label="URL de la imagen" fieldKey="imageDressCodeWomen" placeholder="https://..." />
+                {data.imageDressCodeWomen && (
+                  <img
+                    className="editor-panel__img-preview"
+                    src={data.imageDressCodeWomen}
+                    alt="Preview damas"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                )}
+                <p className="editor-panel__group-label">Foto — Caballeros</p>
+                <EditorField label="URL de la imagen" fieldKey="imageDressCodeMen" placeholder="https://..." />
+                {data.imageDressCodeMen && (
+                  <img
+                    className="editor-panel__img-preview"
+                    src={data.imageDressCodeMen}
+                    alt="Preview caballeros"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <p className="editor-panel__group-label">Foto de vestimenta</p>
+                <EditorField label="URL de la imagen" fieldKey="imageDressCode" placeholder="https://..." />
+                {data.imageDressCode && (
+                  <img
+                    className="editor-panel__img-preview"
+                    src={data.imageDressCode}
+                    alt="Preview vestimenta"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                )}
+              </>
             )}
           </div>
         )}
