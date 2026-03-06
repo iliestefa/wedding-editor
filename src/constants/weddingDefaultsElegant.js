@@ -55,5 +55,5 @@ export const FOOTER_MESSAGE = 'Con amor, los esperamos.';
 
 export const IMAGE_HERO            = 'https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80&auto=format&fit=crop';
 export const IMAGE_CEREMONY        = 'https://images.unsplash.com/photo-1606216840721-aeb5c80ad67e?w=900&q=80&auto=format&fit=crop';
-export const IMAGE_DRESSCODE_WOMEN = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=90&auto=format&fit=crop';
-export const IMAGE_DRESSCODE_MEN   = 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1200&q=90&auto=format&fit=crop';
+export const IMAGE_DRESSCODE_WOMEN = 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=1200&q=90&auto=format&fit=crop';
+export const IMAGE_DRESSCODE_MEN   = 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=1200&q=90&auto=format&fit=crop';
