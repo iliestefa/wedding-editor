@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
-    "@iliestefa/wedding-elegant": "^1.0.2",
-    "@iliestefa/wedding-soho": "^1.0.1",
+    "@iliestefa/wedding-elegant": "file:../wedding-invitation-template-elegant",
+    "@iliestefa/wedding-soho": "file:../web boda v3",
     "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
