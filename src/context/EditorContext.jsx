@@ -15,6 +15,7 @@ const buildInitialState = (slug) => {
     weddingDateIso:       D.WEDDING_DATE_ISO,
     weddingDateDisplay:   D.WEDDING_DATE_DISPLAY,
     weddingYear:          D.WEDDING_YEAR,
+    weddingTime:          '17:00',
     ceremonyTime:         D.CEREMONY_TIME,
     ceremonyVenueName:    D.CEREMONY_VENUE_NAME,
     ceremonyVenueAddress: D.CEREMONY_VENUE_ADDRESS,

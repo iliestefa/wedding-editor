@@ -33,11 +33,18 @@ const MONTHS = [
   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre',
 ];
 
-const DatePicker = ({ isoValue, onIsoChange, onDisplayChange }) => {
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES_OPTS = ['00', '15', '30', '45'];
+
+const DatePicker = ({ isoValue, timeValue, onIsoChange, onDisplayChange, onTimeChange }) => {
   const [y, m, d] = (isoValue || '').split('-');
   const year  = y ? parseInt(y,  10) : '';
   const month = m ? parseInt(m,  10) : '';
   const day   = d ? parseInt(d,  10) : '';
+
+  const [th, tm] = (timeValue || '17:00').split(':');
+  const timeH = th || '17';
+  const timeM = tm || '00';
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => currentYear + i);
@@ -89,15 +96,38 @@ const DatePicker = ({ isoValue, onIsoChange, onDisplayChange }) => {
           {years.map((y) => <option key={y} value={y}>{y}</option>)}
         </select>
       </div>
+      <div className="editor-panel__date-col">
+        <label className="editor-panel__inline-label">Hora</label>
+        <select
+          className="editor-panel__inline-select"
+          value={timeH}
+          onChange={(e) => onTimeChange(`${e.target.value}:${timeM}`)}
+        >
+          {HOURS.map((h) => <option key={h} value={h}>{h}</option>)}
+        </select>
+      </div>
+      <div className="editor-panel__date-col">
+        <label className="editor-panel__inline-label">Min</label>
+        <select
+          className="editor-panel__inline-select"
+          value={timeM}
+          onChange={(e) => onTimeChange(`${timeH}:${e.target.value}`)}
+        >
+          {MINUTES_OPTS.map((m) => <option key={m} value={m}>{m}</option>)}
+        </select>
+      </div>
     </div>
   );
 };
 
 DatePicker.propTypes = {
   isoValue:        PropTypes.string.isRequired,
+  timeValue:       PropTypes.string,
   onIsoChange:     PropTypes.func.isRequired,
   onDisplayChange: PropTypes.func.isRequired,
+  onTimeChange:    PropTypes.func.isRequired,
 };
+DatePicker.defaultProps = { timeValue: '17:00' };
 
 // ── Main panel ──────────────────────────────────────────────────────────────
 const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
@@ -143,11 +173,13 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
             <EditorField label="Nombre de la novia" fieldKey="brideName" placeholder="Ej: Sofia" />
             <EditorField label="Nombre del novio"   fieldKey="groomName" placeholder="Ej: Alejandro" />
 
-            <p className="editor-panel__group-label">Fecha de la boda</p>
+            <p className="editor-panel__group-label">Fecha y hora de la boda</p>
             <DatePicker
               isoValue={data.weddingDateIso}
+              timeValue={data.weddingTime}
               onIsoChange={(v) => setField('weddingDateIso', v)}
               onDisplayChange={(v) => setField('weddingDateDisplay', v)}
+              onTimeChange={(v) => setField('weddingTime', v)}
             />
 
             <p className="editor-panel__group-label">Foto de portada</p>
