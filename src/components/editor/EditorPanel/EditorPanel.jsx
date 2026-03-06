@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { useEditor } from '../../../context/EditorContext';
 import EditorField from '../EditorField/EditorField';
 import EditorSubmit from '../EditorSubmit/EditorSubmit';
+import { mapsLinkToEmbedSrc } from '../../../utils/mapsUtils';
 import './EditorPanel.scss';
 
 const SECTIONS_SOHO = [
@@ -227,16 +228,34 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
         {activeSection === 'eventos' && (
           <div className="editor-panel__section">
             <p className="editor-panel__group-label">Ceremonia</p>
-            <EditorField label="Hora"             fieldKey="ceremonyTime"          placeholder="17:00 hrs" />
-            <EditorField label="Lugar"            fieldKey="ceremonyVenueName"     placeholder="Nombre de la iglesia" />
-            <EditorField label="Dirección"        fieldKey="ceremonyVenueAddress"  placeholder="Calle, ciudad" />
-            <EditorField label="Link Google Maps" fieldKey="ceremonyMapsLink"      placeholder="https://maps.google.com/..." />
+            <EditorField label="Hora"      fieldKey="ceremonyTime"         placeholder="17:00 hrs" />
+            <EditorField label="Lugar"     fieldKey="ceremonyVenueName"    placeholder="Nombre de la iglesia" />
+            <EditorField label="Dirección" fieldKey="ceremonyVenueAddress" placeholder="Calle, ciudad" />
+            <EditorField
+              label="Link Google Maps"
+              fieldKey="ceremonyMapsLink"
+              placeholder="https://maps.google.com/?q=..."
+              onChange={(v) => {
+                setField('ceremonyMapsLink', v);
+                const embed = mapsLinkToEmbedSrc(v);
+                if (embed) setField('ceremonyMapsEmbedSrc', embed);
+              }}
+            />
 
             <p className="editor-panel__group-label">Recepción</p>
-            <EditorField label="Hora"             fieldKey="receptionTime"         placeholder="20:00 hrs" />
-            <EditorField label="Lugar"            fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
-            <EditorField label="Dirección"        fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
-            <EditorField label="Link Google Maps" fieldKey="receptionMapsLink"     placeholder="https://maps.google.com/..." />
+            <EditorField label="Hora"      fieldKey="receptionTime"         placeholder="20:00 hrs" />
+            <EditorField label="Lugar"     fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
+            <EditorField label="Dirección" fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
+            <EditorField
+              label="Link Google Maps"
+              fieldKey="receptionMapsLink"
+              placeholder="https://maps.google.com/?q=..."
+              onChange={(v) => {
+                setField('receptionMapsLink', v);
+                const embed = mapsLinkToEmbedSrc(v);
+                if (embed) setField('receptionMapsEmbedSrc', embed);
+              }}
+            />
           </div>
         )}
 

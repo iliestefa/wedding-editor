@@ -2,9 +2,17 @@ import PropTypes from 'prop-types';
 import { useEditor } from '../../../context/EditorContext';
 import './EditorField.scss';
 
-const EditorField = ({ label, fieldKey, multiline = false, placeholder = '' }) => {
+const EditorField = ({ label, fieldKey, multiline = false, placeholder = '', onChange }) => {
   const { data, setField, setActiveField } = useEditor();
   const value = data[fieldKey] ?? '';
+
+  const handleChange = (e) => {
+    if (onChange) {
+      onChange(e.target.value);
+    } else {
+      setField(fieldKey, e.target.value);
+    }
+  };
 
   return (
     <div
@@ -21,7 +29,7 @@ const EditorField = ({ label, fieldKey, multiline = false, placeholder = '' }) =
           className="editor-field__textarea"
           value={value}
           placeholder={placeholder}
-          onChange={(e) => setField(fieldKey, e.target.value)}
+          onChange={handleChange}
           rows={3}
         />
       ) : (
@@ -31,7 +39,7 @@ const EditorField = ({ label, fieldKey, multiline = false, placeholder = '' }) =
           className="editor-field__input"
           value={value}
           placeholder={placeholder}
-          onChange={(e) => setField(fieldKey, e.target.value)}
+          onChange={handleChange}
         />
       )}
     </div>
@@ -43,6 +51,8 @@ EditorField.propTypes = {
   fieldKey:    PropTypes.string.isRequired,
   multiline:   PropTypes.bool,
   placeholder: PropTypes.string,
+  onChange:    PropTypes.func,
 };
+EditorField.defaultProps = { onChange: null };
 
 export default EditorField;
