@@ -27,6 +27,11 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: '@iliestefa'
 
+      - name: Use published packages in CI
+        run: |
+          npm pkg set dependencies["@iliestefa/wedding-soho"]="latest"
+          npm pkg set dependencies["@iliestefa/wedding-elegant"]="latest"
+
       - run: npm install
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
