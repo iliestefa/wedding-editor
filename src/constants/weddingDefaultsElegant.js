@@ -55,5 +55,5 @@ export const FOOTER_MESSAGE = 'Con amor, los esperamos.';
 
 export const IMAGE_HERO            = 'https://i.postimg.cc/gJyns8nL/pexels-jasminecarter-888899.jpg';
 export const IMAGE_CEREMONY        = 'https://images.unsplash.com/photo-1606216840721-aeb5c80ad67e?w=900&q=80&auto=format&fit=crop';
-export const IMAGE_DRESSCODE_WOMEN = 'https://i.postimg.cc/zXvGb9Sb/pexels-drewrae-883362.jpg';
-export const IMAGE_DRESSCODE_MEN   = 'https://img.freepik.com/foto-gratis/traje-novio-primer-plano_1303-10568.jpg?t=st=1772823100~exp=1772826700~hmac=3a581b62d68541e41ddb3da75b1db7cb117c84588115cfd2202f2779f9a48e24&w=1060';
+export const IMAGE_DRESSCODE_WOMEN = 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=1200&q=90&auto=format&fit=crop';
+export const IMAGE_DRESSCODE_MEN   = 'https://i.postimg.cc/zXvGb9Sb/pexels-drewrae-883362.jpg';
