@@ -65,15 +65,16 @@ export const IMAGE_RINGS = ${s(d.imageRings)};
 `;
 };
 
-export const sendEditorData = async (weddingData) => {
+export const sendEditorData = async (weddingData, order = '') => {
   const { brideName, groomName } = weddingData;
 
   const templateParams = {
     to_email:       'developer@iliestefa.com',
-    subject:        `Datos de boda — ${brideName} & ${groomName}`,
+    subject:        `Datos de boda — ${brideName} & ${groomName} [order: ${order}]`,
     bride_name:     brideName,
     groom_name:     groomName,
     wedding_date:   weddingData.weddingDateDisplay,
+    order,
     extra_notes:    weddingData.extraNotes || '(sin notas adicionales)',
     constants_file: buildConstantsFile(weddingData),
     data_json:      JSON.stringify(weddingData, null, 2),

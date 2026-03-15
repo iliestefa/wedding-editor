@@ -8,10 +8,11 @@ import './index.css';
 const params = new URLSearchParams(window.location.search);
 const slug = params.get('template') ?? '';
 const templateSlug = TEMPLATES[slug] ? slug : DEFAULT_TEMPLATE;
+const order = params.get('order') ?? '';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <EditorProvider templateSlug={templateSlug}>
+    <EditorProvider templateSlug={templateSlug} order={order}>
       <App />
     </EditorProvider>
   </StrictMode>,

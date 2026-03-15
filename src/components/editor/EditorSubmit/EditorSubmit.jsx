@@ -7,17 +7,17 @@ import './EditorSubmit.scss';
 const SEND_STATUS = { IDLE: 'idle', LOADING: 'loading', SUCCESS: 'success', ERROR: 'error' };
 
 const EditorSubmit = ({ onSuccess }) => {
-  const { data } = useEditor();
+  const { data, order } = useEditor();
   const [status, setStatus] = useState(SEND_STATUS.IDLE);
   const [errors, setErrors] = useState([]);
   const [sendError, setSendError] = useState('');
 
   const validate = () => {
     const missing = [];
-    if (!data.brideName.trim())         missing.push('Nombre de la novia');
-    if (!data.groomName.trim())         missing.push('Nombre del novio');
-    if (!data.weddingDateIso.trim())    missing.push('Fecha de la boda');
-    if (!data.ceremonyVenueName.trim()) missing.push('Lugar de la ceremonia');
+    if (!data.brideName.trim())          missing.push('Nombre de la novia');
+    if (!data.groomName.trim())          missing.push('Nombre del novio');
+    if (!data.weddingDateIso.trim())     missing.push('Fecha de la boda');
+    if (!data.ceremonyVenueName.trim())  missing.push('Lugar de la ceremonia');
     if (!data.receptionVenueName.trim()) missing.push('Lugar de la recepción');
     return missing;
   };
@@ -31,7 +31,7 @@ const EditorSubmit = ({ onSuccess }) => {
     setErrors([]);
     setStatus(SEND_STATUS.LOADING);
     try {
-      await sendEditorData(data);
+      await sendEditorData(data, order);
       setStatus(SEND_STATUS.SUCCESS);
       onSuccess?.();
     } catch (err) {
@@ -52,6 +52,8 @@ const EditorSubmit = ({ onSuccess }) => {
       </div>
     );
   }
+
+  if (!order) return null;
 
   return (
     <div className="editor-submit">
