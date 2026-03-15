@@ -1,12 +1,12 @@
-// ── Paleta cálida ─────────────────────────────────────────────────
-$ep-bg:          #3d2b1f;
-$ep-bg-alt:      #4a3728;
-$ep-bg-card:     rgba(255, 255, 255, 0.04);
-$ep-border:      rgba(184, 154, 106, 0.18);
+// ── Paleta cálida clara ───────────────────────────────────────────
+$ep-bg:          #faf6f0;
+$ep-bg-alt:      #f5efe4;
+$ep-bg-card:     rgba(255, 255, 255, 0.7);
+$ep-border:      rgba(184, 154, 106, 0.2);
 $ep-accent:      #b89a6a;
-$ep-accent-glow: rgba(184, 154, 106, 0.15);
-$ep-text:        #faf6f0;
-$ep-text-muted:  rgba(122, 95, 78, 1);
+$ep-accent-glow: rgba(184, 154, 106, 0.12);
+$ep-text:        #4a3728;
+$ep-text-muted:  #a88b78;
 
 .editor-panel {
   display: flex;
@@ -71,7 +71,7 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
 
     &--active {
       background: $ep-accent-glow;
-      border-color: rgba(184, 154, 106, 0.5);
+      border-color: rgba(184, 154, 106, 0.4);
       color: $ep-accent;
     }
   }
@@ -152,7 +152,7 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     transition: background 0.18s, border-color 0.18s;
 
     &:hover {
-      background: rgba(184, 154, 106, 0.2);
+      background: rgba(184, 154, 106, 0.18);
       border-color: rgba(184, 154, 106, 0.6);
     }
   }
@@ -160,7 +160,7 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
   &__remove-btn {
     background: transparent;
     border: none;
-    color: rgba(250, 246, 240, 0.3);
+    color: rgba(74, 55, 40, 0.3);
     cursor: pointer;
     font-size: 0.7rem;
     line-height: 1;
@@ -169,8 +169,8 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     transition: color 0.15s, background 0.15s;
 
     &:hover {
-      color: #f87171;
-      background: rgba(248, 113, 113, 0.1);
+      color: #c9847e;
+      background: rgba(201, 132, 126, 0.1);
     }
   }
 
@@ -211,8 +211,8 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
 
   &__inline-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(184, 154, 106, 0.2);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(184, 154, 106, 0.22);
     border-radius: 5px;
     color: $ep-text;
     font-size: 0.82rem;
@@ -221,19 +221,19 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     transition: border-color 0.18s, background 0.18s;
     box-sizing: border-box;
 
-    &::placeholder { color: rgba(250, 246, 240, 0.25); }
+    &::placeholder { color: rgba(74, 55, 40, 0.25); }
 
     &:focus {
       outline: none;
       border-color: $ep-accent;
-      background: $ep-accent-glow;
+      background: rgba(240, 230, 210, 0.4);
     }
   }
 
   &__inline-select {
     width: 100%;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(184, 154, 106, 0.2);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(184, 154, 106, 0.22);
     border-radius: 5px;
     color: $ep-text;
     font-size: 0.82rem;
@@ -245,7 +245,7 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     appearance: none;
 
     option {
-      background: #3d2b1f;
+      background: #faf6f0;
       color: $ep-text;
     }
 
@@ -257,8 +257,8 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
 
   &__inline-textarea {
     width: 100%;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(184, 154, 106, 0.2);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(184, 154, 106, 0.22);
     border-radius: 5px;
     color: $ep-text;
     font-size: 0.82rem;
@@ -270,12 +270,12 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     box-sizing: border-box;
     margin-top: 0.3rem;
 
-    &::placeholder { color: rgba(250, 246, 240, 0.25); }
+    &::placeholder { color: rgba(74, 55, 40, 0.25); }
 
     &:focus {
       outline: none;
       border-color: $ep-accent;
-      background: $ep-accent-glow;
+      background: rgba(240, 230, 210, 0.4);
     }
   }
 
@@ -320,7 +320,7 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(74, 55, 40, 0.15);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -365,9 +365,9 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #3d2b1f;
+    background: #f5efe4;
     border: 1px solid rgba(184, 154, 106, 0.3);
-    color: rgba(250, 246, 240, 0.5);
+    color: $ep-text-muted;
     font-size: 0.5rem;
     line-height: 1;
     cursor: pointer;
@@ -378,9 +378,9 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
     transition: background 0.15s, color 0.15s;
 
     &:hover {
-      background: rgba(248, 113, 113, 0.2);
-      color: #f87171;
-      border-color: rgba(248, 113, 113, 0.4);
+      background: rgba(201, 132, 126, 0.15);
+      color: #c9847e;
+      border-color: rgba(201, 132, 126, 0.4);
     }
   }
 
@@ -458,7 +458,7 @@ $ep-text-muted:  rgba(122, 95, 78, 1);
 
 .editor-panel__extras-textarea {
   width: 100%;
-  background: $ep-bg-alt;
+  background: rgba(255, 255, 255, 0.6);
   border: 1px solid $ep-border;
   border-radius: 6px;
   color: $ep-text;

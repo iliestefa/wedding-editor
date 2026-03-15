@@ -1,7 +1,8 @@
 .editor-submit {
   padding: 1.25rem 1.25rem 1.5rem;
-  border-top: 1px solid rgba(184, 154, 106, 0.18);
+  border-top: 1px solid rgba(184, 154, 106, 0.2);
   flex-shrink: 0;
+  background: #f5efe4;
 
   &--success {
     text-align: center;
@@ -18,27 +19,27 @@
   &__title {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.1rem;
-    color: #faf6f0;
+    color: #4a3728;
     margin: 0 0 0.5rem;
   }
 
   &__message {
     font-size: 0.85rem;
     font-weight: 300;
-    color: rgba(122, 95, 78, 0.8);
+    color: #a88b78;
     line-height: 1.6;
     margin: 0;
   }
 
   &__errors {
     list-style: none;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(201, 132, 126, 0.1);
+    border: 1px solid rgba(201, 132, 126, 0.3);
     border-radius: 5px;
     padding: 0.75rem 1rem;
     margin: 0 0 1rem;
     font-size: 0.8rem;
-    color: #fca5a5;
+    color: #b85c38;
     line-height: 1.7;
   }
 
@@ -74,7 +75,7 @@
 
   &__error-msg {
     font-size: 0.8rem;
-    color: #fca5a5;
+    color: #b85c38;
     margin: 0.75rem 0 0;
     text-align: center;
   }

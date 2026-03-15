@@ -9,7 +9,7 @@
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(141, 184, 154, 0.75);
+    color: #a88b78;
   }
 
   &__input,
@@ -17,9 +17,9 @@
     font-family: inherit;
     font-size: 0.82rem;
     font-weight: 300;
-    color: #d8ede1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(141, 184, 154, 0.18);
+    color: #4a3728;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(184, 154, 106, 0.25);
     border-radius: 5px;
     padding: 0.35rem 0.5rem;
     width: 100%;
@@ -29,12 +29,12 @@
 
     &:focus {
       outline: none;
-      border-color: #8db89a;
-      background: rgba(141, 184, 154, 0.1);
+      border-color: #b89a6a;
+      background: rgba(240, 230, 210, 0.4);
     }
 
     &::placeholder {
-      color: rgba(216, 237, 225, 0.2);
+      color: rgba(74, 55, 40, 0.3);
     }
   }
 }

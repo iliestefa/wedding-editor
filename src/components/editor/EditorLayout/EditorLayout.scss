@@ -1,10 +1,9 @@
 $panel-width: 420px;
 $mobile-bar-height: 48px;
 
-// Pastel green palette for mobile bar (matches editor panel)
-$bar-bg:     #1e2a22;
-$bar-accent: #8db89a;
-$bar-border: rgba(141, 184, 154, 0.2);
+$bar-bg:     #f5efe4;
+$bar-accent: #b89a6a;
+$bar-border: rgba(184, 154, 106, 0.2);
 
 // ── Editor toggle button (tab anchored to left edge of panel) ───────
 .editor-toggle {
@@ -13,11 +12,11 @@ $bar-border: rgba(141, 184, 154, 0.2);
   right: $panel-width;
   transform: translateY(-50%) translateX(0);
   z-index: 301;
-  background: #1e2a22;
-  border: 1px solid rgba(141, 184, 154, 0.3);
+  background: #f5efe4;
+  border: 1px solid rgba(184, 154, 106, 0.3);
   border-right: none;
   border-radius: 8px 0 0 8px;
-  color: #8db89a;
+  color: #b89a6a;
   cursor: pointer;
   padding: 0.75rem 0.5rem;
   font-size: 0.6rem;
@@ -27,7 +26,7 @@ $bar-border: rgba(141, 184, 154, 0.2);
   text-orientation: mixed;
   transition: right 0.35s ease, background 0.2s;
 
-  &:hover { background: #243029; }
+  &:hover { background: #ede4d6; }
 
   &--collapsed {
     right: 0;
@@ -64,8 +63,8 @@ $bar-border: rgba(141, 184, 154, 0.2);
   }
 
   &__mobile-toggle {
-    background: rgba(141, 184, 154, 0.15);
-    border: 1px solid rgba(141, 184, 154, 0.4);
+    background: rgba(184, 154, 106, 0.12);
+    border: 1px solid rgba(184, 154, 106, 0.35);
     border-radius: 6px;
     color: $bar-accent;
     cursor: pointer;
@@ -76,7 +75,7 @@ $bar-border: rgba(141, 184, 154, 0.2);
     transition: background 0.2s;
 
     &:hover {
-      background: rgba(141, 184, 154, 0.25);
+      background: rgba(184, 154, 106, 0.22);
     }
   }
 
@@ -136,7 +135,7 @@ $bar-border: rgba(141, 184, 154, 0.2);
     overflow: hidden;
     transform: translateX(0);
     transition: transform 0.35s ease;
-    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.4);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
 
     &--collapsed {
       transform: translateX(100%);
@@ -158,12 +157,12 @@ $bar-border: rgba(141, 184, 154, 0.2);
   }
 }
 
-// ── Success overlay (shown over preview after submit) ──────────────
+// ── Success overlay ────────────────────────────────────────────────
 .editor-layout__success-overlay {
   position: fixed;
   inset: 0;
   z-index: 400;
-  background: rgba(30, 42, 34, 0.92);
+  background: rgba(245, 239, 228, 0.92);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -172,13 +171,13 @@ $bar-border: rgba(141, 184, 154, 0.2);
 }
 
 .editor-layout__success-card {
-  background: #243029;
-  border: 1px solid rgba(141, 184, 154, 0.25);
+  background: #faf6f0;
+  border: 1px solid rgba(184, 154, 106, 0.25);
   border-radius: 12px;
   padding: 3rem 2.5rem;
   max-width: 480px;
   text-align: center;
-  color: #d8ede1;
+  color: #4a3728;
 }
 
 .editor-layout__success-icon {
@@ -188,10 +187,10 @@ $bar-border: rgba(141, 184, 154, 0.2);
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: rgba(141, 184, 154, 0.15);
-  border: 2px solid #8db89a;
+  background: rgba(184, 154, 106, 0.12);
+  border: 2px solid #b89a6a;
   font-size: 1.75rem;
-  color: #8db89a;
+  color: #b89a6a;
   margin: 0 auto 1.5rem;
 }
 
@@ -199,7 +198,7 @@ $bar-border: rgba(141, 184, 154, 0.2);
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.75rem;
   font-weight: 400;
-  color: #d8ede1;
+  color: #4a3728;
   margin: 0 0 1rem;
   letter-spacing: 0.02em;
 }
@@ -207,26 +206,26 @@ $bar-border: rgba(141, 184, 154, 0.2);
 .editor-layout__success-body {
   font-size: 0.95rem;
   font-weight: 300;
-  color: rgba(216, 237, 225, 0.8);
+  color: #7a5f4e;
   line-height: 1.7;
   margin: 0 0 0.75rem;
 }
 
 .editor-layout__success-note {
   font-size: 0.85rem;
-  color: rgba(216, 237, 225, 0.55);
+  color: #a88b78;
   line-height: 1.6;
   margin: 0;
 
   strong {
-    color: #8db89a;
+    color: #b89a6a;
     font-weight: 600;
   }
 }
 
 // ── Active section highlight ───────────────────────────────────────
 .is-active-section {
-  outline: 2px solid rgba(141, 184, 154, 0.7);
+  outline: 2px solid rgba(184, 154, 106, 0.6);
   outline-offset: 0;
   border-radius: 2px;
 }
@@ -269,21 +268,19 @@ $bar-border: rgba(141, 184, 154, 0.2);
   }
 }
 
-// ── Field highlight (when input is focused in editor) ─────────────
+// ── Field highlight ────────────────────────────────────────────────
 [data-preview-field] {
   transition: outline 0.2s, box-shadow 0.2s;
 }
 
 [data-preview-field].is-highlighted {
-  outline: 2px solid #8db89a;
+  outline: 2px solid #b89a6a;
   outline-offset: 4px;
-  box-shadow: 0 0 12px rgba(141, 184, 154, 0.4);
+  box-shadow: 0 0 12px rgba(184, 154, 106, 0.35);
   border-radius: 2px;
 }
 
 // ── Navigation fix ────────────────────────────────────────────────
-// Nav uses position:fixed + window.scroll — neither works in the canvas.
-// Override to sticky so it scrolls with the canvas content.
 .editor-layout__preview-canvas {
   .nav {
     position: sticky !important;
@@ -295,13 +292,12 @@ $bar-border: rgba(141, 184, 154, 0.2);
     overflow: visible !important;
   }
 
-  // Hero slides up behind the sticky nav (soho nav ~72px, elegant nav 64px)
   .hero {
     margin-top: -72px !important;
   }
 }
 
-// ── Nav scrolled state — Soho template (light) ────────────────────
+// ── Nav scrolled state — Soho template ────────────────────────────
 .editor-layout__preview-canvas--soho {
   &.editor-layout__preview-canvas--scrolled {
     .nav {
@@ -316,7 +312,7 @@ $bar-border: rgba(141, 184, 154, 0.2);
   }
 }
 
-// ── Nav scrolled state — Elegant template (dark) ──────────────────
+// ── Nav scrolled state — Elegant template ─────────────────────────
 .editor-layout__preview-canvas--elegant {
   &.editor-layout__preview-canvas--scrolled {
     .nav {
