@@ -1,5 +1,11 @@
-import emailjs from '@emailjs/browser';
-import { EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, EMAILJS_PUBLIC_KEY } from '../constants/editorConstants';
+import emailjs from "@emailjs/browser";
+import {
+  EMAILJS_SERVICE_ID,
+  EMAILJS_TEMPLATE_ID,
+  EMAILJS_PUBLIC_KEY,
+  SHOPIFY_DOMAIN,
+  SHOPIFY_VARIANTS,
+} from "../constants/editorConstants";
 
 // Converts the editor data into a weddingConstants.js file string
 const buildConstantsFile = (d) => {
@@ -14,7 +20,7 @@ export const COUPLE_NAMES = \`\${BRIDE_NAME} & \${GROOM_NAME}\`;
 // ─── Fecha ────────────────────────────────────────────────────────────────────
 export const WEDDING_DATE_ISO = ${s(d.weddingDateIso)};
 export const WEDDING_DATE_DISPLAY = ${s(d.weddingDateDisplay)};
-export const WEDDING_YEAR = ${s(d.weddingDateIso?.split('-')[0] ?? '')};
+export const WEDDING_YEAR = ${s(d.weddingDateIso?.split("-")[0] ?? "")};
 
 // ─── Ceremonia ────────────────────────────────────────────────────────────────
 export const CEREMONY_TIME = ${s(d.ceremonyTime)};
@@ -65,20 +71,42 @@ export const IMAGE_RINGS = ${s(d.imageRings)};
 `;
 };
 
-export const sendEditorData = async (weddingData, order = '') => {
+export const buildShopifyCartUrl = (templateSlug, client = "") => {
+  const variantId = SHOPIFY_VARIANTS[templateSlug];
+  if (!variantId) return null;
+  const base = `${SHOPIFY_DOMAIN}/cart/${variantId}:1`;
+  if (!client) return base;
+  return `${base}?note=${encodeURIComponent(client)}`;
+};
+
+export const sendEditorData = async (
+  weddingData,
+  { order = "", client = "", templateSlug = "" } = {},
+) => {
   const { brideName, groomName } = weddingData;
+  const identifier = order || (client ? `cliente-${client}` : "");
 
   const templateParams = {
-    to_email:       'developer@iliestefa.com',
-    subject:        `Datos de boda — ${brideName} & ${groomName} [order: ${order}]`,
-    bride_name:     brideName,
-    groom_name:     groomName,
-    wedding_date:   weddingData.weddingDateDisplay,
-    order,
-    extra_notes:    weddingData.extraNotes || '(sin notas adicionales)',
+    to_email: "developer@iliestefa.com",
+    subject: `Datos de boda — ${brideName} & ${groomName} [order: ${identifier}]`,
+    bride_name: brideName,
+    groom_name: groomName,
+    wedding_date: weddingData.weddingDateDisplay,
+    order: identifier,
+    extra_notes: weddingData.extraNotes || "(sin notas adicionales)",
     constants_file: buildConstantsFile(weddingData),
-    data_json:      JSON.stringify(weddingData, null, 2),
+    data_json: JSON.stringify(weddingData, null, 2),
   };
 
-  await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams, EMAILJS_PUBLIC_KEY);
+  await emailjs.send(
+    EMAILJS_SERVICE_ID,
+    EMAILJS_TEMPLATE_ID,
+    templateParams,
+    EMAILJS_PUBLIC_KEY,
+  );
+
+  if (client) {
+    const cartUrl = buildShopifyCartUrl(templateSlug, client);
+    if (cartUrl) window.location.href = cartUrl;
+  }
 };

@@ -11,9 +11,10 @@ const App = () => {
     return TEMPLATES[slug] ? slug : DEFAULT_TEMPLATE;
   }, [params]);
 
-  const order = useMemo(() => params.get('order') ?? '', [params]);
+  const order  = useMemo(() => params.get('order')  ?? '', [params]);
+  const client = useMemo(() => params.get('client') ?? '', [params]);
 
-  return <EditorLayout templateSlug={templateSlug} order={order} />;
+  return <EditorLayout templateSlug={templateSlug} order={order} client={client} />;
 };
 
 export default App;

@@ -125,7 +125,7 @@ const editorReducer = (state, action) => {
   }
 };
 
-export const EditorProvider = ({ templateSlug, order, children }) => {
+export const EditorProvider = ({ templateSlug, order, client, children }) => {
   const [data, dispatch] = useReducer(
     editorReducer,
     templateSlug,
@@ -155,6 +155,7 @@ export const EditorProvider = ({ templateSlug, order, children }) => {
       data: liveData,
       templateSlug,
       order,
+      client,
       activeField,
       setActiveField,
       setField,
@@ -178,9 +179,10 @@ export const EditorProvider = ({ templateSlug, order, children }) => {
 EditorProvider.propTypes = {
   templateSlug: PropTypes.string,
   order:        PropTypes.string,
+  client:       PropTypes.string,
   children:     PropTypes.node.isRequired,
 };
-EditorProvider.defaultProps = { templateSlug: 'soho', order: '' };
+EditorProvider.defaultProps = { templateSlug: 'soho', order: '', client: '' };
 
 export const useEditor = () => {
   const ctx = useContext(EditorContext);
