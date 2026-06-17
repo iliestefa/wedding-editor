@@ -29,6 +29,7 @@ jobs:
 
       - name: Use published packages in CI
         run: |
+          npm pkg set dependencies["@iliestefa/wedding-animated"]="latest"
           npm pkg set dependencies["@iliestefa/wedding-soho"]="latest"
           npm pkg set dependencies["@iliestefa/wedding-elegant"]="latest"
 

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@iliestefa/wedding-animated": "file:../wedding-invitation-template-animated",
     "@iliestefa/wedding-elegant": "file:../wedding-invitation-template-elegant",
     "@iliestefa/wedding-soho": "file:../wedding-invitation-template-soho",
     "prop-types": "^15.8.1",

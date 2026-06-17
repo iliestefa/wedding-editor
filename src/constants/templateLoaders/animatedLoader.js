@@ -1,4 +1,4 @@
-export { default as AnimatedApp } from '../../../../wedding-invitation-template-animated/src/AnimatedEditorApp';
-export { AnimatedTemplateProvider as TemplateProvider } from '../../../../wedding-invitation-template-animated/src/context/AnimatedContext';
+export { default as AnimatedApp } from '@iliestefa/wedding-animated/AnimatedEditorApp';
+export { AnimatedTemplateProvider as TemplateProvider } from '@iliestefa/wedding-animated/context';
 
 export const isFullApp = true;
