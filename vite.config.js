@@ -5,6 +5,7 @@ import path from 'path';
 export default defineConfig({
   base: '/wedding-editor/',
   plugins: [react()],
+  assetsInclude: ['**/*.mp3'],
   resolve: {
     dedupe: ['react', 'react-dom', 'prop-types'],
     alias: {

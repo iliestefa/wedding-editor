@@ -297,6 +297,14 @@ $bar-border: rgba(184, 154, 106, 0.2);
   }
 }
 
+// ── Animated template canvas ───────────────────────────────────────
+// El template maneja su propio scroll interno (innerRef) y los overlays
+// son position:absolute en un contenedor overflow:hidden. No se necesita
+// ningún override especial en el canvas del editor.
+.editor-layout__preview-canvas--animated {
+  overflow: hidden !important;
+}
+
 // ── Nav scrolled state — Soho template ────────────────────────────
 .editor-layout__preview-canvas--soho {
   &.editor-layout__preview-canvas--scrolled {

@@ -478,3 +478,62 @@ $ep-text-muted:  #a88b78;
     color: $ep-text-muted;
   }
 }
+
+// ── Music field row (animated template) ─────────────────────────────────────
+.editor-panel__music-row {
+  position: relative;
+
+  // Empuja el EditorField para dejar espacio al botón X
+  > :first-child { padding-right: 2.4rem; }
+}
+
+.editor-panel__music-clear {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $ep-text-muted;
+  font-size: 0.85rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    color: #c0392b;
+    background: rgba(192, 57, 43, 0.08);
+  }
+}
+
+.editor-panel__hint {
+  font-size: 0.75rem;
+  color: $ep-text-muted;
+  margin-top: 0.35rem;
+  margin-bottom: 0.75rem;
+
+  a {
+    color: $ep-accent;
+    text-decoration: underline;
+  }
+}
+
+// ── Initials preview (animated template) ────────────────────────────────────
+.editor-panel__initials-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 0 16px;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: $ep-accent;
+
+  &__initials-sep {
+    font-size: 1.4rem;
+    opacity: 0.6;
+  }
+}

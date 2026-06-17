@@ -7,8 +7,59 @@ import {
   SHOPIFY_VARIANTS,
 } from "../constants/editorConstants";
 
-// Converts the editor data into a weddingConstants.js file string
-const buildConstantsFile = (d) => {
+// ── Animated template constants file ─────────────────────────────────────────
+const buildAnimatedConstantsFile = (d) => {
+  const s = (v) => JSON.stringify(v);
+  const j = (v) => JSON.stringify(v, null, 2);
+
+  return `// ─── config.js ────────────────────────────────────────────────────────────────
+export const GROOM = ${s(d.groomName)};
+export const BRIDE = ${s(d.brideName)};
+export const COUPLE = \`\${GROOM} & \${BRIDE}\`;
+export const COUPLE_ES = \`\${GROOM} y \${BRIDE}\`;
+export const INITIALS = \`\${GROOM[0].toUpperCase()}&\${BRIDE[0].toUpperCase()}\`;
+export const INITIALS_DISPLAY = \`\${GROOM[0].toUpperCase()} & \${BRIDE[0].toUpperCase()}\`;
+
+// ─── Datos de boda (reemplaza los campos en i18n.js > translations.es) ────────
+// phrase:           ${s(d.phrase)}
+// ourSong:          ${s(d.songName)}
+// story:            ${s(d.story)}
+// storyBy:          ${s(d.storyBy)}
+// venueName:        ${s(d.venueName)}
+// venueAddr:        ${s(d.venueAddr)}
+// mapsUrl:          ${s(d.mapsUrl)}
+// ceremonyTime:     ${s(d.ceremonyTime)}
+// receptionTime:    ${s(d.receptionTime)}
+// verse:            ${s(d.verse)}
+// giftsContent:     ${s(d.giftsContent)}
+// photographyContent: ${s(d.photographyContent)}
+
+// ─── Itinerario ───────────────────────────────────────────────────────────────
+// itineraryItems: ${j(d.itineraryItems)}
+
+// ─── Código de vestimenta ─────────────────────────────────────────────────────
+// dressCodeItems: ${j(d.dressCodeItems)}
+
+// ─── Secciones adicionales (goodToKnowItems) ──────────────────────────────────
+// goodToKnowItems: ${j(d.goodToKnowItems)}
+
+// ─── Imágenes ─────────────────────────────────────────────────────────────────
+export const IMAGE_HERO      = ${s(d.imageHero)};
+export const IMAGE_EVENT     = ${s(d.imageEvent)};
+export const IMAGE_ITINERARY = ${s(d.imageItinerary)};
+export const IMAGE_CLOSING   = ${s(d.imageClosing)};
+
+// ─── Fecha ────────────────────────────────────────────────────────────────────
+// weddingDateIso:     ${s(d.weddingDateIso)}
+// weddingDateDisplay: ${s(d.weddingDateDisplay)}
+// weddingTime:        ${s(d.weddingTime)}
+`;
+};
+
+// ── Soho / Elegant constants file ─────────────────────────────────────────────
+const buildConstantsFile = (d, templateSlug) => {
+  if (templateSlug === 'animated') return buildAnimatedConstantsFile(d);
+
   const j = (v) => JSON.stringify(v, null, 2);
   const s = (v) => JSON.stringify(v);
 
@@ -94,7 +145,7 @@ export const sendEditorData = async (
     wedding_date: weddingData.weddingDateDisplay,
     order: identifier,
     extra_notes: weddingData.extraNotes || "(sin notas adicionales)",
-    constants_file: buildConstantsFile(weddingData),
+    constants_file: buildConstantsFile(weddingData, templateSlug),
     data_json: JSON.stringify(weddingData, null, 2),
   };
 
