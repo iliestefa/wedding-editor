@@ -36,7 +36,24 @@ const SuccessOverlay = () => (
   </div>
 );
 
-// Renders the preview once the template module is loaded
+// Renders the full-app animated template (envelope + all sections in one component)
+const AnimatedTemplatePreview = ({ templateModule, canvasRef }) => {
+  const { AnimatedApp, TemplateProvider } = templateModule;
+  const { data } = useEditor();
+
+  return (
+    <TemplateProvider data={data}>
+      <AnimatedApp scrollContainerRef={canvasRef} />
+    </TemplateProvider>
+  );
+};
+
+AnimatedTemplatePreview.propTypes = {
+  templateModule: PropTypes.object.isRequired,
+  canvasRef:      PropTypes.object.isRequired,
+};
+
+// Renders the standard section-based templates (soho, elegant)
 const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolled }) => {
   const {
     Navigation, Hero, Story, Countdown,
@@ -124,8 +141,13 @@ const EditorLayout = ({ templateSlug }) => {
 
   const handleSectionChange = useCallback((sectionId) => {
     setActiveSection(sectionId);
-    scrollToSection(sectionId);
-  }, [scrollToSection]);
+    // For full-app templates the section wrappers aren't used, no scroll needed
+    if (templateModule && !templateModule.isFullApp) {
+      scrollToSection(sectionId);
+    }
+  }, [scrollToSection, templateModule]);
+
+  const isFullApp = templateModule?.isFullApp ?? false;
 
   return (
     <div className="editor-layout">
@@ -140,7 +162,7 @@ const EditorLayout = ({ templateSlug }) => {
         </button>
       </div>
 
-      {/* Desktop panel toggle (tab anchored to panel left edge) */}
+      {/* Desktop panel toggle */}
       <button
         className={`editor-toggle${panelCollapsed ? ' editor-toggle--collapsed' : ''}`}
         onClick={() => setPanelCollapsed((v) => !v)}
@@ -157,19 +179,26 @@ const EditorLayout = ({ templateSlug }) => {
         >
           {submitted && <SuccessOverlay />}
           {templateModule ? (
-            <TemplatePreview
-              templateModule={templateModule}
-              activeSection={activeSection}
-              previewRef={previewRef}
-              navScrolled={navScrolled}
-            />
+            isFullApp ? (
+              <AnimatedTemplatePreview
+                templateModule={templateModule}
+                canvasRef={canvasRef}
+              />
+            ) : (
+              <TemplatePreview
+                templateModule={templateModule}
+                activeSection={activeSection}
+                previewRef={previewRef}
+                navScrolled={navScrolled}
+              />
+            )
           ) : (
             <div className="editor-layout__loading">Cargando template…</div>
           )}
         </div>
       </main>
 
-      {/* Editor panel — fixed overlay on right */}
+      {/* Editor panel */}
       <aside className={`editor-layout__panel${panelCollapsed ? ' editor-layout__panel--collapsed' : ''}${!showPreview ? ' editor-layout__panel--visible' : ''}`}>
         <EditorPanel
           activeSection={activeSection}

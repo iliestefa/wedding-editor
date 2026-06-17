@@ -10,6 +10,10 @@ export const TEMPLATES = {
     label: 'Champagne & Charcoal',
     load: () => import('./templateLoaders/elegantLoader'),
   },
+  animated: {
+    label: 'Sobre Animado',
+    load: () => import('./templateLoaders/animatedLoader'),
+  },
 };
 
 export const DEFAULT_TEMPLATE = 'soho';
