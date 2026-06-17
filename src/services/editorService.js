@@ -44,10 +44,10 @@ export const INITIALS_DISPLAY = \`\${GROOM[0].toUpperCase()} & \${BRIDE[0].toUpp
 // goodToKnowItems: ${j(d.goodToKnowItems)}
 
 // ─── Imágenes ─────────────────────────────────────────────────────────────────
-// imageHero:      ${s(d.imageHero)}
-// imageEvent:     ${s(d.imageEvent)}
-// imageItinerary: ${s(d.imageItinerary)}
-// imageClosing:   ${s(d.imageClosing)}
+export const IMAGE_HERO      = ${s(d.imageHero)};
+export const IMAGE_EVENT     = ${s(d.imageEvent)};
+export const IMAGE_ITINERARY = ${s(d.imageItinerary)};
+export const IMAGE_CLOSING   = ${s(d.imageClosing)};
 
 // ─── Fecha ────────────────────────────────────────────────────────────────────
 // weddingDateIso:     ${s(d.weddingDateIso)}
