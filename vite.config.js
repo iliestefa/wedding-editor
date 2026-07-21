@@ -24,7 +24,7 @@ export default defineConfig({
         additionalData: (content, filename) => {
           if (filename.includes('/styles/')) return content;
           const elegantSrc = path.resolve(__dirname, 'node_modules/@iliestefa/wedding-elegant/src');
-          if (filename.includes('wedding-elegant') || filename.includes('wedding-invitation-template-elegant')) {
+          if (filename.includes('wedding-elegant') || filename.includes('wedding-invitation-template-elegant') || filename.includes('/elegante/')) {
             return `
               @import '${elegantSrc}/styles/variables';
               @import '${elegantSrc}/styles/mixins';

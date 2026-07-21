@@ -1,0 +1,163 @@
+.editor-image-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+
+  &__label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #a88b78;
+  }
+
+  &__file-input {
+    display: none;
+  }
+
+  &__dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    width: 100%;
+    padding: 1.1rem 0.5rem;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #4a3728;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px dashed rgba(184, 154, 106, 0.5);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+
+    &:hover,
+    &--over {
+      border-color: #b89a6a;
+      background: rgba(240, 230, 210, 0.4);
+    }
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.8;
+    }
+  }
+
+  &__icon {
+    font-size: 1.3rem;
+  }
+
+  &__hint {
+    font-size: 0.65rem;
+    font-weight: 300;
+    color: rgba(74, 55, 40, 0.45);
+  }
+
+  &__spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(184, 154, 106, 0.3);
+    border-top-color: #b89a6a;
+    border-radius: 50%;
+    animation: editor-image-field-spin 0.7s linear infinite;
+  }
+
+  &__preview-wrap {
+    position: relative;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(184, 154, 106, 0.25);
+  }
+
+  &__preview {
+    display: block;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.4rem;
+    background: rgba(255, 255, 255, 0.75);
+  }
+
+  &__btn {
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #4a3728;
+    background: rgba(240, 230, 210, 0.6);
+    border: 1px solid rgba(184, 154, 106, 0.4);
+    border-radius: 5px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    transition: background 0.18s;
+
+    &:hover {
+      background: rgba(240, 230, 210, 1);
+    }
+
+    &--ghost {
+      background: transparent;
+      border-color: transparent;
+      color: rgba(74, 55, 40, 0.55);
+
+      &:hover {
+        background: rgba(240, 230, 210, 0.5);
+      }
+    }
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 0.7rem;
+    color: #b0483a;
+  }
+
+  &__url-toggle {
+    align-self: flex-start;
+    font-family: inherit;
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: rgba(74, 55, 40, 0.5);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: #a88b78;
+    }
+  }
+
+  &__url-input {
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: #4a3728;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(184, 154, 106, 0.25);
+    border-radius: 5px;
+    padding: 0.35rem 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: #b89a6a;
+      background: rgba(240, 230, 210, 0.4);
+    }
+  }
+}
+
+@keyframes editor-image-field-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
