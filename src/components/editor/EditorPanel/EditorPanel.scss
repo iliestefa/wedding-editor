@@ -76,6 +76,68 @@ $ep-text-muted:  #a88b78;
     }
   }
 
+  // número de step: solo visible en móvil
+  &__tab-step {
+    display: none;
+  }
+
+  // ── Móvil: header oculto (el logo vive en la barra superior) y
+  //    tabs como steps numerados con scroll horizontal ──────────────
+  @media (max-width: 900px) {
+    &__header {
+      display: none;
+    }
+
+    &__tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 0.4rem;
+      padding: 0.5rem 0.75rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+
+      &::-webkit-scrollbar { display: none; }
+    }
+
+    &__tab {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.55rem;
+      border: none;
+
+      &--active {
+        background: transparent;
+      }
+    }
+
+    &__tab-step {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(184, 154, 106, 0.45);
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: $ep-text-muted;
+      transition: background 0.18s, color 0.18s, border-color 0.18s;
+    }
+
+    &__tab--active &__tab-step {
+      background: $ep-accent;
+      border-color: $ep-accent;
+      color: #fdf8f3;
+    }
+
+    &__tab-label {
+      font-size: 0.58rem;
+    }
+  }
+
   // ── Body ─────────────────────────────────────────────────────────
   &__body {
     flex: 1;
@@ -110,6 +172,104 @@ $ep-text-muted:  #a88b78;
     margin: 1rem 0 0.3rem;
 
     &:first-child { margin-top: 0; }
+  }
+
+  // ── Selector de modo de eventos ───────────────────────────────────
+  &__mode-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__mode-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: $ep-text;
+    background: $ep-bg-card;
+    border: 1px solid $ep-border;
+    border-radius: 6px;
+    padding: 0.5rem 0.6rem;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+
+    &:hover {
+      border-color: $ep-accent;
+    }
+
+    &--active {
+      border-color: $ep-accent;
+      background: rgba(240, 230, 210, 0.4);
+      font-weight: 600;
+    }
+  }
+
+  &__mode-radio {
+    accent-color: $ep-accent;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  &__mode-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__mode-desc {
+    font-size: 0.66rem;
+    font-weight: 300;
+    color: $ep-text-muted;
+  }
+
+  &__hint {
+    font-size: 0.68rem;
+    font-weight: 300;
+    line-height: 1.5;
+    color: $ep-text-muted;
+    margin: 0.2rem 0 0.6rem;
+  }
+
+  // ── Checkboxes (cupos) ────────────────────────────────────────────
+  &__checks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.76rem;
+    font-weight: 400;
+    color: $ep-text;
+    background: $ep-bg-card;
+    border: 1px solid $ep-border;
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    transition: border-color 0.18s, background 0.18s;
+
+    &:hover {
+      border-color: $ep-accent;
+    }
+
+    &--active {
+      border-color: $ep-accent;
+      background: rgba(240, 230, 210, 0.4);
+      font-weight: 600;
+    }
+  }
+
+  &__check-input {
+    accent-color: $ep-accent;
+    margin: 0;
+    flex-shrink: 0;
   }
 
   // ── Cards ─────────────────────────────────────────────────────────
@@ -198,6 +358,14 @@ $ep-text-muted:  #a88b78;
   }
 
   // ── Inline labels + inputs ────────────────────────────────────────
+  // separación entre campos apilados dentro de una card
+  &__inline-input + &__inline-label,
+  &__inline-select + &__inline-label,
+  &__inline-textarea + &__inline-label,
+  &__row + &__inline-label {
+    margin-top: 0.65rem;
+  }
+
   &__inline-label {
     display: block;
     font-size: 0.61rem;
@@ -426,6 +594,57 @@ $ep-text-muted:  #a88b78;
     border-radius: 6px;
     border: 1px solid $ep-border;
     margin-bottom: 0.5rem;
+  }
+
+  // ── Prev / Next navigation ──────────────────────────────────────────
+  &__nav-buttons {
+    display: flex;
+    align-items: stretch;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid $ep-border;
+
+    // Cuando sigue justo al botón de enviar (último step), no repetir la línea divisoria
+    .editor-panel__section:has(.editor-submit) + & {
+      margin-top: 1rem;
+      padding-top: 0;
+      border-top: none;
+    }
+  }
+
+  &__nav-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    height: 2.4rem;
+    line-height: 1.2;
+    font-family: inherit;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: $ep-accent;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(184, 154, 106, 0.3);
+    border-radius: 6px;
+    padding: 0 0.6rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.18s, border-color 0.18s;
+
+    &--prev { justify-content: flex-start; }
+    &--next { justify-content: flex-end; }
+
+    &:hover:not(:disabled) {
+      background: $ep-accent-glow;
+      border-color: rgba(184, 154, 106, 0.5);
+    }
+
+    &:disabled {
+      visibility: hidden;
+    }
   }
 
   // ── Empty state ───────────────────────────────────────────────────

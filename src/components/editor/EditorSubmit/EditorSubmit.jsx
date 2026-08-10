@@ -12,7 +12,7 @@ const SEND_STATUS = {
 };
 
 const EditorSubmit = ({ onSuccess }) => {
-  const { data, order, client, templateSlug } = useEditor();
+  const { data, order, client, templateSlug, clearSavedProgress } = useEditor();
   const [status, setStatus] = useState(SEND_STATUS.IDLE);
   const [errors, setErrors] = useState([]);
   const [sendError, setSendError] = useState("");
@@ -39,6 +39,7 @@ const EditorSubmit = ({ onSuccess }) => {
     setStatus(SEND_STATUS.LOADING);
     try {
       await sendEditorData(data, { order, client, templateSlug });
+      clearSavedProgress();
       if (!isClientMode) {
         setStatus(SEND_STATUS.SUCCESS);
         onSuccess?.();
@@ -53,20 +54,11 @@ const EditorSubmit = ({ onSuccess }) => {
   };
 
   if (status === SEND_STATUS.SUCCESS) {
-    return (
-      <div className="editor-submit editor-submit--success">
-        <span className="editor-submit__icon" aria-hidden="true">
-          ✓
-        </span>
-        <p className="editor-submit__title">¡Datos enviados!</p>
-        <p className="editor-submit__message">
-          Tu web está en construcción. Mira el preview para más detalles.
-        </p>
-      </div>
-    );
+    // El overlay de éxito (con los botones de contacto en modo lead) lo
+    // muestra EditorLayout a pantalla completa — este componente no
+    // renderiza nada más una vez enviado.
+    return null;
   }
-
-  if (!order && !client) return null;
 
   return (
     <div className="editor-submit">

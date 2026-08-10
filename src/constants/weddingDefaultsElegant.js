@@ -39,15 +39,13 @@ export const DRESS_CODE_PALETTE = [
   { id: 'champagne', label: 'Champagne', hex: '#e8d5b0' },
   { id: 'burgundy',  label: 'Burdeos',   hex: '#6b2737' },
   { id: 'navy',      label: 'Navy',      hex: '#1a2744' },
-  { id: 'graphite',  label: 'Grafito',   hex: '#3d3d3d' },
-  { id: 'gold',      label: 'Dorado',    hex: '#c9a96e' },
 ];
 
 export const GIFT_REGISTRY_INTRO = 'Su presencia es nuestro mayor regalo. Si desean obsequiarnos algo, aquí encontrarán nuestras cuentas.';
 
 export const BANK_ACCOUNTS = [
-  { id: 'sofia',     ownerName: 'Sofía Morales',   bankName: 'Banco Pichincha', accountType: 'Cuenta de Ahorros', accountAlias: 'sofia.morales',   cbu: '2200123456789012', accountNumberLabel: 'N° de Cuenta' },
-  { id: 'alejandro', ownerName: 'Alejandro Gómez', bankName: 'Banco Guayaquil', accountType: 'Cuenta Corriente',  accountAlias: 'alejandro.gomez', cbu: '0200987654321098', accountNumberLabel: 'N° de Cuenta' },
+  { id: 'sofia',     ownerName: 'Sofía Morales',   bankName: 'Banco Pichincha', accountType: 'Cuenta de Ahorros', accountAlias: '1712345678', cbu: '2200123456789012', accountNumberLabel: 'N° de Cuenta' },
+  { id: 'alejandro', ownerName: 'Alejandro Gómez', bankName: 'Banco Guayaquil', accountType: 'Cuenta Corriente',  accountAlias: '0987654321', cbu: '0200987654321098', accountNumberLabel: 'N° de Cuenta' },
 ];
 
 export const RSVP_DEADLINE  = '01 de Julio 2026';

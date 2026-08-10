@@ -1,35 +1,7 @@
 .editor-submit {
-  padding: 1.25rem 1.25rem 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
   border-top: 1px solid rgba(184, 154, 106, 0.2);
-  flex-shrink: 0;
-  background: #f5efe4;
-
-  &--success {
-    text-align: center;
-    padding: 2rem 1.25rem;
-  }
-
-  &__icon {
-    display: block;
-    font-size: 2rem;
-    color: #b89a6a;
-    margin-bottom: 0.75rem;
-  }
-
-  &__title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.1rem;
-    color: #4a3728;
-    margin: 0 0 0.5rem;
-  }
-
-  &__message {
-    font-size: 0.85rem;
-    font-weight: 300;
-    color: #a88b78;
-    line-height: 1.6;
-    margin: 0;
-  }
 
   &__errors {
     list-style: none;

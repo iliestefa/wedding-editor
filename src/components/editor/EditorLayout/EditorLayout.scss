@@ -54,12 +54,21 @@ $bar-border: rgba(184, 154, 106, 0.2);
     background: $bar-bg;
     padding: 0 1rem;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     border-bottom: 1px solid $bar-border;
 
     @media (max-width: 900px) {
       display: flex;
     }
+  }
+
+  &__mobile-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: $bar-accent;
   }
 
   &__mobile-toggle {
@@ -157,70 +166,97 @@ $bar-border: rgba(184, 154, 106, 0.2);
   }
 }
 
-// ── Success overlay ────────────────────────────────────────────────
-.editor-layout__success-overlay {
+// ── Contact dialog — única confirmación al enviar ──────────────────
+.editor-layout__contact-overlay {
   position: fixed;
   inset: 0;
-  z-index: 400;
-  background: rgba(245, 239, 228, 0.92);
+  z-index: 500;
+  background: rgba(30, 22, 16, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  backdrop-filter: blur(6px);
+  padding: 1rem;
 }
 
-.editor-layout__success-card {
-  background: #faf6f0;
-  border: 1px solid rgba(184, 154, 106, 0.25);
-  border-radius: 12px;
-  padding: 3rem 2.5rem;
-  max-width: 480px;
-  text-align: center;
-  color: #4a3728;
+.editor-layout__contact-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #faf5ef;
+  border-radius: 10px;
+  padding: 1.75rem 1.5rem 1.5rem;
+  box-shadow: 0 12px 40px rgba(30, 22, 16, 0.25);
 }
 
-.editor-layout__success-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(184, 154, 106, 0.12);
-  border: 2px solid #b89a6a;
-  font-size: 1.75rem;
-  color: #b89a6a;
-  margin: 0 auto 1.5rem;
-}
-
-.editor-layout__success-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.75rem;
-  font-weight: 400;
-  color: #4a3728;
-  margin: 0 0 1rem;
-  letter-spacing: 0.02em;
-}
-
-.editor-layout__success-body {
-  font-size: 0.95rem;
-  font-weight: 300;
-  color: #7a5f4e;
-  line-height: 1.7;
-  margin: 0 0 0.75rem;
-}
-
-.editor-layout__success-note {
-  font-size: 0.85rem;
+.editor-layout__contact-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
   color: #a88b78;
-  line-height: 1.6;
-  margin: 0;
+  cursor: pointer;
+  padding: 0.25rem;
+  touch-action: manipulation;
 
-  strong {
-    color: #b89a6a;
-    font-weight: 600;
+  &:hover {
+    color: #4a3728;
   }
+}
+
+.editor-layout__contact-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  color: #4a3728;
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+
+.editor-layout__contact-text {
+  font-size: 0.82rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #a88b78;
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.editor-layout__contact-channels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editor-layout__contact-channel-btn {
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fdf8f3;
+  background: #b89a6a;
+  border: none;
+  border-radius: 5px;
+  padding: 0.75rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.18s;
+
+  &:hover {
+    background: #c9a97e;
+  }
+}
+
+.editor-layout__contact-copied-note {
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: #a88b78;
+  text-align: center;
+  margin: 0.75rem 0 0;
 }
 
 // ── Active section highlight ───────────────────────────────────────

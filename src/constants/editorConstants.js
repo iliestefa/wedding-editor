@@ -11,6 +11,11 @@ export const SHOPIFY_VARIANTS = {
   elegant: '47858613059828',
 };
 
+// ─── Contacto Wedya (canales para leads del editor libre) ────────────────────
+export const WEDYA_WHATSAPP = '593998771032';
+export const WEDYA_INSTAGRAM = 'wedya.digital';
+export const WEDYA_TIKTOK = 'wedya.digital';
+
 // ─── EmailJS ─────────────────────────────────────────────────────────────────
 // Set these in GitHub Actions secrets or .env.local for development
 export const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  ?? '';

@@ -29,6 +29,8 @@ img {
 
 button {
   font-family: inherit;
+  /* evita el delay de ~300ms y el doble-tap fantasma en iOS/Android */
+  touch-action: manipulation;
 }
 
 a {
@@ -38,4 +40,13 @@ a {
 ul,
 ol {
   list-style: none;
+}
+
+/* iOS Safari auto-zooms on focus when inputs are under 16px */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }

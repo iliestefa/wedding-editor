@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useEffect, useRef } from 'react';
 import { useEditor } from '../../../context/EditorContext';
 import EditorField from '../EditorField/EditorField';
 import EditorImageField from '../EditorImageField/EditorImageField';
@@ -32,6 +33,30 @@ const SECTIONS_ELEGANT = [
 const MONTHS = [
   'Enero','Febrero','Marzo','Abril','Mayo','Junio',
   'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre',
+];
+
+const EVENTS_MODE_OPTIONS = [
+  { value: 'separate',       label: 'Ceremonia y recepción en lugares distintos' },
+  { value: 'same',           label: 'Ceremonia y recepción en el mismo lugar' },
+  { value: 'reception-only', label: 'Solo recepción' },
+];
+
+const RSVP_TYPE_OPTIONS = [
+  {
+    value: 'whatsapp',
+    label: 'Confirmación por WhatsApp',
+    desc:  'Cada confirmación te llega como mensaje de WhatsApp.',
+  },
+  {
+    value: 'sheets',
+    label: 'Formulario con Google Sheets',
+    desc:  'Las respuestas se guardan automáticamente en una hoja de cálculo.',
+  },
+];
+
+const COMPANIONS_MODE_OPTIONS = [
+  { value: 'free',    label: 'Libre (el invitado escribe cuántos van)' },
+  { value: 'limited', label: 'Limitado por cupos' },
 ];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
@@ -138,13 +163,52 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
     setField,
     setStoryItem, addStoryItem, removeStoryItem,
     setScheduleItem, addScheduleItem, removeScheduleItem,
-    setBankAccount,
+    setBankAccount, addBankAccount, removeBankAccount,
+    setRsvpQuestion, addRsvpQuestion, removeRsvpQuestion,
+    toggleRsvpCupo,
     setDressCodeColor, setDressCodeColorLabel, addDressCodeColor, removeDressCodeColor,
     setActiveField,
   } = useEditor();
 
   const isElegant = templateSlug === 'elegant';
   const sections = isElegant ? SECTIONS_ELEGANT : SECTIONS_SOHO;
+  const bodyRef = useRef(null);
+  const tabsRef = useRef(null);
+
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activeSection]);
+
+  useEffect(() => {
+    const activeTab = tabsRef.current?.querySelector('.editor-panel__tab--active');
+    activeTab?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, [activeSection]);
+
+  const currentIndex = sections.findIndex((sec) => sec.id === activeSection);
+  const prevSection = currentIndex > 0 ? sections[currentIndex - 1] : null;
+  const nextSection =
+    currentIndex >= 0 && currentIndex < sections.length - 1 ? sections[currentIndex + 1] : null;
+
+  const navButtons = (prevSection || nextSection) && (
+    <div className="editor-panel__nav-buttons">
+      <button
+        type="button"
+        className="editor-panel__nav-btn editor-panel__nav-btn--prev"
+        onClick={() => prevSection && onSectionChange(prevSection.id)}
+        disabled={!prevSection}
+      >
+        ← {prevSection ? prevSection.label : ''}
+      </button>
+      <button
+        type="button"
+        className="editor-panel__nav-btn editor-panel__nav-btn--next"
+        onClick={() => nextSection && onSectionChange(nextSection.id)}
+        disabled={!nextSection}
+      >
+        {nextSection ? nextSection.label : ''} →
+      </button>
+    </div>
+  );
 
   return (
     <aside className="editor-panel">
@@ -153,19 +217,20 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
         <p className="editor-panel__subtitle">Personaliza tu invitación en tiempo real</p>
       </header>
 
-      <nav className="editor-panel__tabs" aria-label="Secciones">
-        {sections.map((sec) => (
+      <nav className="editor-panel__tabs" aria-label="Secciones" ref={tabsRef}>
+        {sections.map((sec, i) => (
           <button
             key={sec.id}
             className={`editor-panel__tab ${activeSection === sec.id ? 'editor-panel__tab--active' : ''}`}
             onClick={() => onSectionChange(sec.id)}
           >
-            {sec.label}
+            <span className="editor-panel__tab-step" aria-hidden="true">{i + 1}</span>
+            <span className="editor-panel__tab-label">{sec.label}</span>
           </button>
         ))}
       </nav>
 
-      <div className="editor-panel__body">
+      <div className="editor-panel__body" ref={bodyRef}>
 
         {/* ── Portada / Hero ── */}
         {activeSection === 'hero' && (
@@ -252,41 +317,116 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
         {/* ── Eventos (Ceremonia & Recepción) ── */}
         {activeSection === 'eventos' && (
           <div className="editor-panel__section">
-            <p className="editor-panel__group-label">Ceremonia</p>
-            <EditorField label="Hora"      fieldKey="ceremonyTime"         placeholder="17:00 hrs" />
-            <EditorField label="Lugar"     fieldKey="ceremonyVenueName"    placeholder="Nombre de la iglesia" />
-            <EditorField label="Dirección" fieldKey="ceremonyVenueAddress" placeholder="Calle, ciudad" />
-            <EditorField
-              label="Link Google Maps"
-              fieldKey="ceremonyMapsLink"
-              placeholder="https://maps.google.com/?q=..."
-              onChange={(v) => {
-                setField('ceremonyMapsLink', v);
-                const embed = mapsLinkToEmbedSrc(v);
-                if (embed) setField('ceremonyMapsEmbedSrc', embed);
-              }}
-            />
+            <p className="editor-panel__group-label">¿Cómo será el evento?</p>
+            <div className="editor-panel__mode-group">
+              {EVENTS_MODE_OPTIONS.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`editor-panel__mode-option ${
+                    (data.eventsMode ?? 'separate') === opt.value ? 'editor-panel__mode-option--active' : ''
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="eventsMode"
+                    className="editor-panel__mode-radio"
+                    value={opt.value}
+                    checked={(data.eventsMode ?? 'separate') === opt.value}
+                    onChange={() => setField('eventsMode', opt.value)}
+                  />
+                  <span>{opt.label}</span>
+                </label>
+              ))}
+            </div>
 
-            <p className="editor-panel__group-label">Recepción</p>
-            <EditorField label="Hora"      fieldKey="receptionTime"         placeholder="20:00 hrs" />
-            <EditorField label="Lugar"     fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
-            <EditorField label="Dirección" fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
-            <EditorField
-              label="Link Google Maps"
-              fieldKey="receptionMapsLink"
-              placeholder="https://maps.google.com/?q=..."
-              onChange={(v) => {
-                setField('receptionMapsLink', v);
-                const embed = mapsLinkToEmbedSrc(v);
-                if (embed) setField('receptionMapsEmbedSrc', embed);
-              }}
-            />
+            {(data.eventsMode ?? 'separate') === 'separate' && (
+              <>
+                <p className="editor-panel__group-label">Ceremonia</p>
+                <EditorField label="Hora"      fieldKey="ceremonyTime"         placeholder="17:00 hrs" />
+                <EditorField label="Lugar"     fieldKey="ceremonyVenueName"    placeholder="Nombre de la iglesia" />
+                <EditorField label="Dirección" fieldKey="ceremonyVenueAddress" placeholder="Calle, ciudad" />
+                <EditorField
+                  label="Link Google Maps"
+                  fieldKey="ceremonyMapsLink"
+                  placeholder="https://maps.google.com/?q=..."
+                  onChange={(v) => {
+                    setField('ceremonyMapsLink', v);
+                    const embed = mapsLinkToEmbedSrc(v);
+                    if (embed) setField('ceremonyMapsEmbedSrc', embed);
+                  }}
+                />
+
+                <p className="editor-panel__group-label">Recepción</p>
+                <EditorField label="Hora"      fieldKey="receptionTime"         placeholder="20:00 hrs" />
+                <EditorField label="Lugar"     fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
+                <EditorField label="Dirección" fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
+                <EditorField
+                  label="Link Google Maps"
+                  fieldKey="receptionMapsLink"
+                  placeholder="https://maps.google.com/?q=..."
+                  onChange={(v) => {
+                    setField('receptionMapsLink', v);
+                    const embed = mapsLinkToEmbedSrc(v);
+                    if (embed) setField('receptionMapsEmbedSrc', embed);
+                  }}
+                />
+              </>
+            )}
+
+            {data.eventsMode === 'same' && (
+              <>
+                <p className="editor-panel__group-label">Horarios</p>
+                <EditorField label="Hora ceremonia" fieldKey="ceremonyTime"  placeholder="17:00 hrs" />
+                <EditorField label="Hora recepción" fieldKey="receptionTime" placeholder="20:00 hrs" />
+
+                <p className="editor-panel__group-label">Lugar del evento</p>
+                <EditorField label="Lugar"     fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
+                <EditorField label="Dirección" fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
+                <EditorField
+                  label="Link Google Maps"
+                  fieldKey="receptionMapsLink"
+                  placeholder="https://maps.google.com/?q=..."
+                  onChange={(v) => {
+                    setField('receptionMapsLink', v);
+                    const embed = mapsLinkToEmbedSrc(v);
+                    if (embed) setField('receptionMapsEmbedSrc', embed);
+                  }}
+                />
+              </>
+            )}
+
+            {data.eventsMode === 'reception-only' && (
+              <>
+                <p className="editor-panel__group-label">Recepción</p>
+                <EditorField label="Hora"      fieldKey="receptionTime"         placeholder="20:00 hrs" />
+                <EditorField label="Lugar"     fieldKey="receptionVenueName"    placeholder="Nombre del salón" />
+                <EditorField label="Dirección" fieldKey="receptionVenueAddress" placeholder="Calle, ciudad" />
+                <EditorField
+                  label="Link Google Maps"
+                  fieldKey="receptionMapsLink"
+                  placeholder="https://maps.google.com/?q=..."
+                  onChange={(v) => {
+                    setField('receptionMapsLink', v);
+                    const embed = mapsLinkToEmbedSrc(v);
+                    if (embed) setField('receptionMapsEmbedSrc', embed);
+                  }}
+                />
+              </>
+            )}
           </div>
         )}
 
         {/* ── Cronograma ── */}
         {activeSection === 'cronograma' && (
           <div className="editor-panel__section">
+            {!isElegant && (
+              <EditorField
+                label="Frase del cronograma"
+                fieldKey="scheduleIntro"
+                multiline
+                placeholder="Cada momento del día fue pensado con amor…"
+              />
+            )}
             {data.scheduleItems.map((item, i) => (
               <div key={item.id} className="editor-panel__card">
                 <div className="editor-panel__card-header">
@@ -369,7 +509,7 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
 
             <p className="editor-panel__group-label">
               Paleta de colores
-              {data.dressCodePalette.length < 8 && (
+              {data.dressCodePalette.length < 4 && (
                 <button className="editor-panel__group-add-btn" onClick={addDressCodeColor}>
                   + Agregar
                 </button>
@@ -434,15 +574,24 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
 
             {data.bankAccounts.map((acc, i) => (
               <div key={acc.id} className="editor-panel__card">
-                <p className="editor-panel__card-title">Cuenta {i + 1}</p>
+                <div className="editor-panel__card-header">
+                  <span className="editor-panel__card-title">Cuenta {i + 1}</span>
+                  <button
+                    className="editor-panel__remove-btn"
+                    onClick={() => removeBankAccount(i)}
+                    aria-label="Eliminar cuenta"
+                  >
+                    ✕
+                  </button>
+                </div>
                 <table className="editor-panel__bank-table">
                   <tbody>
                     {[
-                      ['Banco',    'bankName'],
-                      ['Titular',  'ownerName'],
-                      ['Tipo',     'accountType'],
-                      ['Alias',    'accountAlias'],
-                      ['Número',   'cbu'],
+                      ['Banco',          'bankName'],
+                      ['Titular',        'ownerName'],
+                      ['Tipo',           'accountType'],
+                      ['Identificación', 'accountAlias'],
+                      ['Número',         'cbu'],
                     ].map(([lbl, key]) => (
                       <tr key={key}>
                         <td className="editor-panel__bank-cell-label">{lbl}</td>
@@ -461,6 +610,9 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
                 </table>
               </div>
             ))}
+            <button className="editor-panel__add-btn" onClick={addBankAccount}>
+              + Agregar cuenta
+            </button>
           </div>
         )}
 
@@ -468,6 +620,157 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
         {activeSection === 'rsvp' && (
           <div className="editor-panel__section">
             <EditorField label="Fecha límite RSVP" fieldKey="rsvpDeadline" placeholder="01 de Julio 2026" />
+
+            <p className="editor-panel__group-label">¿Cómo quieres recibir las confirmaciones?</p>
+            <div className="editor-panel__mode-group">
+              {RSVP_TYPE_OPTIONS.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`editor-panel__mode-option ${
+                    data.rsvpType === opt.value ? 'editor-panel__mode-option--active' : ''
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="rsvpType"
+                    className="editor-panel__mode-radio"
+                    value={opt.value}
+                    checked={data.rsvpType === opt.value}
+                    onChange={() => setField('rsvpType', opt.value)}
+                  />
+                  <span className="editor-panel__mode-text">
+                    <span>{opt.label}</span>
+                    <span className="editor-panel__mode-desc">{opt.desc}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            {data.rsvpType === 'whatsapp' && (
+              <>
+                <EditorField
+                  label="Número de WhatsApp"
+                  fieldKey="rsvpWhatsapp"
+                  placeholder="+593 99 123 4567"
+                />
+                <p className="editor-panel__hint">
+                  Incluye el código de país. Las confirmaciones de tus invitados te llegarán
+                  como mensaje de WhatsApp a este número.
+                </p>
+              </>
+            )}
+
+            {data.rsvpType === 'sheets' && (
+              <>
+                <p className="editor-panel__group-label">Campo de acompañantes</p>
+                <div className="editor-panel__mode-group">
+                  {COMPANIONS_MODE_OPTIONS.map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={`editor-panel__mode-option ${
+                        data.rsvpCompanionsMode === opt.value ? 'editor-panel__mode-option--active' : ''
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="rsvpCompanionsMode"
+                        className="editor-panel__mode-radio"
+                        value={opt.value}
+                        checked={data.rsvpCompanionsMode === opt.value}
+                        onChange={() => setField('rsvpCompanionsMode', opt.value)}
+                      />
+                      <span>{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {data.rsvpCompanionsMode === 'free' && (
+                  <p className="editor-panel__hint">
+                    Con acompañantes libres, todos los invitados usan el mismo link y cada uno
+                    escribe cuántas personas van.
+                  </p>
+                )}
+
+                {data.rsvpCompanionsMode === 'limited' && (
+                  <>
+                    <label className="editor-panel__inline-label">¿Qué tipos de invitados tienes?</label>
+                    <div className="editor-panel__checks">
+                      {[0, 1, 2, 3, 4, 5, 6].map((n) => (
+                        <label
+                          key={n}
+                          className={`editor-panel__check ${
+                            data.rsvpCupos.includes(n) ? 'editor-panel__check--active' : ''
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="editor-panel__check-input"
+                            checked={data.rsvpCupos.includes(n)}
+                            onChange={() => toggleRsvpCupo(n)}
+                          />
+                          <span>
+                            {n === 0
+                              ? 'Individuales (sin acompañantes)'
+                              : n === 1
+                                ? 'Con 1 acompañante'
+                                : `Con ${n} acompañantes`}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="editor-panel__hint">
+                      Marca los tipos de invitados que tienes: se creará un link distinto por cada
+                      cupo (a diferencia del modo libre, que usa un solo link para todos). A cada
+                      invitado le envías el link que le corresponde, y el formulario solo le
+                      permitirá confirmar hasta ese número de acompañantes.
+                    </p>
+                  </>
+                )}
+              </>
+            )}
+
+            <p className="editor-panel__group-label">
+              Preguntas del formulario
+              {data.rsvpQuestions.length < 6 && (
+                <button className="editor-panel__group-add-btn" onClick={addRsvpQuestion}>
+                  + Agregar
+                </button>
+              )}
+            </p>
+            <p className="editor-panel__hint">
+              Además de nombre, asistencia y acompañantes, estas preguntas aparecen en la
+              confirmación. Puedes cambiarlas, agregar más o eliminarlas.
+            </p>
+            {data.rsvpQuestions.map((q, i) => (
+              <div key={q.id} className="editor-panel__card">
+                <div className="editor-panel__card-header">
+                  <span className="editor-panel__card-title">Pregunta {i + 1}</span>
+                  <button
+                    className="editor-panel__remove-btn"
+                    onClick={() => removeRsvpQuestion(i)}
+                    aria-label="Eliminar pregunta"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <label className="editor-panel__inline-label">Texto de la pregunta</label>
+                <input
+                  className="editor-panel__inline-input"
+                  value={q.label}
+                  placeholder="Ej: ¿Alguna restricción alimentaria?"
+                  onChange={(e) => setRsvpQuestion(i, 'label', e.target.value)}
+                />
+                <label className="editor-panel__inline-label">Tipo de respuesta</label>
+                <select
+                  className="editor-panel__inline-select"
+                  value={q.type}
+                  onChange={(e) => setRsvpQuestion(i, 'type', e.target.value)}
+                >
+                  <option value="text">Texto corto</option>
+                  <option value="textarea">Texto largo</option>
+                </select>
+              </div>
+            ))}
           </div>
         )}
 
@@ -492,6 +795,8 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
               value={data.extraNotes ?? ''}
               onChange={(e) => setField('extraNotes', e.target.value)}
             />
+
+            <EditorSubmit onSuccess={onSubmitSuccess} />
           </div>
         )}
 
@@ -500,9 +805,9 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
             <p>Selecciona una sección para empezar a editar</p>
           </div>
         )}
-      </div>
 
-      <EditorSubmit onSuccess={onSubmitSuccess} />
+        {activeSection && navButtons}
+      </div>
     </aside>
   );
 };
