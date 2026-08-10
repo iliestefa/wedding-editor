@@ -26,10 +26,10 @@ SectionWrapper.propTypes = {
 };
 SectionWrapper.defaultProps = { activeSection: null };
 
-// Dialog de confirmación — reemplaza al overlay de éxito. Se muestra al
-// enviar y es la única confirmación visual, con o sin datos de contacto
-// según el modo (lead vs. cliente/order).
-const ContactDialog = ({ isLeadMode, brideName, groomName, onClose }) => {
+// Dialog de confirmación — única confirmación visual tras enviar los datos.
+// Un solo flujo para todos: se muestra siempre, con los botones de contacto
+// para coordinar la entrega por WhatsApp, Instagram o TikTok.
+const ContactDialog = ({ brideName, groomName, onClose }) => {
   const [copied, setCopied] = useState(false);
 
   const prefilledMessage =
@@ -73,47 +73,40 @@ const ContactDialog = ({ isLeadMode, brideName, groomName, onClose }) => {
           ×
         </button>
 
-        <p className="editor-layout__contact-title">
-          {isLeadMode ? '¡Recibimos su diseño! 🤍' : '¡Datos enviados! ✓'}
-        </p>
+        <p className="editor-layout__contact-title">¡Recibimos su diseño! 🤍</p>
         <p className="editor-layout__contact-text">
-          {isLeadMode
-            ? 'Déjennos un mensaje con sus nombres para coordinar la entrega de su invitación. Les escribiremos en cuanto esté lista.'
-            : 'Tu invitación está en construcción. Te avisaremos en cuanto esté lista.'}
+          Déjennos un mensaje con sus nombres para coordinar la entrega de su
+          invitación. Les escribiremos en cuanto esté lista.
         </p>
 
-        {isLeadMode && (
-          <>
-            <div className="editor-layout__contact-channels">
-              <button
-                type="button"
-                className="editor-layout__contact-channel-btn"
-                onClick={() => handleChannel('whatsapp')}
-              >
-                WhatsApp
-              </button>
-              <button
-                type="button"
-                className="editor-layout__contact-channel-btn"
-                onClick={() => handleChannel('instagram')}
-              >
-                Instagram
-              </button>
-              <button
-                type="button"
-                className="editor-layout__contact-channel-btn"
-                onClick={() => handleChannel('tiktok')}
-              >
-                TikTok
-              </button>
-            </div>
+        <div className="editor-layout__contact-channels">
+          <button
+            type="button"
+            className="editor-layout__contact-channel-btn"
+            onClick={() => handleChannel('whatsapp')}
+          >
+            WhatsApp
+          </button>
+          <button
+            type="button"
+            className="editor-layout__contact-channel-btn"
+            onClick={() => handleChannel('instagram')}
+          >
+            Instagram
+          </button>
+          <button
+            type="button"
+            className="editor-layout__contact-channel-btn"
+            onClick={() => handleChannel('tiktok')}
+          >
+            TikTok
+          </button>
+        </div>
 
-            {copied && (
-              <p className="editor-layout__contact-copied-note">
-                Mensaje copiado — solo pégalo en el chat 😉
-              </p>
-            )}
-          </>
+        {copied && (
+          <p className="editor-layout__contact-copied-note">
+            Mensaje copiado — solo pégalo en el chat 😉
+          </p>
         )}
       </div>
     </div>
@@ -121,15 +114,13 @@ const ContactDialog = ({ isLeadMode, brideName, groomName, onClose }) => {
 };
 
 ContactDialog.propTypes = {
-  isLeadMode: PropTypes.bool,
-  brideName:  PropTypes.string,
-  groomName:  PropTypes.string,
-  onClose:    PropTypes.func.isRequired,
+  brideName: PropTypes.string,
+  groomName: PropTypes.string,
+  onClose:   PropTypes.func.isRequired,
 };
 ContactDialog.defaultProps = {
-  isLeadMode: false,
-  brideName:  '',
-  groomName:  '',
+  brideName: '',
+  groomName: '',
 };
 
 // Renders the preview once the template module is loaded
@@ -198,8 +189,7 @@ const EditorLayout = ({ templateSlug }) => {
   const [templateModule, setTemplateModule] = useState(null);
   const previewRef = useRef(null);
   const canvasRef  = useRef(null);
-  const { data, order, client, hasChanges } = useEditor();
-  const isLeadMode = !order && !client;
+  const { data, hasChanges } = useEditor();
 
   const slug = TEMPLATES[templateSlug] ? templateSlug : DEFAULT_TEMPLATE;
 
@@ -301,7 +291,6 @@ const EditorLayout = ({ templateSlug }) => {
 
       {showContactDialog && (
         <ContactDialog
-          isLeadMode={isLeadMode}
           brideName={data.brideName}
           groomName={data.groomName}
           onClose={() => setShowContactDialog(false)}

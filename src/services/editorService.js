@@ -3,8 +3,6 @@ import {
   EMAILJS_SERVICE_ID,
   EMAILJS_TEMPLATE_ID,
   EMAILJS_PUBLIC_KEY,
-  SHOPIFY_DOMAIN,
-  SHOPIFY_VARIANTS,
 } from "../constants/editorConstants";
 
 // Converts the editor data into a weddingConstants.js file string
@@ -97,28 +95,21 @@ ${imagesBlock}
 `;
 };
 
-export const buildShopifyCartUrl = (templateSlug, client = "") => {
-  const variantId = SHOPIFY_VARIANTS[templateSlug];
-  if (!variantId) return null;
-  const base = `${SHOPIFY_DOMAIN}/cart/${variantId}:1`;
-  if (!client) return base;
-  return `${base}?note=${encodeURIComponent(client)}`;
-};
-
 export const sendEditorData = async (
   weddingData,
-  { order = "", client = "", templateSlug = "" } = {},
+  { templateSlug = "" } = {},
 ) => {
   const { brideName, groomName } = weddingData;
-  const identifier = order || (client ? `cliente-${client}` : "editor-libre");
 
   const templateParams = {
     to_email: "developer@iliestefa.com",
-    subject: `Datos de boda — ${brideName} & ${groomName} [order: ${identifier}]`,
+    subject: `Datos de boda — ${brideName} & ${groomName}`,
     bride_name: brideName,
     groom_name: groomName,
     wedding_date: weddingData.weddingDateDisplay,
-    order: identifier,
+    // El template de EmailJS espera esta key; se deja fija ya que el editor
+    // ahora tiene un único flujo (sin ?order= ni distinción de pedido).
+    order: "editor",
     extra_notes: weddingData.extraNotes || "(sin notas adicionales)",
     constants_file: buildConstantsFile(weddingData, templateSlug),
     data_json: JSON.stringify(weddingData, null, 2),
@@ -139,10 +130,5 @@ export const sendEditorData = async (
     console.warn('[editor] EmailJS sin configurar — envío omitido en desarrollo', templateParams);
   } else {
     throw new Error('El servicio de envío no está configurado.');
-  }
-
-  if (client) {
-    const cartUrl = buildShopifyCartUrl(templateSlug, client);
-    if (cartUrl) window.location.href = cartUrl;
   }
 };

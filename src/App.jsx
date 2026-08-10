@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { TEMPLATES, DEFAULT_TEMPLATE } from './constants/templateRegistry';
 import EditorLayout from './components/editor/EditorLayout/EditorLayout';
+import Analytics from './components/Analytics/Analytics';
 import './App.scss';
 
 const App = () => {
@@ -11,10 +12,12 @@ const App = () => {
     return TEMPLATES[slug] ? slug : DEFAULT_TEMPLATE;
   }, [params]);
 
-  const order  = useMemo(() => params.get('order')  ?? '', [params]);
-  const client = useMemo(() => params.get('client') ?? '', [params]);
-
-  return <EditorLayout templateSlug={templateSlug} order={order} client={client} />;
+  return (
+    <>
+      <Analytics />
+      <EditorLayout templateSlug={templateSlug} />
+    </>
+  );
 };
 
 export default App;

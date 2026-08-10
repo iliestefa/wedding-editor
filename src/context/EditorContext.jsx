@@ -13,12 +13,11 @@ const STORAGE_VERSION = 1;
 const STORAGE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 días
 const SAVE_DEBOUNCE_MS = 500;
 
-const buildStorageKey = (templateSlug, order, client) =>
-  `wedya-editor-draft:${templateSlug}:${order || client || 'libre'}`;
+const buildStorageKey = (templateSlug) => `wedya-editor-draft:${templateSlug}`;
 
-const loadSavedData = (templateSlug, order, client) => {
+const loadSavedData = (templateSlug) => {
   try {
-    const raw = window.localStorage.getItem(buildStorageKey(templateSlug, order, client));
+    const raw = window.localStorage.getItem(buildStorageKey(templateSlug));
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     if (parsed?.version !== STORAGE_VERSION) return null;
@@ -29,10 +28,10 @@ const loadSavedData = (templateSlug, order, client) => {
   }
 };
 
-const persistData = (templateSlug, order, client, data) => {
+const persistData = (templateSlug, data) => {
   try {
     window.localStorage.setItem(
-      buildStorageKey(templateSlug, order, client),
+      buildStorageKey(templateSlug),
       JSON.stringify({ version: STORAGE_VERSION, savedAt: Date.now(), data }),
     );
   } catch {
@@ -41,9 +40,9 @@ const persistData = (templateSlug, order, client, data) => {
   }
 };
 
-const clearSavedData = (templateSlug, order, client) => {
+const clearSavedData = (templateSlug) => {
   try {
-    window.localStorage.removeItem(buildStorageKey(templateSlug, order, client));
+    window.localStorage.removeItem(buildStorageKey(templateSlug));
   } catch {
     // no-op
   }
@@ -219,13 +218,13 @@ const editorReducer = (state, action) => {
   }
 };
 
-export const EditorProvider = ({ templateSlug, order, client, children }) => {
+export const EditorProvider = ({ templateSlug, children }) => {
   const [data, dispatch] = useReducer(
     editorReducer,
     templateSlug,
     (slug) => {
       const defaults = buildInitialState(slug);
-      const saved = loadSavedData(slug, order, client);
+      const saved = loadSavedData(slug);
       return saved ? { ...defaults, ...saved } : defaults;
     },
   );
@@ -244,10 +243,10 @@ export const EditorProvider = ({ templateSlug, order, client, children }) => {
     if (!hasChanges) return undefined;
     clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      persistData(templateSlug, order, client, data);
+      persistData(templateSlug, data);
     }, SAVE_DEBOUNCE_MS);
     return () => clearTimeout(saveTimeoutRef.current);
-  }, [data, hasChanges, templateSlug, order, client]);
+  }, [data, hasChanges, templateSlug]);
 
   const setField             = (field, value)        => dispatch({ type: 'SET_FIELD', field, value });
   const setStoryItem         = (index, key, value)   => dispatch({ type: 'SET_STORY_ITEM', index, key, value });
@@ -269,10 +268,10 @@ export const EditorProvider = ({ templateSlug, order, client, children }) => {
   const removeDressCodeColor = (index)               => dispatch({ type: 'REMOVE_DRESS_CODE_COLOR', index });
 
   // Se llama tras un envío exitoso para no dejar el borrador viejo dando
-  // vueltas si el mismo link se vuelve a abrir más adelante.
+  // vueltas si el editor se vuelve a abrir más adelante.
   const clearSavedProgress = () => {
     clearTimeout(saveTimeoutRef.current);
-    clearSavedData(templateSlug, order, client);
+    clearSavedData(templateSlug);
   };
 
   const coupleNames = `${data.brideName} & ${data.groomName}`;
@@ -285,8 +284,6 @@ export const EditorProvider = ({ templateSlug, order, client, children }) => {
       hasChanges,
       clearSavedProgress,
       templateSlug,
-      order,
-      client,
       activeField,
       setActiveField,
       setField,
@@ -315,11 +312,9 @@ export const EditorProvider = ({ templateSlug, order, client, children }) => {
 
 EditorProvider.propTypes = {
   templateSlug: PropTypes.string,
-  order:        PropTypes.string,
-  client:       PropTypes.string,
   children:     PropTypes.node.isRequired,
 };
-EditorProvider.defaultProps = { templateSlug: 'soho', order: '', client: '' };
+EditorProvider.defaultProps = { templateSlug: 'soho' };
 
 export const useEditor = () => {
   const ctx = useContext(EditorContext);

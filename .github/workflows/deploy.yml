@@ -44,6 +44,8 @@ jobs:
           VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
           VITE_UPLOAD_ENDPOINT: ${{ secrets.VITE_UPLOAD_ENDPOINT }}
           VITE_UPLOAD_KEY: ${{ secrets.VITE_UPLOAD_KEY }}
+          VITE_GA4_ID: ${{ secrets.VITE_GA4_ID }}
+          VITE_META_PIXEL_ID: ${{ secrets.VITE_META_PIXEL_ID }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

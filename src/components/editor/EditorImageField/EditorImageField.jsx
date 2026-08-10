@@ -35,7 +35,8 @@ const EditorImageField = ({ label, fieldKey }) => {
       setField(fieldKey, url);
     } catch (err) {
       console.error('Error subiendo imagen:', err);
-      setError('No se pudo subir la foto. Revisa tu conexión e intenta de nuevo.');
+      const detail = err?.message ? ` (${err.message})` : '';
+      setError(`No se pudo subir la foto. Revisa tu conexión e intenta de nuevo.${detail}`);
     } finally {
       setUploading(false);
       if (inputRef.current) inputRef.current.value = '';

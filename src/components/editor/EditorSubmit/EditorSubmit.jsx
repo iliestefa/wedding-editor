@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { useEditor } from "../../../context/EditorContext";
 import { sendEditorData } from "../../../services/editorService";
+import { trackOrderSubmitted } from "../../../utils/analyticsEvents";
 import "./EditorSubmit.scss";
 
 const SEND_STATUS = {
@@ -12,12 +13,10 @@ const SEND_STATUS = {
 };
 
 const EditorSubmit = ({ onSuccess }) => {
-  const { data, order, client, templateSlug, clearSavedProgress } = useEditor();
+  const { data, templateSlug, clearSavedProgress } = useEditor();
   const [status, setStatus] = useState(SEND_STATUS.IDLE);
   const [errors, setErrors] = useState([]);
   const [sendError, setSendError] = useState("");
-
-  const isClientMode = !!client && !order;
 
   const validate = () => {
     const missing = [];
@@ -38,13 +37,11 @@ const EditorSubmit = ({ onSuccess }) => {
     setErrors([]);
     setStatus(SEND_STATUS.LOADING);
     try {
-      await sendEditorData(data, { order, client, templateSlug });
+      await sendEditorData(data, { templateSlug });
       clearSavedProgress();
-      if (!isClientMode) {
-        setStatus(SEND_STATUS.SUCCESS);
-        onSuccess?.();
-      }
-      // In client mode, sendEditorData handles the redirect to Shopify
+      trackOrderSubmitted({ templateSlug });
+      setStatus(SEND_STATUS.SUCCESS);
+      onSuccess?.();
     } catch (err) {
       const msg =
         err?.text || err?.message || JSON.stringify(err) || "Error desconocido";
@@ -54,9 +51,8 @@ const EditorSubmit = ({ onSuccess }) => {
   };
 
   if (status === SEND_STATUS.SUCCESS) {
-    // El overlay de éxito (con los botones de contacto en modo lead) lo
-    // muestra EditorLayout a pantalla completa — este componente no
-    // renderiza nada más una vez enviado.
+    // El dialog de confirmación (con los botones de contacto) lo muestra
+    // EditorLayout — este componente no renderiza nada más una vez enviado.
     return null;
   }
 
@@ -78,13 +74,7 @@ const EditorSubmit = ({ onSuccess }) => {
         onClick={handleSend}
         disabled={status === SEND_STATUS.LOADING}
       >
-        {status === SEND_STATUS.LOADING
-          ? isClientMode
-            ? "Procesando..."
-            : "Enviando..."
-          : isClientMode
-            ? "Proceder con el pago"
-            : "Enviar mis datos"}
+        {status === SEND_STATUS.LOADING ? "Enviando..." : "Enviar mis datos"}
       </button>
 
       {status === SEND_STATUS.ERROR && (

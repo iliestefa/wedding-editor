@@ -4,13 +4,6 @@
 const rawTokens = import.meta.env.VITE_VALID_TOKENS ?? 'dev-token';
 export const VALID_TOKENS = rawTokens.split(',').map((t) => t.trim()).filter(Boolean);
 
-// ─── Shopify ─────────────────────────────────────────────────────────────────
-export const SHOPIFY_DOMAIN = 'https://wedya.iliestefa.com';
-export const SHOPIFY_VARIANTS = {
-  soho:    '47858613027060',
-  elegant: '47858613059828',
-};
-
 // ─── Contacto Wedya (canales para leads del editor libre) ────────────────────
 export const WEDYA_WHATSAPP = '593998771032';
 export const WEDYA_INSTAGRAM = 'wedya.digital';
@@ -24,3 +17,9 @@ export const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  ?? '
 
 export const UPLOAD_ENDPOINT = import.meta.env.VITE_UPLOAD_ENDPOINT ?? '';
 export const UPLOAD_KEY      = import.meta.env.VITE_UPLOAD_KEY      ?? '';
+
+// ─── Analytics ───────────────────────────────────────────────────────────────
+// Set these in GitHub Actions secrets or .env.local for development.
+// Ambos quedan inactivos si su ID no está definido.
+export const GA4_ID        = import.meta.env.VITE_GA4_ID        ?? '';
+export const META_PIXEL_ID = import.meta.env.VITE_META_PIXEL_ID ?? '';
