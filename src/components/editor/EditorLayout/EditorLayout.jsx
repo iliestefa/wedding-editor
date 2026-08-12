@@ -7,6 +7,7 @@ import {
   WEDYA_INSTAGRAM,
   WEDYA_TIKTOK,
 } from '../../../constants/editorConstants';
+import { trackContactClick } from '../../../utils/analyticsEvents';
 import EditorPanel from '../EditorPanel/EditorPanel';
 import './EditorLayout.scss';
 
@@ -29,7 +30,7 @@ SectionWrapper.defaultProps = { activeSection: null };
 // Dialog de confirmación — única confirmación visual tras enviar los datos.
 // Un solo flujo para todos: se muestra siempre, con los botones de contacto
 // para coordinar la entrega por WhatsApp, Instagram o TikTok.
-const ContactDialog = ({ brideName, groomName, onClose }) => {
+const ContactDialog = ({ brideName, groomName, templateSlug, onClose }) => {
   const [copied, setCopied] = useState(false);
 
   const prefilledMessage =
@@ -37,6 +38,10 @@ const ContactDialog = ({ brideName, groomName, onClose }) => {
     'Ya llenamos nuestros datos en el editor ✨';
 
   const handleChannel = async (channelKey) => {
+    // Evento de conversión real para Meta Ads: se dispara justo cuando el
+    // usuario de verdad inicia el contacto, no antes (ver analyticsEvents.js).
+    trackContactClick({ channel: channelKey, templateSlug });
+
     let url;
     if (channelKey === 'whatsapp') {
       url = `https://wa.me/${WEDYA_WHATSAPP}?text=${encodeURIComponent(prefilledMessage)}`;
@@ -114,13 +119,15 @@ const ContactDialog = ({ brideName, groomName, onClose }) => {
 };
 
 ContactDialog.propTypes = {
-  brideName: PropTypes.string,
-  groomName: PropTypes.string,
-  onClose:   PropTypes.func.isRequired,
+  brideName:    PropTypes.string,
+  groomName:    PropTypes.string,
+  templateSlug: PropTypes.string,
+  onClose:      PropTypes.func.isRequired,
 };
 ContactDialog.defaultProps = {
-  brideName: '',
-  groomName: '',
+  brideName:    '',
+  groomName:    '',
+  templateSlug: '',
 };
 
 // Renders the preview once the template module is loaded
@@ -293,6 +300,7 @@ const EditorLayout = ({ templateSlug }) => {
         <ContactDialog
           brideName={data.brideName}
           groomName={data.groomName}
+          templateSlug={slug}
           onClose={() => setShowContactDialog(false)}
         />
       )}
