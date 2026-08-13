@@ -90,6 +90,11 @@ export const RSVP_GUESTS = [];
 // ─── Footer ───────────────────────────────────────────────────────────────────
 export const FOOTER_MESSAGE = ${s(d.footerMessage)};
 
+// ─── Paleta de colores ────────────────────────────────────────────────────────
+// null → paleta original de la plantilla; si no: { id, bg, accent, text }
+// (el resto de tonos se derivan solos — ver src/utils/palettes.js)
+export const COLOR_PALETTE = ${j(d.colorPalette ?? null)};
+
 // ─── Imágenes ─────────────────────────────────────────────────────────────────
 ${imagesBlock}
 `;

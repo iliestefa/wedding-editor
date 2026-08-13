@@ -84,6 +84,8 @@ const buildInitialState = (slug) => {
     rsvpCupos:            [0, 1, 2],
     footerMessage:        D.FOOTER_MESSAGE,
     imageHero:            D.IMAGE_HERO,
+    // null → paleta original; { id, bg, accent, text } → preset o personalizada
+    colorPalette:         null,
   };
 
   // Soho-only fields

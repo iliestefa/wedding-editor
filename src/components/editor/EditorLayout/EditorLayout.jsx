@@ -310,6 +310,7 @@ const EditorLayout = ({ templateSlug }) => {
         <EditorPanel
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
+          palettePresets={templateModule?.PRESET_PALETTES ?? []}
           onSubmitSuccess={() => {
             setSubmitted(true);
             setShowContactDialog(true);

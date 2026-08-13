@@ -8,5 +8,6 @@ export { default as GiftRegistry } from '@iliestefa/wedding-elegant/components/G
 export { default as RsvpForm } from '@iliestefa/wedding-elegant/components/RsvpForm/RsvpForm';
 export { default as Footer } from '@iliestefa/wedding-elegant/components/Footer/Footer';
 export { TemplateProvider } from '@iliestefa/wedding-elegant/context';
+export { PRESET_PALETTES } from '@iliestefa/wedding-elegant/utils/palettes';
 export const Story = null;
 export const hasStory = false;

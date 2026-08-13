@@ -469,6 +469,103 @@ $ep-text-muted:  #a88b78;
     padding: 0.2rem 0;
   }
 
+  // ── Selector de paleta de la invitación ───────────────────────────
+  &__palette-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__palette-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    background: $ep-bg-card;
+    border: 1px solid $ep-border;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    color: $ep-text;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+
+    &:hover {
+      border-color: rgba(184, 154, 106, 0.45);
+    }
+
+    &--active {
+      border-color: $ep-accent;
+      background: $ep-accent-glow;
+      box-shadow: 0 0 0 1px $ep-accent inset;
+    }
+  }
+
+  &__palette-dots {
+    display: inline-flex;
+    gap: 4px;
+    flex-shrink: 0;
+
+    span {
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 1px solid rgba(74, 55, 40, 0.15);
+    }
+  }
+
+  &__palette-dot-custom {
+    background: conic-gradient(#c9847e, #b89a6a, #8a9b7a, #7f95ad, #c9847e);
+  }
+
+  &__palette-name {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  &__palette-tag {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $ep-text-muted;
+    border: 1px solid $ep-border;
+    border-radius: 999px;
+    padding: 0.08rem 0.4rem;
+  }
+
+  &__palette-custom {
+    border: 1px solid $ep-border;
+    border-radius: 7px;
+    padding: 0.6rem 0.75rem;
+    background: $ep-bg-card;
+    margin-bottom: 0.75rem;
+  }
+
+  &__palette-custom-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.3rem 0;
+  }
+
+  &__palette-custom-label {
+    flex: 1;
+    font-size: 0.72rem;
+    color: $ep-text;
+  }
+
+  &__palette-custom-hex {
+    font-size: 0.62rem;
+    font-family: monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: $ep-text-muted;
+  }
+
   // ── Color picker grid ─────────────────────────────────────────────
   &__color-grid {
     display: grid;

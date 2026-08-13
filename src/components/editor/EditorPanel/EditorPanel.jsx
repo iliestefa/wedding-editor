@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef } from 'react';
 import { useEditor } from '../../../context/EditorContext';
+import { trackPaletteSelect } from '../../../utils/analyticsEvents';
 import EditorField from '../EditorField/EditorField';
 import EditorImageField from '../EditorImageField/EditorImageField';
 import EditorSubmit from '../EditorSubmit/EditorSubmit';
@@ -9,6 +10,7 @@ import './EditorPanel.scss';
 
 const SECTIONS_SOHO = [
   { id: 'hero',       label: 'Portada' },
+  { id: 'colores',    label: 'Colores' },
   { id: 'historia',   label: 'Historia' },
   { id: 'eventos',    label: 'Eventos' },
   { id: 'cronograma', label: 'Cronograma' },
@@ -21,6 +23,7 @@ const SECTIONS_SOHO = [
 
 const SECTIONS_ELEGANT = [
   { id: 'hero',       label: 'Portada' },
+  { id: 'colores',    label: 'Colores' },
   { id: 'eventos',    label: 'Eventos' },
   { id: 'cronograma', label: 'Cronograma' },
   { id: 'vestimenta', label: 'Vestimenta' },
@@ -155,8 +158,15 @@ DatePicker.propTypes = {
 };
 DatePicker.defaultProps = { timeValue: '17:00' };
 
+// Campos editables de la paleta personalizada, en orden de aparición
+const CUSTOM_PALETTE_FIELDS = [
+  { key: 'bg',     label: 'Fondo' },
+  { key: 'accent', label: 'Color principal' },
+  { key: 'text',   label: 'Texto' },
+];
+
 // ── Main panel ──────────────────────────────────────────────────────────────
-const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
+const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess, palettePresets }) => {
   const {
     data,
     templateSlug,
@@ -183,6 +193,31 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
     const activeTab = tabsRef.current?.querySelector('.editor-panel__tab--active');
     activeTab?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }, [activeSection]);
+
+  // ── Paleta de colores de la invitación ────────────────────────────────────
+  // null → paleta original (el primer preset). El primer preset se guarda como
+  // null para que el sitio final use los colores compilados de la plantilla.
+  const customPaletteActive = data.colorPalette?.id === 'custom';
+  const selectedPaletteId = data.colorPalette?.id ?? palettePresets[0]?.id;
+
+  const handleSelectPreset = (preset, index) => {
+    const value = index === 0
+      ? null
+      : { id: preset.id, bg: preset.bg, accent: preset.accent, text: preset.text };
+    setField('colorPalette', value);
+    trackPaletteSelect({ paletteId: preset.id, templateSlug });
+  };
+
+  const handleActivateCustomPalette = () => {
+    if (customPaletteActive) return;
+    const base = data.colorPalette ?? palettePresets[0];
+    setField('colorPalette', { id: 'custom', bg: base.bg, accent: base.accent, text: base.text });
+    trackPaletteSelect({ paletteId: 'custom', templateSlug });
+  };
+
+  const setCustomPaletteColor = (key, value) => {
+    setField('colorPalette', { ...data.colorPalette, [key]: value });
+  };
 
   const currentIndex = sections.findIndex((sec) => sec.id === activeSection);
   const prevSection = currentIndex > 0 ? sections[currentIndex - 1] : null;
@@ -250,6 +285,98 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess }) => {
 
             <p className="editor-panel__group-label">Foto de portada</p>
             <EditorImageField fieldKey="imageHero" />
+          </div>
+        )}
+
+        {/* ── Colores de la invitación ── */}
+        {activeSection === 'colores' && (
+          <div className="editor-panel__section">
+            <p className="editor-panel__group-label">Paleta de colores</p>
+            <p className="editor-panel__hint">
+              Elige una paleta y toda la invitación se adapta al instante: los
+              tonos intermedios se calculan solos para que siempre combinen.
+            </p>
+
+            {palettePresets.length === 0 ? (
+              <p className="editor-panel__hint">Cargando paletas…</p>
+            ) : (
+              <>
+                <div className="editor-panel__palette-list">
+                  {palettePresets.map((preset, i) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      className={`editor-panel__palette-option${
+                        !customPaletteActive && selectedPaletteId === preset.id
+                          ? ' editor-panel__palette-option--active'
+                          : ''
+                      }`}
+                      onClick={() => handleSelectPreset(preset, i)}
+                    >
+                      <span className="editor-panel__palette-dots" aria-hidden="true">
+                        <span style={{ background: preset.bg }} />
+                        <span style={{ background: preset.accent }} />
+                        <span style={{ background: preset.text }} />
+                      </span>
+                      <span className="editor-panel__palette-name">
+                        {preset.label}
+                        {i === 0 && <span className="editor-panel__palette-tag">Original</span>}
+                      </span>
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    className={`editor-panel__palette-option${
+                      customPaletteActive ? ' editor-panel__palette-option--active' : ''
+                    }`}
+                    onClick={handleActivateCustomPalette}
+                  >
+                    <span className="editor-panel__palette-dots" aria-hidden="true">
+                      {customPaletteActive ? (
+                        <>
+                          <span style={{ background: data.colorPalette.bg }} />
+                          <span style={{ background: data.colorPalette.accent }} />
+                          <span style={{ background: data.colorPalette.text }} />
+                        </>
+                      ) : (
+                        <span className="editor-panel__palette-dot-custom" />
+                      )}
+                    </span>
+                    <span className="editor-panel__palette-name">Personalizada</span>
+                  </button>
+                </div>
+
+                {customPaletteActive && (
+                  <div className="editor-panel__palette-custom">
+                    {CUSTOM_PALETTE_FIELDS.map(({ key, label }) => (
+                      <div key={key} className="editor-panel__palette-custom-row">
+                        <label
+                          className="editor-panel__color-swatch"
+                          style={{ background: data.colorPalette[key] }}
+                          title={label}
+                        >
+                          <input
+                            type="color"
+                            className="editor-panel__color-input"
+                            value={data.colorPalette[key]}
+                            onChange={(e) => setCustomPaletteColor(key, e.target.value)}
+                          />
+                        </label>
+                        <span className="editor-panel__palette-custom-label">{label}</span>
+                        <span className="editor-panel__palette-custom-hex">
+                          {data.colorPalette[key]}
+                        </span>
+                      </div>
+                    ))}
+                    <p className="editor-panel__hint">
+                      Si el texto no contrasta bien con el fondo, lo ajustamos
+                      automáticamente para que la invitación siempre sea legible.
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
@@ -816,11 +943,19 @@ EditorPanel.propTypes = {
   activeSection:   PropTypes.string,
   onSectionChange: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
+  palettePresets:  PropTypes.arrayOf(PropTypes.shape({
+    id:     PropTypes.string.isRequired,
+    label:  PropTypes.string.isRequired,
+    bg:     PropTypes.string.isRequired,
+    accent: PropTypes.string.isRequired,
+    text:   PropTypes.string.isRequired,
+  })),
 };
 
 EditorPanel.defaultProps = {
   activeSection:   null,
   onSubmitSuccess: null,
+  palettePresets:  [],
 };
 
 export default EditorPanel;

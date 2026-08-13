@@ -9,4 +9,5 @@ export { default as GiftRegistry } from '@iliestefa/wedding-soho/components/Gift
 export { default as RsvpForm } from '@iliestefa/wedding-soho/components/RsvpForm/RsvpForm';
 export { default as Footer } from '@iliestefa/wedding-soho/components/Footer/Footer';
 export { TemplateProvider } from '@iliestefa/wedding-soho/context';
+export { PRESET_PALETTES } from '@iliestefa/wedding-soho/utils/palettes';
 export const hasStory = true;

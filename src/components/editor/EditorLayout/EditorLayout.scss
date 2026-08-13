@@ -113,7 +113,8 @@ $bar-border: rgba(184, 154, 106, 0.2);
     overflow-x: hidden;
     overflow-y: auto;
     position: relative;
-    background: #1a1410;
+    // Sigue la paleta elegida en el editor (variables aplicadas en <html>)
+    background: var(--color-bg, #1a1410);
     scrollbar-width: thin;
     scrollbar-color: rgba(196, 152, 90, 0.3) transparent;
 
@@ -338,12 +339,14 @@ $bar-border: rgba(184, 154, 106, 0.2);
   &.editor-layout__preview-canvas--scrolled {
     .nav {
       background-color: rgba(250, 245, 239, 0.95) !important;
+      background-color: color-mix(in srgb, var(--color-bg, #faf5ef) 95%, transparent) !important;
       backdrop-filter: blur(12px) !important;
       box-shadow: 0 1px 0 rgba(196, 152, 90, 0.15) !important;
+      box-shadow: 0 1px 0 color-mix(in srgb, var(--color-gold, #c4985a) 15%, transparent) !important;
 
-      .nav__link { color: #2a221a !important; }
-      .nav__monogram-text { color: #c4985a !important; }
-      .nav__burger span { background: #2a221a !important; }
+      .nav__link { color: var(--color-bg-dark, #2a221a) !important; }
+      .nav__monogram-text { color: var(--color-gold, #c4985a) !important; }
+      .nav__burger span { background: var(--color-bg-dark, #2a221a) !important; }
     }
   }
 }
@@ -353,8 +356,9 @@ $bar-border: rgba(184, 154, 106, 0.2);
   &.editor-layout__preview-canvas--scrolled {
     .nav {
       background-color: rgba(17, 15, 13, 0.92) !important;
+      background-color: color-mix(in srgb, var(--color-bg-deep, #110f0d) 92%, transparent) !important;
       backdrop-filter: blur(16px) !important;
-      border-bottom-color: rgba(201, 169, 110, 0.2) !important;
+      border-bottom-color: var(--color-border, rgba(201, 169, 110, 0.2)) !important;
     }
   }
 
