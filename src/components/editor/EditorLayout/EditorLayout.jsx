@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useEditor } from '../../../context/EditorContext';
 import { TEMPLATES, DEFAULT_TEMPLATE } from '../../../constants/templateRegistry';
@@ -186,6 +186,75 @@ TemplatePreview.propTypes = {
 };
 TemplatePreview.defaultProps = { activeSection: null, navScrolled: false };
 
+// ── Preview en modo Celular ─────────────────────────────────────────────────
+// Carga el preview dentro de un <iframe> con ancho real de celular (390px),
+// para que las @media queries de la plantilla activen su diseño móvil de
+// verdad — no una versión de escritorio achicada. El iframe corre en un
+// documento aparte (ver RawPreview), así que los datos del editor viajan
+// por postMessage en cada cambio.
+const MobilePreviewFrame = ({ templateSlug, data, sectionRequest }) => {
+  const iframeRef = useRef(null);
+  const [iframeReady, setIframeReady] = useState(false);
+
+  const iframeSrc = useMemo(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('template', templateSlug);
+    url.searchParams.set('raw', '1');
+    return url.toString();
+  }, [templateSlug]);
+
+  // El iframe avisa "wedya:ready" (ver RawPreview) cuando ya puede recibir
+  // datos — evita mandar el primer postMessage antes de que exista el
+  // listener del lado del iframe.
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.source !== iframeRef.current?.contentWindow) return;
+      if (event.data?.type === 'wedya:ready') setIframeReady(true);
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  useEffect(() => {
+    if (!iframeReady) return;
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: 'wedya:data', data },
+      window.location.origin,
+    );
+  }, [iframeReady, data]);
+
+  // Cambio de tab en el panel → el iframe hace scroll a esa sección.
+  // sectionRequest es un objeto nuevo en cada click (ver handleSectionChange),
+  // así el efecto también corre al repetir la misma sección.
+  useEffect(() => {
+    if (!iframeReady || !sectionRequest) return;
+    iframeRef.current?.contentWindow?.postMessage(
+      { type: 'wedya:section', sectionId: sectionRequest.id },
+      window.location.origin,
+    );
+  }, [iframeReady, sectionRequest]);
+
+  return (
+    <div className="editor-layout__mobile-frame">
+      <div className="editor-layout__mobile-frame-notch" />
+      <iframe
+        ref={iframeRef}
+        key={iframeSrc}
+        src={iframeSrc}
+        title="Vista previa en celular"
+        className="editor-layout__mobile-frame-iframe"
+      />
+    </div>
+  );
+};
+
+MobilePreviewFrame.propTypes = {
+  templateSlug:   PropTypes.string.isRequired,
+  data:           PropTypes.object.isRequired,
+  sectionRequest: PropTypes.shape({ id: PropTypes.string }),
+};
+MobilePreviewFrame.defaultProps = { sectionRequest: null };
+
 const EditorLayout = ({ templateSlug }) => {
   const [showPreview, setShowPreview]       = useState(false);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
@@ -194,6 +263,10 @@ const EditorLayout = ({ templateSlug }) => {
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [navScrolled, setNavScrolled]       = useState(false);
   const [templateModule, setTemplateModule] = useState(null);
+  const [previewMode, setPreviewMode]       = useState('desktop'); // 'desktop' | 'mobile'
+  // Último salto de sección pedido desde el panel — objeto nuevo por click,
+  // consumido por el iframe del modo Celular (ver MobilePreviewFrame).
+  const [sectionRequest, setSectionRequest] = useState(null);
   const previewRef = useRef(null);
   const canvasRef  = useRef(null);
   const { data, hasChanges } = useEditor();
@@ -244,14 +317,27 @@ const EditorLayout = ({ templateSlug }) => {
     return () => canvas.removeEventListener('scroll', update);
   }, []);
 
+  // Scrollea al INICIO de la sección (no al centro): las secciones altas
+  // centradas aterrizan a mitad de contenido y se saltan el título.
+  // Se descuenta el nav sticky para que el título quede visible.
   const scrollToSection = useCallback((sectionId) => {
     const el = previewRef.current?.querySelector(`[data-section="${sectionId}"]`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const canvas = canvasRef.current;
+    if (!el || !canvas) return;
+    const navHeight = previewRef.current?.querySelector('.nav, nav')?.offsetHeight ?? 0;
+    const top = Math.max(
+      0,
+      canvas.scrollTop + el.getBoundingClientRect().top - canvas.getBoundingClientRect().top - navHeight,
+    );
+    canvas.scrollTo({ top, behavior: 'smooth' });
   }, []);
 
   const handleSectionChange = useCallback((sectionId) => {
     setActiveSection(sectionId);
+    // Preview de escritorio (mismo documento): scroll directo.
     scrollToSection(sectionId);
+    // Preview modo Celular (iframe): se pide por postMessage.
+    setSectionRequest({ id: sectionId });
   }, [scrollToSection]);
 
   return (
@@ -277,23 +363,49 @@ const EditorLayout = ({ templateSlug }) => {
         {panelCollapsed ? 'EDITOR' : 'CERRAR'}
       </button>
 
+      {/* Desktop-only: simula el ancho de celular dentro del preview */}
+      <div className="editor-layout__device-toggle" role="group" aria-label="Vista del preview">
+        <button
+          type="button"
+          className={`editor-layout__device-btn${previewMode === 'desktop' ? ' editor-layout__device-btn--active' : ''}`}
+          onClick={() => setPreviewMode('desktop')}
+          aria-pressed={previewMode === 'desktop'}
+        >
+          Escritorio
+        </button>
+        <button
+          type="button"
+          className={`editor-layout__device-btn${previewMode === 'mobile' ? ' editor-layout__device-btn--active' : ''}`}
+          onClick={() => setPreviewMode('mobile')}
+          aria-pressed={previewMode === 'mobile'}
+        >
+          Celular
+        </button>
+      </div>
+
       {/* Full-viewport preview */}
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
-        <div
-          ref={canvasRef}
-          className={`editor-layout__preview-canvas editor-layout__preview-canvas--${slug}${navScrolled ? ' editor-layout__preview-canvas--scrolled' : ''}`}
-        >
-          {templateModule ? (
-            <TemplatePreview
-              templateModule={templateModule}
-              activeSection={activeSection}
-              previewRef={previewRef}
-              navScrolled={navScrolled}
-            />
-          ) : (
-            <div className="editor-layout__loading">Cargando template…</div>
-          )}
-        </div>
+        {previewMode === 'mobile' ? (
+          <div className="editor-layout__mobile-frame-wrap">
+            <MobilePreviewFrame templateSlug={slug} data={data} sectionRequest={sectionRequest} />
+          </div>
+        ) : (
+          <div
+            ref={canvasRef}
+            className={`editor-layout__preview-canvas editor-layout__preview-canvas--${slug}${navScrolled ? ' editor-layout__preview-canvas--scrolled' : ''}`}
+          >
+            {templateModule ? (
+              <TemplatePreview
+                templateModule={templateModule}
+                activeSection={activeSection}
+                previewRef={previewRef}
+                navScrolled={navScrolled}
+              />
+            ) : (
+              <div className="editor-layout__loading">Cargando template…</div>
+            )}
+          </div>
+        )}
       </main>
 
       {showContactDialog && (
