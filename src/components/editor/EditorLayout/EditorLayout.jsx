@@ -142,7 +142,8 @@ const TemplatePreview = ({ templateModule, activeSection, previewRef, navScrolle
 
   return (
     <TemplateProvider data={data}>
-      <div ref={previewRef} className="editor-layout__preview-inner">
+      {/* template-shell: ancla de overlays globales de la plantilla (ej. textura floral) */}
+      <div ref={previewRef} className="editor-layout__preview-inner template-shell">
         <Navigation forceScrolled={navScrolled} />
         <SectionWrapper id="hero" activeSection={activeSection}>
           <Hero />
@@ -386,7 +387,11 @@ const EditorLayout = ({ templateSlug }) => {
       {/* Full-viewport preview */}
       <main className={`editor-layout__preview ${showPreview ? 'editor-layout__preview--visible' : ''}`}>
         {previewMode === 'mobile' ? (
-          <div className="editor-layout__mobile-frame-wrap">
+          <div
+            className={`editor-layout__mobile-frame-wrap${
+              !panelCollapsed ? ' editor-layout__mobile-frame-wrap--panel-open' : ''
+            }`}
+          >
             <MobilePreviewFrame templateSlug={slug} data={data} sectionRequest={sectionRequest} />
           </div>
         ) : (

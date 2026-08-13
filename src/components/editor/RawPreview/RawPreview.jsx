@@ -66,18 +66,21 @@ const RawPreview = ({ templateSlug }) => {
 
   // Mismos ids de sección que usa el panel del editor (ver EditorPanel), para
   // que el salto de sección funcione igual que en el preview de escritorio.
+  // template-shell: ancla de overlays globales de la plantilla (textura floral).
   return (
     <TemplateProvider data={data}>
-      <Navigation />
-      <div data-section="hero"><Hero /></div>
-      {Story && <div data-section="historia"><Story /></div>}
-      <div data-section="countdown"><Countdown /></div>
-      <div data-section="eventos"><Events /></div>
-      <div data-section="cronograma"><Schedule /></div>
-      <div data-section="vestimenta"><DressCode /></div>
-      <div data-section="regalos"><GiftRegistry /></div>
-      <div data-section="rsvp"><RsvpForm /></div>
-      <div data-section="footer"><Footer /></div>
+      <div className="template-shell">
+        <Navigation />
+        <div data-section="hero"><Hero /></div>
+        {Story && <div data-section="historia"><Story /></div>}
+        <div data-section="countdown"><Countdown /></div>
+        <div data-section="eventos"><Events /></div>
+        <div data-section="cronograma"><Schedule /></div>
+        <div data-section="vestimenta"><DressCode /></div>
+        <div data-section="regalos"><GiftRegistry /></div>
+        <div data-section="rsvp"><RsvpForm /></div>
+        <div data-section="footer"><Footer /></div>
+      </div>
     </TemplateProvider>
   );
 };

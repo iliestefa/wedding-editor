@@ -163,9 +163,19 @@ $bar-border: rgba(184, 154, 106, 0.2);
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    background: #0d0b09;
+    // Más claro que el cuerpo del teléfono (#111) para que el borde del
+    // mockup no se pierda contra el fondo.
+    background: radial-gradient(circle at 50% 30%, #38302a, #1e1a16);
     padding: 2.5rem 0;
     overflow: auto;
+    transition: padding-right 0.35s ease;
+
+    // Con el panel del editor abierto (420px fijos a la derecha), el centro
+    // real del área visible está corrido — se compensa con padding para que
+    // el teléfono quede centrado en lo que de verdad se ve.
+    &--panel-open {
+      padding-right: $panel-width;
+    }
   }
 
   &__preview-canvas {
@@ -377,7 +387,11 @@ $bar-border: rgba(184, 154, 106, 0.2);
   border-radius: 32px;
   overflow: hidden;
   background: #111;
-  box-shadow: 0 0 0 10px #111, 0 20px 60px rgba(0, 0, 0, 0.5);
+  // Filo de luz exterior para separar el teléfono del fondo oscuro
+  box-shadow:
+    0 0 0 10px #111,
+    0 0 0 11px rgba(255, 255, 255, 0.14),
+    0 24px 60px rgba(0, 0, 0, 0.55);
 }
 
 .editor-layout__mobile-frame-notch {
