@@ -30,16 +30,25 @@ Publica versión nueva de ambas plantillas. Desde ahí, **ningún cliente
 necesita configuración de RSVP**: el slug viaja en sus constants y la hoja
 se crea sola.
 
+## Clave de administrador (obligatoria para consultas)
+
+En el proyecto de Apps Script: **Configuración del proyecto → Propiedades de
+la secuencia de comandos → Agregar propiedad**: nombre `ADMIN_KEY`, valor una
+clave larga inventada por ti (ej. generada con un gestor de contraseñas).
+Protege las acciones administrativas: sin ella, cualquiera que conozca la URL
+podría adivinar un slug y llegar a la lista de invitados de una pareja.
+La clave vive SOLO ahí — nunca en repos ni en el código de las invitaciones.
+
 ## Uso diario
 
 - **Ver la hoja de un cliente**: abre en el navegador
-  `<URL-del-webapp>?slug=sofiayalejandro` → responde con el link de su hoja.
-  (O búscala en Drive, carpeta `Wedya — RSVP`.)
+  `<URL-del-webapp>?slug=sofiayalejandro&key=<TU_ADMIN_KEY>` → responde con
+  el link de su hoja. (O búscala en Drive, carpeta `Wedya — RSVP`.)
 - **Pre-crear y compartir la hoja con la novia** (opcional, antes de la boda):
   ```bash
   curl -L -X POST '<URL-del-webapp>' \
     -H 'Content-Type: text/plain' \
-    -d '{"action":"setup","slug":"sofiayalejandro","coupleNames":"Sofía & Alejandro","questionLabels":["Restricciones alimentarias o alergias"],"shareWith":"novia@gmail.com"}'
+    -d '{"action":"setup","adminKey":"<TU_ADMIN_KEY>","slug":"sofiayalejandro","coupleNames":"Sofía & Alejandro","questionLabels":["Restricciones alimentarias o alergias"],"shareWith":"novia@gmail.com"}'
   ```
 
 ## Notas técnicas

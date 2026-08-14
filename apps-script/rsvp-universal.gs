@@ -76,6 +76,8 @@ function doPost(e) {
     if (!data.slug) return jsonResponse({ ok: false, error: 'slug requerido' });
 
     if (data.action === 'setup') {
+      // Acción administrativa: requiere la clave (Script Properties → ADMIN_KEY)
+      if (!isAdmin(data.adminKey)) return jsonResponse({ ok: false, error: 'no autorizado' });
       var setup = getOrCreateSheet(data);
       if (data.shareWith) shareSheet(setup.spreadsheet, data.shareWith);
       return jsonResponse({ ok: true, url: setup.spreadsheet.getUrl() });
@@ -94,9 +96,21 @@ function doPost(e) {
 function doGet(e) {
   var slug = e.parameter.slug;
   if (!slug) return jsonResponse({ ok: true, service: 'wedya-rsvp' });
+  // Consultar el link de una hoja requiere la clave de administrador —
+  // los slugs son adivinables (nombres de la pareja) y sin esto cualquiera
+  // podría llegar a la lista de invitados de una boda ajena.
+  if (!isAdmin(e.parameter.key)) return jsonResponse({ ok: false, error: 'no autorizado' });
   var id = PropertiesService.getScriptProperties().getProperty(propKey(slug));
   if (!id) return jsonResponse({ ok: false, error: 'sin hoja para ese slug' });
   return jsonResponse({ ok: true, url: SpreadsheetApp.openById(id).getUrl() });
+}
+
+// La clave vive SOLO en Script Properties (ADMIN_KEY) — nunca en repos ni
+// en el bundle de las invitaciones. Sin la propiedad configurada, las
+// acciones administrativas quedan cerradas.
+function isAdmin(key) {
+  var adminKey = PropertiesService.getScriptProperties().getProperty('ADMIN_KEY');
+  return Boolean(adminKey) && key === adminKey;
 }
 
 // ─── Hoja por cliente ────────────────────────────────────────────────────────
