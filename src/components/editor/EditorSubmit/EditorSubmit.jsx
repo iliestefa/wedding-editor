@@ -25,6 +25,10 @@ const EditorSubmit = ({ onSuccess }) => {
     if (!data.weddingDateIso.trim()) missing.push("Fecha de la boda");
     if (!data.ceremonyVenueName.trim()) missing.push("Lugar de la ceremonia");
     if (!data.receptionVenueName.trim()) missing.push("Lugar de la recepción");
+    // Sin número, el botón de confirmar por WhatsApp no puede armar el link
+    if (data.rsvpType === "whatsapp" && !(data.rsvpWhatsapp ?? "").trim()) {
+      missing.push("Número de WhatsApp para confirmaciones (sección RSVP)");
+    }
     return missing;
   };
 
