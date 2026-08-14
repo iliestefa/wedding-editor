@@ -1,13 +1,16 @@
 {
   "name": "wedding-editor",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:viewer": "vite build --config vite.viewer.config.js",
+    "worker:dev": "npm run build:viewer && cd worker && npx wrangler dev",
+    "worker:deploy": "npm run build:viewer && cd worker && npx wrangler deploy"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

@@ -30,12 +30,13 @@ SectionWrapper.defaultProps = { activeSection: null };
 // Dialog de confirmación — única confirmación visual tras enviar los datos.
 // Un solo flujo para todos: se muestra siempre, con los botones de contacto
 // para coordinar la entrega por WhatsApp, Instagram o TikTok.
-const ContactDialog = ({ brideName, groomName, templateSlug, onClose }) => {
+const ContactDialog = ({ brideName, groomName, templateSlug, previewUrl, onClose }) => {
   const [copied, setCopied] = useState(false);
 
   const prefilledMessage =
     `¡Holaa! Somos ${brideName} & ${groomName} 💍 y queremos nuestra invitación digital. ` +
-    'Ya llenamos nuestros datos en el editor ✨';
+    'Ya llenamos nuestros datos en el editor ✨' +
+    (previewUrl ? ` Nuestro preview: ${previewUrl}` : '');
 
   const handleChannel = async (channelKey) => {
     // Evento de conversión real para Meta Ads: se dispara justo cuando el
@@ -84,6 +85,15 @@ const ContactDialog = ({ brideName, groomName, templateSlug, onClose }) => {
           invitación. Les escribiremos en cuanto esté lista.
         </p>
 
+        {previewUrl && (
+          <p className="editor-layout__contact-preview">
+            Mientras tanto, así quedó su invitación:{' '}
+            <a href={previewUrl} target="_blank" rel="noreferrer noopener">
+              ver mi invitación
+            </a>
+          </p>
+        )}
+
         <div className="editor-layout__contact-channels">
           <button
             type="button"
@@ -122,12 +132,14 @@ ContactDialog.propTypes = {
   brideName:    PropTypes.string,
   groomName:    PropTypes.string,
   templateSlug: PropTypes.string,
+  previewUrl:   PropTypes.string,
   onClose:      PropTypes.func.isRequired,
 };
 ContactDialog.defaultProps = {
   brideName:    '',
   groomName:    '',
   templateSlug: '',
+  previewUrl:   '',
 };
 
 // Renders the preview once the template module is loaded
@@ -262,6 +274,7 @@ const EditorLayout = ({ templateSlug }) => {
   const [activeSection, setActiveSection]   = useState('hero');
   const [submitted, setSubmitted]           = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
+  const [previewUrl, setPreviewUrl]         = useState('');
   const [navScrolled, setNavScrolled]       = useState(false);
   const [templateModule, setTemplateModule] = useState(null);
   const [previewMode, setPreviewMode]       = useState('desktop'); // 'desktop' | 'mobile'
@@ -418,6 +431,7 @@ const EditorLayout = ({ templateSlug }) => {
           brideName={data.brideName}
           groomName={data.groomName}
           templateSlug={slug}
+          previewUrl={previewUrl}
           onClose={() => setShowContactDialog(false)}
         />
       )}
@@ -428,8 +442,9 @@ const EditorLayout = ({ templateSlug }) => {
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
           palettePresets={templateModule?.PRESET_PALETTES ?? []}
-          onSubmitSuccess={() => {
+          onSubmitSuccess={(saved) => {
             setSubmitted(true);
+            setPreviewUrl(saved?.previewUrl ?? '');
             setShowContactDialog(true);
           }}
         />

@@ -297,6 +297,18 @@ $bar-border: rgba(184, 154, 106, 0.2);
   text-align: center;
 }
 
+.editor-layout__contact-preview {
+  font-size: 0.82rem;
+  text-align: center;
+  margin: 0 0 1.25rem;
+  color: #4a3728;
+
+  a {
+    color: #b89a6a;
+    font-weight: 700;
+  }
+}
+
 .editor-layout__contact-channels {
   display: flex;
   flex-direction: column;

@@ -15,6 +15,10 @@ export const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  ?? '
 export const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? '';
 export const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  ?? '';
 
+// Worker de invitaciones (Fase 2) — guarda los datos y devuelve la URL de
+// preview de la pareja. Vacío → se omite (el email sigue siendo el respaldo).
+export const WEDDINGS_API = import.meta.env.VITE_WEDDINGS_API ?? '';
+
 export const UPLOAD_ENDPOINT = import.meta.env.VITE_UPLOAD_ENDPOINT ?? '';
 export const UPLOAD_KEY      = import.meta.env.VITE_UPLOAD_KEY      ?? '';
 

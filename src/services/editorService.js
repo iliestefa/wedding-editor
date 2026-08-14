@@ -3,7 +3,26 @@ import {
   EMAILJS_SERVICE_ID,
   EMAILJS_TEMPLATE_ID,
   EMAILJS_PUBLIC_KEY,
+  WEDDINGS_API,
 } from "../constants/editorConstants";
+
+// Guarda la invitación en el Worker (Fase 2) y devuelve { slug, previewUrl }
+// para que la pareja vea su invitación al instante. Nunca rompe el envío:
+// si el Worker falla, el email sigue siendo la fuente de verdad.
+const saveToWeddingsApi = async (weddingData, templateSlug) => {
+  if (!WEDDINGS_API) return null;
+  try {
+    const res = await fetch(`${WEDDINGS_API}/api/invitations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ templateSlug, data: weddingData }),
+    });
+    const result = await res.json();
+    return result?.ok ? { slug: result.slug, previewUrl: result.previewUrl } : null;
+  } catch {
+    return null;
+  }
+};
 
 // Identificador único del cliente: "Sofía" + "Alejandro" → "sofiayalejandro".
 // Lo usan el RSVP universal (nombre de la hoja de respuestas) y, a futuro,
@@ -120,6 +139,10 @@ export const sendEditorData = async (
 ) => {
   const { brideName, groomName } = weddingData;
 
+  // Primero el Worker (si está configurado): así el link de preview de la
+  // pareja también viaja en el email que recibe Wedya.
+  const saved = await saveToWeddingsApi(weddingData, templateSlug);
+
   const templateParams = {
     to_email: "developer@iliestefa.com",
     subject: `Datos de boda — ${brideName} & ${groomName}`,
@@ -129,7 +152,10 @@ export const sendEditorData = async (
     // El template de EmailJS espera esta key; se deja fija ya que el editor
     // ahora tiene un único flujo (sin ?order= ni distinción de pedido).
     order: "editor",
-    extra_notes: weddingData.extraNotes || "(sin notas adicionales)",
+    extra_notes: [
+      weddingData.extraNotes || "(sin notas adicionales)",
+      saved ? `\n— Guardado en el Worker: slug "${saved.slug}" · preview: ${saved.previewUrl}` : "",
+    ].join(""),
     constants_file: buildConstantsFile(weddingData, templateSlug),
     data_json: JSON.stringify(weddingData, null, 2),
   };
@@ -150,4 +176,7 @@ export const sendEditorData = async (
   } else {
     throw new Error('El servicio de envío no está configurado.');
   }
+
+  // La pareja ve su link de preview en el dialog de confirmación
+  return saved;
 };

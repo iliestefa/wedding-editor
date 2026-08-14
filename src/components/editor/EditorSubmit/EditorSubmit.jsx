@@ -37,11 +37,12 @@ const EditorSubmit = ({ onSuccess }) => {
     setErrors([]);
     setStatus(SEND_STATUS.LOADING);
     try {
-      await sendEditorData(data, { templateSlug });
+      // saved: { slug, previewUrl } si el Worker está configurado, o null
+      const saved = await sendEditorData(data, { templateSlug });
       clearSavedProgress();
       trackOrderSubmitted({ templateSlug });
       setStatus(SEND_STATUS.SUCCESS);
-      onSuccess?.();
+      onSuccess?.(saved);
     } catch (err) {
       const msg =
         err?.text || err?.message || JSON.stringify(err) || "Error desconocido";
