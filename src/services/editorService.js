@@ -5,6 +5,16 @@ import {
   EMAILJS_PUBLIC_KEY,
 } from "../constants/editorConstants";
 
+// Identificador único del cliente: "Sofía" + "Alejandro" → "sofiayalejandro".
+// Lo usan el RSVP universal (nombre de la hoja de respuestas) y, a futuro,
+// la URL de la invitación publicada.
+export const buildWeddingSlug = (brideName = "", groomName = "") =>
+  `${brideName}y${groomName}`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // quita tildes
+    .replace(/[^a-z0-9]/g, "");
+
 // Converts the editor data into a weddingConstants.js file string
 const buildConstantsFile = (d, templateSlug = "") => {
   const j = (v) => JSON.stringify(v, null, 2);
@@ -25,6 +35,10 @@ export const IMAGE_RINGS = ${s(d.imageRings)};`;
 export const BRIDE_NAME = ${s(d.brideName)};
 export const GROOM_NAME = ${s(d.groomName)};
 export const COUPLE_NAMES = \`\${BRIDE_NAME} & \${GROOM_NAME}\`;
+
+// Identificador único del cliente — lo usa el RSVP universal para crear su
+// hoja de respuestas (y a futuro, la URL de la invitación publicada).
+export const WEDDING_SLUG = ${s(buildWeddingSlug(d.brideName, d.groomName))};
 
 // ─── Fecha ────────────────────────────────────────────────────────────────────
 export const WEDDING_DATE_ISO = ${s(d.weddingDateIso)};
