@@ -1,15 +1,11 @@
 .editor-submit {
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid rgba(184, 154, 106, 0.2);
-
   &__errors {
     list-style: none;
     background: rgba(201, 132, 126, 0.1);
     border: 1px solid rgba(201, 132, 126, 0.3);
     border-radius: 5px;
     padding: 0.75rem 1rem;
-    margin: 0 0 1rem;
+    margin: 0;
     font-size: 0.8rem;
     color: #b85c38;
     line-height: 1.7;
@@ -20,35 +16,10 @@
     margin-bottom: 0.25rem;
   }
 
-  &__btn {
-    width: 100%;
-    font-family: inherit;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: #fdf8f3;
-    background: #b89a6a;
-    border: none;
-    border-radius: 5px;
-    padding: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.2s, opacity 0.2s;
-
-    &:hover:not(:disabled) {
-      background: #c9a97e;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-
   &__error-msg {
     font-size: 0.8rem;
     color: #b85c38;
-    margin: 0.75rem 0 0;
+    margin: 0 0 0.75rem;
     text-align: center;
   }
 
@@ -57,7 +28,7 @@
     align-items: baseline;
     justify-content: center;
     gap: 0.6rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
   }
 
   &__price-regular {
@@ -70,32 +41,5 @@
     font-size: 1.15rem;
     font-weight: 700;
     color: #6b4f2e;
-  }
-
-  &__paypal {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-
-  &__cancel-btn {
-    width: 100%;
-    font-family: inherit;
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: #8a7960;
-    background: transparent;
-    border: 1px solid rgba(184, 154, 106, 0.35);
-    border-radius: 5px;
-    padding: 0.7rem;
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-
-    &:hover {
-      background: rgba(184, 154, 106, 0.08);
-      border-color: rgba(184, 154, 106, 0.6);
-    }
   }
 }

@@ -12,16 +12,17 @@ import {
 import "./EditorSubmit.scss";
 
 const STEP = {
-  FORM: "form",
-  PAYING: "paying",
+  READY: "ready",
   SUCCESS: "success",
   ERROR: "error",
 };
 
+// Vive dentro del step "Publicar" del editor: la pareja ya llegó acá a
+// propósito, así que no hay un botón intermedio — se valida el formulario
+// y, si está completo, se muestra directo el precio + botón de PayPal.
 const EditorSubmit = ({ onSuccess }) => {
   const { data, templateSlug, clearSavedProgress } = useEditor();
-  const [step, setStep] = useState(STEP.FORM);
-  const [errors, setErrors] = useState([]);
+  const [step, setStep] = useState(STEP.READY);
   const [payError, setPayError] = useState("");
 
   const validate = () => {
@@ -38,20 +39,13 @@ const EditorSubmit = ({ onSuccess }) => {
     return missing;
   };
 
-  // "Publicar" solo valida y abre el paso de pago — nada se guarda todavía.
-  const handleOpenPayment = () => {
-    const missing = validate();
-    if (missing.length > 0) {
-      setErrors(missing);
-      return;
-    }
-    setErrors([]);
-    setPayError("");
-    setStep(STEP.PAYING);
-  };
+  const missingFields = validate();
 
   const createOrder = (_data, actions) =>
     actions.order.create({
+      // Producto digital: sin esto PayPal pide dirección de envío además
+      // de la de facturación (dos veces la misma dirección, sin sentido acá).
+      application_context: { shipping_preference: "NO_SHIPPING" },
       purchase_units: [
         {
           description: `Invitación digital — ${data.brideName} & ${data.groomName}`,
@@ -89,66 +83,52 @@ const EditorSubmit = ({ onSuccess }) => {
     return null;
   }
 
-  return (
-    <div className="editor-submit">
-      {errors.length > 0 && (
+  if (missingFields.length > 0) {
+    return (
+      <div className="editor-submit">
         <ul className="editor-submit__errors">
           <li className="editor-submit__errors-title">
-            Completa estos campos obligatorios:
+            Completa estos campos antes de publicar:
           </li>
-          {errors.map((e) => (
-            <li key={e}>— {e}</li>
+          {missingFields.map((f) => (
+            <li key={f}>— {f}</li>
           ))}
         </ul>
+      </div>
+    );
+  }
+
+  return (
+    <div className="editor-submit">
+      <div className="editor-submit__price">
+        <span className="editor-submit__price-regular">${PUBLISH_PRICE_REGULAR_USD}</span>
+        <span className="editor-submit__price-offer">${PUBLISH_PRICE_USD} USD</span>
+      </div>
+
+      {step === STEP.ERROR && (
+        <p className="editor-submit__error-msg">Error: {payError}</p>
       )}
 
-      {step === STEP.FORM && (
-        <>
-          <div className="editor-submit__price">
-            <span className="editor-submit__price-regular">
-              ${PUBLISH_PRICE_REGULAR_USD}
-            </span>
-            <span className="editor-submit__price-offer">${PUBLISH_PRICE_USD} USD</span>
-          </div>
-          <button
-            className="editor-submit__btn"
-            onClick={handleOpenPayment}
-          >
-            Publicar
-          </button>
-        </>
-      )}
-
-      {(step === STEP.PAYING || step === STEP.ERROR) && PAYPAL_CLIENT_ID && (
-        <div className="editor-submit__paypal">
-          {step === STEP.ERROR && (
-            <p className="editor-submit__error-msg">Error: {payError}</p>
-          )}
-          <PayPalScriptProvider
-            options={{ clientId: PAYPAL_CLIENT_ID, currency: "USD", intent: "capture" }}
-          >
-            <PayPalButtons
-              style={{ layout: "vertical", label: "pay" }}
-              createOrder={createOrder}
-              onApprove={handleApprove}
-              onCancel={() => setStep(STEP.FORM)}
-              onError={(err) => {
-                setPayError(err?.message || "Error al procesar el pago.");
-                setStep(STEP.ERROR);
-              }}
-            />
-          </PayPalScriptProvider>
-          <button
-            type="button"
-            className="editor-submit__cancel-btn"
-            onClick={() => setStep(STEP.FORM)}
-          >
-            Volver al editor
-          </button>
-        </div>
-      )}
-
-      {(step === STEP.PAYING || step === STEP.ERROR) && !PAYPAL_CLIENT_ID && (
+      {PAYPAL_CLIENT_ID ? (
+        <PayPalScriptProvider
+          options={{
+            clientId: PAYPAL_CLIENT_ID,
+            currency: "USD",
+            intent: "capture",
+            locale: "es_EC",
+          }}
+        >
+          <PayPalButtons
+            style={{ layout: "vertical", label: "pay" }}
+            createOrder={createOrder}
+            onApprove={handleApprove}
+            onError={(err) => {
+              setPayError(err?.message || "Error al procesar el pago.");
+              setStep(STEP.ERROR);
+            }}
+          />
+        </PayPalScriptProvider>
+      ) : (
         <p className="editor-submit__error-msg">
           El pago no está configurado. Contacta a Wedya para publicar tu invitación.
         </p>

@@ -23,7 +23,13 @@ export const publishToWeddingsApi = async (weddingData, templateSlug, orderId) =
   if (!result?.ok) {
     throw new Error(result?.error || "No se pudo confirmar la publicación.");
   }
-  return { slug: result.slug, previewUrl: result.previewUrl, sheetUrl: result.sheetUrl };
+  return {
+    slug: result.slug,
+    previewUrl: result.previewUrl,
+    sheetUrl: result.sheetUrl,
+    payerName: result.payerName,
+    payerEmail: result.payerEmail,
+  };
 };
 
 // Identificador único del cliente: "Sofía" + "Alejandro" → "sofiayalejandro".
@@ -157,7 +163,11 @@ export const sendEditorData = async (
       weddingData.extraNotes || "(sin notas adicionales)",
       published
         ? `\n— Publicado: slug "${published.slug}" · sitio: ${published.previewUrl}` +
-          (published.sheetUrl ? ` · RSVP: ${published.sheetUrl}` : "")
+          (published.sheetUrl ? ` · RSVP: ${published.sheetUrl}` : "") +
+          // Datos del pagador de PayPal — para la factura.
+          (published.payerName || published.payerEmail
+            ? `\n— Pagó: ${published.payerName || "(sin nombre)"} · ${published.payerEmail || "(sin email)"}`
+            : "")
         : "",
     ].join(""),
     constants_file: buildConstantsFile(weddingData, templateSlug),

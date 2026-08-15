@@ -40,101 +40,77 @@ $ep-text-muted:  #a88b78;
     letter-spacing: 0.03em;
   }
 
-  // ── Section tabs ──────────────────────────────────────────────────
+  // ── Section tabs — steps numerados con scroll horizontal, iguales
+  //    en desktop y en móvil ─────────────────────────────────────────
   &__tabs {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.2rem;
-    padding: 0.6rem 1rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.4rem;
+    padding: 0.6rem 0.75rem;
     border-bottom: 1px solid $ep-border;
     flex-shrink: 0;
     background: $ep-bg-alt;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
   }
 
   &__tab {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
     background: transparent;
-    border: 1px solid transparent;
-    border-radius: 5px;
+    border: none;
     color: $ep-text-muted;
     cursor: pointer;
-    font-size: 0.67rem;
     font-family: inherit;
-    letter-spacing: 0.07em;
-    padding: 0.27rem 0.58rem;
-    text-transform: uppercase;
-    transition: color 0.18s, border-color 0.18s, background 0.18s;
+    padding: 0.35rem 0.55rem;
+    transition: color 0.18s;
 
     &:hover {
       color: $ep-text;
-      border-color: rgba(184, 154, 106, 0.3);
     }
 
     &--active {
-      background: $ep-accent-glow;
-      border-color: rgba(184, 154, 106, 0.4);
       color: $ep-accent;
     }
   }
 
-  // número de step: solo visible en móvil
   &__tab-step {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(184, 154, 106, 0.45);
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: $ep-text-muted;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
   }
 
-  // ── Móvil: header oculto (el logo vive en la barra superior) y
-  //    tabs como steps numerados con scroll horizontal ──────────────
+  &__tab--active &__tab-step {
+    background: $ep-accent;
+    border-color: $ep-accent;
+    color: #fdf8f3;
+  }
+
+  &__tab-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  // ── Móvil: header oculto (el logo vive en la barra superior) ──────
   @media (max-width: 900px) {
     &__header {
       display: none;
-    }
-
-    &__tabs {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: 0.4rem;
-      padding: 0.5rem 0.75rem;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-
-      &::-webkit-scrollbar { display: none; }
-    }
-
-    &__tab {
-      flex: 0 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.35rem 0.55rem;
-      border: none;
-
-      &--active {
-        background: transparent;
-      }
-    }
-
-    &__tab-step {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 1px solid rgba(184, 154, 106, 0.45);
-      font-size: 0.62rem;
-      font-weight: 600;
-      color: $ep-text-muted;
-      transition: background 0.18s, color 0.18s, border-color 0.18s;
-    }
-
-    &__tab--active &__tab-step {
-      background: $ep-accent;
-      border-color: $ep-accent;
-      color: #fdf8f3;
-    }
-
-    &__tab-label {
-      font-size: 0.58rem;
     }
   }
 
@@ -761,7 +737,8 @@ $ep-text-muted:  #a88b78;
 }
 
 // ── Extras section ──────────────────────────────────────────────────────────
-.editor-panel__extras-hint {
+.editor-panel__extras-hint,
+.editor-panel__publish-hint {
   font-size: 0.8rem;
   color: $ep-text-muted;
   line-height: 1.6;

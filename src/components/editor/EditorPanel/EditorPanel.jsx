@@ -19,6 +19,7 @@ const SECTIONS_SOHO = [
   { id: 'rsvp',       label: 'RSVP' },
   { id: 'footer',     label: 'Footer' },
   { id: 'extras',     label: 'Extras' },
+  { id: 'publicar',   label: 'Publicar' },
 ];
 
 const SECTIONS_ELEGANT = [
@@ -31,6 +32,7 @@ const SECTIONS_ELEGANT = [
   { id: 'rsvp',       label: 'RSVP' },
   { id: 'footer',     label: 'Footer' },
   { id: 'extras',     label: 'Extras' },
+  { id: 'publicar',   label: 'Publicar' },
 ];
 
 const MONTHS = [
@@ -922,7 +924,16 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess, paletteP
               value={data.extraNotes ?? ''}
               onChange={(e) => setField('extraNotes', e.target.value)}
             />
+          </div>
+        )}
 
+        {/* ── Publicar ── */}
+        {activeSection === 'publicar' && (
+          <div className="editor-panel__section">
+            <p className="editor-panel__publish-hint">
+              Realiza el pago para generar tu página. En cuanto se confirme,
+              tu invitación queda publicada al instante.
+            </p>
             <EditorSubmit onSuccess={onSubmitSuccess} />
           </div>
         )}
