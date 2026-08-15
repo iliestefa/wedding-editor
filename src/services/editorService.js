@@ -6,22 +6,24 @@ import {
   WEDDINGS_API,
 } from "../constants/editorConstants";
 
-// Guarda la invitación en el Worker (Fase 2) y devuelve { slug, previewUrl }
-// para que la pareja vea su invitación al instante. Nunca rompe el envío:
-// si el Worker falla, el email sigue siendo la fuente de verdad.
-const saveToWeddingsApi = async (weddingData, templateSlug) => {
-  if (!WEDDINGS_API) return null;
-  try {
-    const res = await fetch(`${WEDDINGS_API}/api/invitations`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ templateSlug, data: weddingData }),
-    });
-    const result = await res.json();
-    return result?.ok ? { slug: result.slug, previewUrl: result.previewUrl } : null;
-  } catch {
-    return null;
+// Confirma el pago (orderId de PayPal ya aprobado por el pagador) y publica
+// la invitación: el engine verifica el pago contra PayPal server-to-server,
+// y si es válido guarda + activa la boda + arma la hoja de RSVP. A diferencia
+// del guardado viejo (borrador sin pagar), acá SÍ propagamos el error — si el
+// pago no se puede verificar, el editor debe saberlo y avisarle a la pareja.
+export const publishToWeddingsApi = async (weddingData, templateSlug, orderId) => {
+  if (!WEDDINGS_API) throw new Error("El servicio de publicación no está configurado.");
+
+  const res = await fetch(`${WEDDINGS_API}/api/invitations/publish`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ templateSlug, data: weddingData, orderId }),
+  });
+  const result = await res.json().catch(() => null);
+  if (!result?.ok) {
+    throw new Error(result?.error || "No se pudo confirmar la publicación.");
   }
+  return { slug: result.slug, previewUrl: result.previewUrl, sheetUrl: result.sheetUrl };
 };
 
 // Identificador único del cliente: "Sofía" + "Alejandro" → "sofiayalejandro".
@@ -133,19 +135,18 @@ ${imagesBlock}
 `;
 };
 
+// Envía el email de notificación a Wedya. `published` es el resultado de
+// publishToWeddingsApi (slug/previewUrl/sheetUrl) cuando el pago ya se
+// verificó — si es null, el email se manda igual pero sin esa info.
 export const sendEditorData = async (
   weddingData,
-  { templateSlug = "" } = {},
+  { templateSlug = "", published = null } = {},
 ) => {
   const { brideName, groomName } = weddingData;
 
-  // Primero el Worker (si está configurado): así el link de preview de la
-  // pareja también viaja en el email que recibe Wedya.
-  const saved = await saveToWeddingsApi(weddingData, templateSlug);
-
   const templateParams = {
     to_email: "developer@iliestefa.com",
-    subject: `Datos de boda — ${brideName} & ${groomName}`,
+    subject: `Nueva boda pagada — ${brideName} & ${groomName}`,
     bride_name: brideName,
     groom_name: groomName,
     wedding_date: weddingData.weddingDateDisplay,
@@ -154,7 +155,10 @@ export const sendEditorData = async (
     order: "editor",
     extra_notes: [
       weddingData.extraNotes || "(sin notas adicionales)",
-      saved ? `\n— Guardado en el Worker: slug "${saved.slug}" · preview: ${saved.previewUrl}` : "",
+      published
+        ? `\n— Publicado: slug "${published.slug}" · sitio: ${published.previewUrl}` +
+          (published.sheetUrl ? ` · RSVP: ${published.sheetUrl}` : "")
+        : "",
     ].join(""),
     constants_file: buildConstantsFile(weddingData, templateSlug),
     data_json: JSON.stringify(weddingData, null, 2),
@@ -177,6 +181,6 @@ export const sendEditorData = async (
     throw new Error('El servicio de envío no está configurado.');
   }
 
-  // La pareja ve su link de preview en el dialog de confirmación
-  return saved;
+  // La pareja ve su link de preview (y de RSVP) en el dialog de confirmación
+  return published;
 };

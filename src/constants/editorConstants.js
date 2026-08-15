@@ -22,6 +22,13 @@ export const WEDDINGS_API = import.meta.env.VITE_WEDDINGS_API ?? '';
 export const UPLOAD_ENDPOINT = import.meta.env.VITE_UPLOAD_ENDPOINT ?? '';
 export const UPLOAD_KEY      = import.meta.env.VITE_UPLOAD_KEY      ?? '';
 
+// ─── Pago (PayPal) ───────────────────────────────────────────────────────────
+// Client ID público de la app "Live" en developer.paypal.com — no es secreto,
+// viaja en el bundle del navegador (el SDK de PayPal lo requiere así).
+export const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID ?? '';
+export const PUBLISH_PRICE_USD = '65.00';
+export const PUBLISH_PRICE_REGULAR_USD = '75.00';
+
 // ─── Analytics ───────────────────────────────────────────────────────────────
 // Set these in GitHub Actions secrets or .env.local for development.
 // Ambos quedan inactivos si su ID no está definido.

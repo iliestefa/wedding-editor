@@ -27,16 +27,16 @@ SectionWrapper.propTypes = {
 };
 SectionWrapper.defaultProps = { activeSection: null };
 
-// Dialog de confirmación — única confirmación visual tras enviar los datos.
-// Un solo flujo para todos: se muestra siempre, con los botones de contacto
-// para coordinar la entrega por WhatsApp, Instagram o TikTok.
-const ContactDialog = ({ brideName, groomName, templateSlug, previewUrl, onClose }) => {
+// Dialog de confirmación — se muestra tras el pago aprobado. Un solo flujo
+// para todos: URL del sitio ya activo + hoja de RSVP, con los botones de
+// contacto para coordinar cualquier ajuste por WhatsApp, Instagram o TikTok.
+const ContactDialog = ({ brideName, groomName, templateSlug, previewUrl, sheetUrl, onClose }) => {
   const [copied, setCopied] = useState(false);
 
   const prefilledMessage =
-    `¡Holaa! Somos ${brideName} & ${groomName} 💍 y queremos nuestra invitación digital. ` +
-    'Ya llenamos nuestros datos en el editor ✨' +
-    (previewUrl ? ` Nuestro preview: ${previewUrl}` : '');
+    `¡Holaa! Somos ${brideName} & ${groomName} 💍 y ya pagamos nuestra invitación digital. ` +
+    'Quedó publicada ✨' +
+    (previewUrl ? ` Nuestro sitio: ${previewUrl}` : '');
 
   const handleChannel = async (channelKey) => {
     // Evento de conversión real para Meta Ads: se dispara justo cuando el
@@ -79,17 +79,26 @@ const ContactDialog = ({ brideName, groomName, templateSlug, previewUrl, onClose
           ×
         </button>
 
-        <p className="editor-layout__contact-title">¡Recibimos su diseño! 🤍</p>
+        <p className="editor-layout__contact-title">¡Su invitación ya está publicada! 🤍</p>
         <p className="editor-layout__contact-text">
-          Déjennos un mensaje con sus nombres para coordinar la entrega de su
-          invitación. Les escribiremos en cuanto esté lista.
+          Déjennos un mensaje con sus nombres por si quieren coordinar algún
+          ajuste. Mientras tanto, acá tienen todo listo:
         </p>
 
         {previewUrl && (
           <p className="editor-layout__contact-preview">
-            Mientras tanto, así quedó su invitación:{' '}
+            Su sitio:{' '}
             <a href={previewUrl} target="_blank" rel="noreferrer noopener">
-              ver mi invitación
+              {previewUrl}
+            </a>
+          </p>
+        )}
+
+        {sheetUrl && (
+          <p className="editor-layout__contact-preview">
+            Hoja de confirmaciones (RSVP):{' '}
+            <a href={sheetUrl} target="_blank" rel="noreferrer noopener">
+              ver hoja de cálculo
             </a>
           </p>
         )}
@@ -133,11 +142,13 @@ ContactDialog.propTypes = {
   groomName:    PropTypes.string,
   templateSlug: PropTypes.string,
   previewUrl:   PropTypes.string,
+  sheetUrl:     PropTypes.string,
   onClose:      PropTypes.func.isRequired,
 };
 ContactDialog.defaultProps = {
   brideName:    '',
   groomName:    '',
+  sheetUrl:     '',
   templateSlug: '',
   previewUrl:   '',
 };
@@ -275,6 +286,7 @@ const EditorLayout = ({ templateSlug }) => {
   const [submitted, setSubmitted]           = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [previewUrl, setPreviewUrl]         = useState('');
+  const [sheetUrl, setSheetUrl]             = useState('');
   const [navScrolled, setNavScrolled]       = useState(false);
   const [templateModule, setTemplateModule] = useState(null);
   const [previewMode, setPreviewMode]       = useState('desktop'); // 'desktop' | 'mobile'
@@ -432,6 +444,7 @@ const EditorLayout = ({ templateSlug }) => {
           groomName={data.groomName}
           templateSlug={slug}
           previewUrl={previewUrl}
+          sheetUrl={sheetUrl}
           onClose={() => setShowContactDialog(false)}
         />
       )}
@@ -442,9 +455,10 @@ const EditorLayout = ({ templateSlug }) => {
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
           palettePresets={templateModule?.PRESET_PALETTES ?? []}
-          onSubmitSuccess={(saved) => {
+          onSubmitSuccess={(published) => {
             setSubmitted(true);
-            setPreviewUrl(saved?.previewUrl ?? '');
+            setPreviewUrl(published?.previewUrl ?? '');
+            setSheetUrl(published?.sheetUrl ?? '');
             setShowContactDialog(true);
           }}
         />

@@ -51,4 +51,51 @@
     margin: 0.75rem 0 0;
     text-align: center;
   }
+
+  &__price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__price-regular {
+    font-size: 0.85rem;
+    color: #a8998a;
+    text-decoration: line-through;
+  }
+
+  &__price-offer {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #6b4f2e;
+  }
+
+  &__paypal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  &__cancel-btn {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #8a7960;
+    background: transparent;
+    border: 1px solid rgba(184, 154, 106, 0.35);
+    border-radius: 5px;
+    padding: 0.7rem;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+
+    &:hover {
+      background: rgba(184, 154, 106, 0.08);
+      border-color: rgba(184, 154, 106, 0.6);
+    }
+  }
 }
