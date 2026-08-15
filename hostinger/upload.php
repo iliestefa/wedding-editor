@@ -16,7 +16,7 @@ $UPLOAD_KEY = 'CAMBIAME-09876543210987654321';
 
 $ALLOWED_ORIGINS = [
     'https://iliestefa.github.io',
-    'http://localhost:5173',
+    'https://editor.mywedya.com'
 ];
 
 $MAX_BYTES = 25 * 1024 * 1024; // 25 MB
