@@ -6,7 +6,7 @@ import {
   usePayPalScriptReducer,
 } from "@paypal/react-paypal-js";
 import { useEditor } from "../../../context/EditorContext";
-import { sendEditorData, publishToWeddingsApi, updateWeddingApi } from "../../../services/editorService";
+import { sendPurchaseEmail, publishToWeddingsApi, updateWeddingApi } from "../../../services/editorService";
 import { loadDraftIdentity } from "../../../services/draftIdentity";
 import { trackPurchase } from "../../../utils/analyticsEvents";
 import { PAYPAL_CLIENT_ID, PUBLISH_PRICE_USD } from "../../../constants/editorConstants";
@@ -147,10 +147,28 @@ const EditorSubmit = ({ onSuccess, isRepublish }) => {
         draftSlug: identity?.slug ?? null,
         draftToken: identity?.token ?? null,
       });
-      await sendEditorData(data, { templateSlug, published }).catch(() => {
-        // El pago y la publicación ya se confirmaron; si el email de aviso
-        // falla, no le mostramos un error de pago a la pareja por eso.
-      });
+      // El mismo token sigue sirviendo para volver a editar después de
+      // publicado — se lo pasamos a PublishedInfo, no se borra.
+      const editToken = identity?.token ?? published?.editToken;
+      const editLink = buildEditLink(published.slug, editToken);
+
+      // Email a la pareja con sus links (el CC a Wedya configurado en el
+      // template hace de aviso interno de venta): va al correo que dejaron
+      // al guardar borrador o, si publicaron de corrido, al de PayPal.
+      const coupleEmail = identity?.email || published?.payerEmail || "";
+      if (coupleEmail) {
+        await sendPurchaseEmail({
+          email: coupleEmail,
+          coupleNames: `${data.brideName} & ${data.groomName}`,
+          publicLink: published.previewUrl,
+          sheetLink: published.sheetUrl,
+          editLink,
+        }).catch(() => {
+          // El pago y la publicación ya se confirmaron; si este email falla
+          // no le mostramos un error de pago a la pareja — los links igual
+          // quedan visibles en el dialog de confirmación.
+        });
+      }
 
       clearSavedProgress();
       // Pixel de compra: se dispara recién cuando el engine confirmó el pago
@@ -162,10 +180,7 @@ const EditorSubmit = ({ onSuccess, isRepublish }) => {
         orderId,
       });
       setStep(STEP.SUCCESS);
-      // El mismo token sigue sirviendo para volver a editar después de
-      // publicado — se lo pasamos a PublishedInfo, no se borra.
-      const editToken = identity?.token ?? published?.editToken;
-      onSuccess?.({ ...published, editLink: buildEditLink(published.slug, editToken) });
+      onSuccess?.({ ...published, editLink });
     } catch (err) {
       const msg = String(err?.message ?? "");
       // Popup cerrado durante la captura: acá sí es ambiguo si el cobro

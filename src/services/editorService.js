@@ -1,8 +1,8 @@
 import emailjs from "@emailjs/browser";
 import {
   EMAILJS_SERVICE_ID,
-  EMAILJS_TEMPLATE_ID,
   EMAILJS_DRAFT_TEMPLATE_ID,
+  EMAILJS_PURCHASE_TEMPLATE_ID,
   EMAILJS_PUBLIC_KEY,
   WEDDINGS_API,
 } from "../constants/editorConstants";
@@ -72,6 +72,50 @@ export const sendDraftLinkEmail = async ({ email, coupleNames, draftLink }) => {
   return true;
 };
 
+// Email a la pareja con los links de su invitación recién publicada (sitio,
+// RSVP y edición). Requiere su template de EmailJS
+// (VITE_EMAILJS_PURCHASE_TEMPLATE_ID) — sin él se omite en silencio y los
+// links solo se muestran en el dialog de confirmación.
+export const sendPurchaseEmail = async ({
+  email,
+  coupleNames,
+  publicLink,
+  sheetLink,
+  editLink,
+}) => {
+  if (!EMAILJS_SERVICE_ID || !EMAILJS_PURCHASE_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+    return false;
+  }
+
+  // La fila de RSVP solo existe cuando hay hoja de respuestas (RSVP por
+  // formulario); por WhatsApp no hay link. EmailJS no soporta condicionales
+  // en el template, así que la fila viaja ya armada como HTML — el template
+  // la inserta con {{{rsvp_block}}} (triple llave = sin escapar) dentro del
+  // card de enlaces, con los mismos estilos de las otras filas.
+  const rsvpBlock = sheetLink
+    ? `<div style="font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:1px;color:#a88b78;text-transform:uppercase;padding-top:14px;">
+        Respuestas de sus invitados (RSVP)
+      </div>
+      <div style="font-family:'Lato','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.5;padding-top:3px;word-break:break-all;">
+        <a href="${sheetLink}" target="_blank" style="color:#8a6a2f;">${sheetLink}</a>
+      </div>`
+    : "";
+
+  await emailjs.send(
+    EMAILJS_SERVICE_ID,
+    EMAILJS_PURCHASE_TEMPLATE_ID,
+    {
+      to_email: email,
+      couple_names: coupleNames,
+      public_link: publicLink,
+      edit_link: editLink ?? "",
+      rsvp_block: rsvpBlock,
+    },
+    EMAILJS_PUBLIC_KEY,
+  );
+  return true;
+};
+
 // Confirma el pago (orderId de PayPal ya aprobado por el pagador) y publica
 // la invitación: el engine verifica el pago contra PayPal server-to-server,
 // y si es válido guarda + activa la boda + arma la hoja de RSVP. A diferencia
@@ -121,165 +165,7 @@ export const updateWeddingApi = async (weddingData, { slug, token }) => {
   return { slug: result.slug, previewUrl: result.previewUrl, sheetUrl: result.sheetUrl };
 };
 
-// Identificador único del cliente: "Sofía" + "Alejandro" → "sofiayalejandro".
-// Lo usan el RSVP universal (nombre de la hoja de respuestas) y, a futuro,
-// la URL de la invitación publicada.
-export const buildWeddingSlug = (brideName = "", groomName = "") =>
-  `${brideName}y${groomName}`
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // quita tildes
-    .replace(/[^a-z0-9]/g, "");
-
-// Converts the editor data into a weddingConstants.js file string
-const buildConstantsFile = (d, templateSlug = "") => {
-  const j = (v) => JSON.stringify(v, null, 2);
-  const s = (v) => JSON.stringify(v);
-  const isElegant = templateSlug === "elegant";
-
-  const imagesBlock = isElegant
-    ? `export const IMAGE_HERO = ${s(d.imageHero)};
-export const IMAGE_CEREMONY = ${s(d.imageCeremony)};
-export const IMAGE_DRESSCODE_WOMEN = ${s(d.imageDressCodeWomen)};
-export const IMAGE_DRESSCODE_MEN = ${s(d.imageDressCodeMen)};`
-    : `export const IMAGE_HERO = ${s(d.imageHero)};
-export const IMAGE_STORY = ${s(d.imageStory)};
-export const IMAGE_DRESS_CODE = ${s(d.imageDressCode)};
-export const IMAGE_RINGS = ${s(d.imageRings)};`;
-
-  return `// ─── Pareja ───────────────────────────────────────────────────────────────────
-export const BRIDE_NAME = ${s(d.brideName)};
-export const GROOM_NAME = ${s(d.groomName)};
-export const COUPLE_NAMES = \`\${BRIDE_NAME} & \${GROOM_NAME}\`;
-
-// Identificador único del cliente — lo usa el RSVP universal para crear su
-// hoja de respuestas (y a futuro, la URL de la invitación publicada).
-export const WEDDING_SLUG = ${s(buildWeddingSlug(d.brideName, d.groomName))};
-
-// ─── Fecha ────────────────────────────────────────────────────────────────────
-export const WEDDING_DATE_ISO = ${s(d.weddingDateIso)};
-export const WEDDING_DATE_DISPLAY = ${s(d.weddingDateDisplay)};
-export const WEDDING_YEAR = ${s(d.weddingDateIso?.split("-")[0] ?? "")};
-
-// ─── Eventos ──────────────────────────────────────────────────────────────────
-// 'separate' (lugares distintos) | 'same' (mismo lugar) | 'reception-only' (solo recepción)
-export const EVENTS_MODE = ${s(d.eventsMode ?? "separate")};
-
-// ─── Ceremonia ────────────────────────────────────────────────────────────────
-export const CEREMONY_TIME = ${s(d.ceremonyTime)};
-export const CEREMONY_VENUE_NAME = ${s(d.ceremonyVenueName)};
-export const CEREMONY_VENUE_ADDRESS = ${s(d.ceremonyVenueAddress)};
-export const CEREMONY_MAPS_LINK = ${s(d.ceremonyMapsLink)};
-export const CEREMONY_MAPS_EMBED_SRC = ${s(d.ceremonyMapsEmbedSrc)};
-
-// ─── Recepción ────────────────────────────────────────────────────────────────
-export const RECEPTION_TIME = ${s(d.receptionTime)};
-export const RECEPTION_VENUE_NAME = ${s(d.receptionVenueName)};
-export const RECEPTION_VENUE_ADDRESS = ${s(d.receptionVenueAddress)};
-export const RECEPTION_MAPS_LINK = ${s(d.receptionMapsLink)};
-export const RECEPTION_MAPS_EMBED_SRC = ${s(d.receptionMapsEmbedSrc)};
-
-// ─── Historia ─────────────────────────────────────────────────────────────────
-export const STORY_INTRO = ${s(d.storyIntro)};
-
-export const STORY_ITEMS = ${j(d.storyItems)};
-
-// ─── Cronograma ───────────────────────────────────────────────────────────────
-export const SCHEDULE_INTRO = ${s(d.scheduleIntro ?? "")};
-
-export const SCHEDULE_ITEMS = ${j(d.scheduleItems)};
-
-// ─── Dress Code ───────────────────────────────────────────────────────────────
-export const DRESS_CODE_STYLE = ${s(d.dressCodeStyle)};
-export const DRESS_CODE_DESCRIPTION = ${s(d.dressCodeDescription)};
-export const DRESS_CODE_WOMEN = ${s(d.dressCodeWomen)};
-export const DRESS_CODE_MEN = ${s(d.dressCodeMen)};
-
-export const DRESS_CODE_PALETTE = ${j(d.dressCodePalette)};
-
-// ─── Cuentas para Regalo ──────────────────────────────────────────────────────
-export const GIFT_REGISTRY_INTRO = ${s(d.giftRegistryIntro)};
-
-export const BANK_ACCOUNTS = ${j(d.bankAccounts)};
-
-// ─── RSVP ─────────────────────────────────────────────────────────────────────
-export const RSVP_DEADLINE = ${s(d.rsvpDeadline)};
-
-// 'whatsapp' (mensaje al número) | 'sheets' (formulario → Google Sheets)
-export const RSVP_TYPE = ${s(d.rsvpType ?? "sheets")};
-export const RSVP_WHATSAPP = ${s(d.rsvpWhatsapp ?? "")};
-
-// 'free' (acompañantes libres, un solo link) | 'limited' (un link por cupo: ?cupos=N)
-export const RSVP_COMPANIONS_MODE = ${s(d.rsvpCompanionsMode ?? "free")};
-export const RSVP_CUPOS = ${JSON.stringify(d.rsvpCupos ?? [])};
-
-export const RSVP_QUESTIONS = ${j(d.rsvpQuestions ?? [])};
-
-export const RSVP_GUESTS = [];
-
-// ─── Footer ───────────────────────────────────────────────────────────────────
-export const FOOTER_MESSAGE = ${s(d.footerMessage)};
-
-// ─── Paleta de colores ────────────────────────────────────────────────────────
-// null → paleta original de la plantilla; si no: { id, bg, accent, text }
-// (el resto de tonos se derivan solos — ver src/utils/palettes.js)
-export const COLOR_PALETTE = ${j(d.colorPalette ?? null)};
-
-// ─── Imágenes ─────────────────────────────────────────────────────────────────
-${imagesBlock}
-`;
-};
-
-// Envía el email de notificación a Wedya. `published` es el resultado de
-// publishToWeddingsApi (slug/previewUrl/sheetUrl) cuando el pago ya se
-// verificó — si es null, el email se manda igual pero sin esa info.
-export const sendEditorData = async (
-  weddingData,
-  { templateSlug = "", published = null } = {},
-) => {
-  const { brideName, groomName } = weddingData;
-
-  const templateParams = {
-    to_email: "developer@iliestefa.com",
-    subject: `Nueva boda pagada — ${brideName} & ${groomName}`,
-    bride_name: brideName,
-    groom_name: groomName,
-    wedding_date: weddingData.weddingDateDisplay,
-    // El template de EmailJS espera esta key; se deja fija ya que el editor
-    // ahora tiene un único flujo (sin ?order= ni distinción de pedido).
-    order: "editor",
-    extra_notes: [
-      weddingData.extraNotes || "(sin notas adicionales)",
-      published
-        ? `\n— Publicado: slug "${published.slug}" · sitio: ${published.previewUrl}` +
-          (published.sheetUrl ? ` · RSVP: ${published.sheetUrl}` : "") +
-          // Datos del pagador de PayPal — para la factura.
-          (published.payerName || published.payerEmail
-            ? `\n— Pagó: ${published.payerName || "(sin nombre)"} · ${published.payerEmail || "(sin email)"}`
-            : "")
-        : "",
-    ].join(""),
-    constants_file: buildConstantsFile(weddingData, templateSlug),
-    data_json: JSON.stringify(weddingData, null, 2),
-  };
-
-  const emailConfigured =
-    EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY;
-
-  if (emailConfigured) {
-    await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      EMAILJS_TEMPLATE_ID,
-      templateParams,
-      EMAILJS_PUBLIC_KEY,
-    );
-  } else if (import.meta.env.DEV) {
-    // Las claves de EmailJS viven en GitHub Actions; en local se omite el envío
-    console.warn('[editor] EmailJS sin configurar — envío omitido en desarrollo', templateParams);
-  } else {
-    throw new Error('El servicio de envío no está configurado.');
-  }
-
-  // La pareja ve su link de preview (y de RSVP) en el dialog de confirmación
-  return published;
-};
+// ─── (eliminado) Aviso interno a Wedya ───────────────────────────────────────
+// El viejo sendEditorData (template "contacto" de EmailJS, con el dump de
+// datos) se retiró: el engine ya guarda todo al publicar, PayPal avisa cada
+// venta, y el CC a Wedya en el template post-compra cubre el aviso con links.

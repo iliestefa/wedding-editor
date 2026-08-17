@@ -10,14 +10,20 @@ export const WEDYA_INSTAGRAM = 'wedya.digital';
 export const WEDYA_TIKTOK = 'wedya.digital';
 
 // ─── EmailJS ─────────────────────────────────────────────────────────────────
-// Set these in GitHub Actions secrets or .env.local for development
+// Set these in GitHub Actions secrets or .env.local for development.
+// Solo hay 2 templates (límite del plan gratis): el de borrador y el de
+// post-compra — ambos van a la pareja, con CC a Wedya como aviso interno.
 export const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  ?? '';
-export const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? '';
 export const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  ?? '';
 // Template del email "continúa editando tu invitación" (va a la pareja, no a
 // Wedya). Campos que espera: {{to_email}}, {{couple_names}}, {{draft_link}}.
 // Vacío → el link solo se muestra en pantalla, sin email.
 export const EMAILJS_DRAFT_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_DRAFT_TEMPLATE_ID ?? '';
+// Template del email post-compra con los links de la invitación publicada
+// (también va a la pareja). Campos: {{to_email}}, {{couple_names}},
+// {{public_link}}, {{edit_link}}, {{{rsvp_block}}}.
+// Vacío → los links solo se muestran en el dialog de confirmación, sin email.
+export const EMAILJS_PURCHASE_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_PURCHASE_TEMPLATE_ID ?? '';
 
 // Worker de invitaciones (Fase 2) — guarda los datos y devuelve la URL de
 // preview de la pareja. Vacío → se omite (el email sigue siendo el respaldo).
