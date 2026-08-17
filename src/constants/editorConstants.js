@@ -14,6 +14,10 @@ export const WEDYA_TIKTOK = 'wedya.digital';
 export const EMAILJS_SERVICE_ID  = import.meta.env.VITE_EMAILJS_SERVICE_ID  ?? '';
 export const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID ?? '';
 export const EMAILJS_PUBLIC_KEY  = import.meta.env.VITE_EMAILJS_PUBLIC_KEY  ?? '';
+// Template del email "continúa editando tu invitación" (va a la pareja, no a
+// Wedya). Campos que espera: {{to_email}}, {{couple_names}}, {{draft_link}}.
+// Vacío → el link solo se muestra en pantalla, sin email.
+export const EMAILJS_DRAFT_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_DRAFT_TEMPLATE_ID ?? '';
 
 // Worker de invitaciones (Fase 2) — guarda los datos y devuelve la URL de
 // preview de la pareja. Vacío → se omite (el email sigue siendo el respaldo).

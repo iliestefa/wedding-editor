@@ -41,24 +41,32 @@ $ep-text-muted:  #a88b78;
   }
 
   // ── Section tabs — steps numerados con scroll horizontal, iguales
-  //    en desktop y en móvil ─────────────────────────────────────────
+  //    en desktop y en móvil. El fade en los bordes (mask) deja claro que
+  //    hay más tabs fuera de vista, en vez de que se vean cortados a lo bruto.
   &__tabs {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     gap: 0.4rem;
-    padding: 0.6rem 0.75rem;
+    // Mismo margen lateral que __body (donde viven los textos de cada
+    // sección) para que el primer/último tab no queden pegados al borde.
+    padding: 0.6rem 1.25rem;
     border-bottom: 1px solid $ep-border;
     flex-shrink: 0;
     background: $ep-bg-alt;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    mask-image: linear-gradient(90deg, transparent, black 18px, black calc(100% - 18px), transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 18px, black calc(100% - 18px), transparent);
 
     &::-webkit-scrollbar { display: none; }
   }
 
+  // Ancho fijo (no auto) para que todos los steps midan y se separen igual,
+  // sin importar cuán largo sea cada label ("RSVP" vs "Cronograma").
   &__tab {
-    flex: 0 0 auto;
+    position: relative;
+    flex: 0 0 68px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -68,8 +76,21 @@ $ep-text-muted:  #a88b78;
     color: $ep-text-muted;
     cursor: pointer;
     font-family: inherit;
-    padding: 0.35rem 0.55rem;
+    padding: 0.35rem 0.2rem;
     transition: color 0.18s;
+
+    // Línea que conecta este step con el anterior, a la altura del círculo.
+    // El primer tab no tiene predecesor, así que no dibuja línea.
+    &:not(:first-child)::before {
+      content: '';
+      position: absolute;
+      top: 16px; // centro del círculo (22px de alto + 0.35rem de padding-top)
+      right: 50%;
+      width: 100%;
+      height: 1px;
+      background: rgba(184, 154, 106, 0.3);
+      z-index: 0;
+    }
 
     &:hover {
       color: $ep-text;
@@ -81,17 +102,25 @@ $ep-text-muted:  #a88b78;
   }
 
   &__tab-step {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    box-sizing: border-box;
     width: 22px;
     height: 22px;
     border-radius: 50%;
     border: 1px solid rgba(184, 154, 106, 0.45);
+    background: $ep-bg-alt;
     font-size: 0.62rem;
     font-weight: 600;
     color: $ep-text-muted;
     transition: background 0.18s, color 0.18s, border-color 0.18s;
+
+    // Centrado por line-height (no flex): evita que la caja de línea del
+    // texto quede descentrada por el baseline del span dentro de un
+    // contenedor flex en columna.
+    line-height: 20px; // height (22px) - 2×border (1px)
+    text-align: center;
   }
 
   &__tab--active &__tab-step {
@@ -101,10 +130,11 @@ $ep-text-muted:  #a88b78;
   }
 
   &__tab-label {
-    font-size: 0.58rem;
-    letter-spacing: 0.06em;
+    font-size: 0.56rem;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    white-space: nowrap;
+    text-align: center;
+    line-height: 1.25;
   }
 
   // ── Móvil: header oculto (el logo vive en la barra superior) ──────
@@ -737,8 +767,7 @@ $ep-text-muted:  #a88b78;
 }
 
 // ── Extras section ──────────────────────────────────────────────────────────
-.editor-panel__extras-hint,
-.editor-panel__publish-hint {
+.editor-panel__extras-hint {
   font-size: 0.8rem;
   color: $ep-text-muted;
   line-height: 1.6;
@@ -747,6 +776,59 @@ $ep-text-muted:  #a88b78;
   background: rgba($ep-accent, 0.06);
   border-left: 2px solid $ep-accent;
   border-radius: 0 4px 4px 0;
+}
+
+// ── Publicar section — bloque de oferta destacado ─────────────────────────────
+.editor-panel__publish-offer {
+  text-align: center;
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(180deg, rgba($ep-accent, 0.1), rgba($ep-accent, 0.03));
+  border: 1px solid rgba($ep-accent, 0.35);
+  border-radius: 10px;
+}
+
+.editor-panel__publish-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fdf8f3;
+  background: #c9846b;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  margin-bottom: 0.9rem;
+}
+
+.editor-panel__publish-prices {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.editor-panel__publish-price-regular {
+  font-size: 0.95rem;
+  color: $ep-text-muted;
+  text-decoration: line-through;
+}
+
+.editor-panel__publish-price-offer {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.1rem;
+  font-weight: 600;
+  color: $ep-accent;
+  line-height: 1;
+}
+
+.editor-panel__publish-hint {
+  font-size: 0.78rem;
+  color: $ep-text-muted;
+  line-height: 1.6;
+  max-width: 32ch;
+  margin: 0 auto;
 }
 
 .editor-panel__extras-textarea {
@@ -769,5 +851,254 @@ $ep-text-muted:  #a88b78;
 
   &::placeholder {
     color: $ep-text-muted;
+  }
+}
+
+// ── Footer del panel — jerarquía: Publicar (primario) > Guardar luego
+//    (secundario, tipo link) > Dudas/contacto (terciario, discreto) ─────────
+.editor-panel__footer {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.8rem 1.25rem;
+  border-top: 1px solid rgba(184, 154, 106, 0.2);
+  background: #f5efe4;
+}
+
+.editor-panel__publish-cta {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fdf8f3;
+  background: #b89a6a;
+  border: none;
+  border-radius: 5px;
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background: #c9a97e;
+  }
+}
+
+.editor-panel__footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.editor-panel__save-draft-link {
+  font-family: inherit;
+  font-size: 0.66rem;
+  color: #8a7960;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(184, 154, 106, 0.5);
+  transition: color 0.18s;
+  white-space: nowrap;
+
+  &:hover {
+    color: #4a3728;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+}
+
+.editor-panel__contact {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.editor-panel__contact-text {
+  font-size: 0.62rem;
+  color: #bcaa96;
+  white-space: nowrap;
+}
+
+.editor-panel__contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #bcaa96;
+  transition: color 0.18s, background-color 0.18s;
+
+  svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  &:hover {
+    color: #4a3728;
+    background: rgba(184, 154, 106, 0.12);
+  }
+}
+
+// ── Diálogo "Guardar y continuar luego" ─────────────────────────────────────
+.editor-panel__draft-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(42, 30, 20, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.editor-panel__draft-dialog {
+  position: relative;
+  width: min(92vw, 400px);
+  background: #faf6f0;
+  border-radius: 10px;
+  padding: 1.75rem 1.5rem 1.5rem;
+  box-shadow: 0 18px 50px rgba(42, 30, 20, 0.3);
+  text-align: center;
+}
+
+.editor-panel__draft-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #a88b78;
+  cursor: pointer;
+
+  &:hover {
+    color: #4a3728;
+  }
+}
+
+.editor-panel__draft-success-icon {
+  display: block;
+  font-size: 2.4rem;
+  line-height: 1;
+  margin-bottom: 0.6rem;
+}
+
+.editor-panel__draft-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  color: #4a3728;
+  margin-bottom: 0.5rem;
+}
+
+.editor-panel__draft-text {
+  font-size: 0.78rem;
+  color: #a88b78;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.editor-panel__draft-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(184, 154, 106, 0.3);
+  border-radius: 6px;
+  color: #4a3728;
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.7rem 0.875rem;
+  margin-bottom: 0.75rem;
+  transition: border-color 0.18s;
+
+  &:focus {
+    outline: none;
+    border-color: #b89a6a;
+  }
+
+  &::placeholder {
+    color: #a88b78;
+  }
+}
+
+.editor-panel__draft-error {
+  font-size: 0.74rem;
+  color: #b85c38;
+  margin: -0.25rem 0 0.75rem;
+}
+
+.editor-panel__draft-save-btn {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #fdf8f3;
+  background: #b89a6a;
+  border: none;
+  border-radius: 5px;
+  padding: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+
+  &:hover:not(:disabled) {
+    background: #c9a97e;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.editor-panel__draft-link-box {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(184, 154, 106, 0.3);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: #4a3728;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.75rem;
+  word-break: break-all;
+  text-align: left;
+  user-select: all;
+}
+
+.editor-panel__draft-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.editor-panel__draft-copy-btn {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8a7960;
+  background: transparent;
+  border: 1px solid rgba(184, 154, 106, 0.4);
+  border-radius: 5px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.18s, border-color 0.18s, color 0.18s;
+
+  &:hover {
+    background: rgba(184, 154, 106, 0.1);
+    border-color: rgba(184, 154, 106, 0.65);
+    color: #4a3728;
   }
 }

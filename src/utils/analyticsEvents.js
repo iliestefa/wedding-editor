@@ -1,16 +1,38 @@
-// Evento de interés: el usuario terminó de llenar sus datos y le dio a
-// enviar. Es el punto donde, en el embudo marketing → editor, alguien pasa
-// de "visitante" a "pedido enviado" — úsalo desde donde se dispara el envío.
-// OJO: esto NO es la conversión real (no hay pago aquí, solo interés) —
-// para optimizar campañas de Meta Ads usa trackContactClick, no este.
-export const trackOrderSubmitted = ({ templateSlug = '' } = {}) => {
+// ─── Eventos de analytics (GA4 + Meta Pixel) ────────────────────────────────
+// Todos degradan en silencio si gtag/fbq no están cargados (IDs sin definir).
+
+// CONVERSIÓN REAL: pago confirmado por PayPal y invitación publicada.
+// Este es el evento que Meta Ads debe usar como objetivo de optimización
+// ("Purchase"). Lleva el valor y la moneda reales del cobro, y el orderId
+// de PayPal como eventID — así, si un día se agrega la Conversions API del
+// lado del servidor, Meta deduplica ambos envíos del mismo pago.
+export const trackPurchase = ({
+  value = 0,
+  currency = 'USD',
+  templateSlug = '',
+  orderId = '',
+} = {}) => {
   if (typeof window.gtag === 'function') {
-    window.gtag('event', 'pedido_enviado', {
-      template: templateSlug || 'sin_etiquetar',
+    window.gtag('event', 'purchase', {
+      transaction_id: orderId || undefined,
+      value,
+      currency,
+      items: [
+        {
+          item_name: `invitacion_${templateSlug || 'sin_etiquetar'}`,
+          price: value,
+          quantity: 1,
+        },
+      ],
     });
   }
   if (typeof window.fbq === 'function') {
-    window.fbq('track', 'Lead');
+    window.fbq(
+      'track',
+      'Purchase',
+      { value, currency, content_name: templateSlug || 'sin_etiquetar' },
+      orderId ? { eventID: orderId } : undefined,
+    );
   }
 };
 
@@ -26,11 +48,9 @@ export const trackPaletteSelect = ({ paletteId = '', templateSlug = '' } = {}) =
   }
 };
 
-// Evento de conversión real: el usuario, ya con su diseño enviado, hace clic
-// para contactar por WhatsApp/Instagram/TikTok y coordinar la entrega. Como
-// el cierre de venta es manual (no hay checkout online), este es el paso
-// más cercano a "compra" que existe hoy — es el que debe usarse como
-// objetivo de optimización en Meta Ads Manager, no "Lead" ni "Interacción".
+// Evento de contacto: clic en WhatsApp/Instagram/TikTok para pedir ajustes o
+// resolver dudas. Ya no es la conversión (eso es trackPurchase) — es señal
+// de intención/soporte.
 export const trackContactClick = ({ channel = '', templateSlug = '' } = {}) => {
   if (typeof window.gtag === 'function') {
     window.gtag('event', 'contacto_iniciado', {

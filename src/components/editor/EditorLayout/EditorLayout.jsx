@@ -2,13 +2,8 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useEditor } from '../../../context/EditorContext';
 import { TEMPLATES, DEFAULT_TEMPLATE } from '../../../constants/templateRegistry';
-import {
-  WEDYA_WHATSAPP,
-  WEDYA_INSTAGRAM,
-  WEDYA_TIKTOK,
-} from '../../../constants/editorConstants';
-import { trackContactClick } from '../../../utils/analyticsEvents';
 import EditorPanel from '../EditorPanel/EditorPanel';
+import PublishedInfo from '../PublishedInfo';
 import './EditorLayout.scss';
 
 const SectionWrapper = ({ id, activeSection, children }) => (
@@ -27,130 +22,47 @@ SectionWrapper.propTypes = {
 };
 SectionWrapper.defaultProps = { activeSection: null };
 
-// Dialog de confirmación — se muestra tras el pago aprobado. Un solo flujo
-// para todos: URL del sitio ya activo + hoja de RSVP, con los botones de
-// contacto para coordinar cualquier ajuste por WhatsApp, Instagram o TikTok.
-const ContactDialog = ({ brideName, groomName, templateSlug, previewUrl, sheetUrl, onClose }) => {
-  const [copied, setCopied] = useState(false);
+// Dialog de confirmación — se muestra tras el pago aprobado, con la misma
+// info (PublishedInfo) que reaparece en el step "Publicar" si se reabre una
+// boda ya activa.
+const ContactDialog = ({ previewUrl, sheetUrl, editLink, onClose }) => (
+  <div
+    className="editor-layout__contact-overlay"
+    onClick={(e) => {
+      if (e.target === e.currentTarget) onClose();
+    }}
+  >
+    <div className="editor-layout__contact-dialog" role="dialog" aria-modal="true">
+      <button
+        type="button"
+        className="editor-layout__contact-close"
+        aria-label="Cerrar"
+        onClick={onClose}
+      >
+        ×
+      </button>
 
-  const prefilledMessage =
-    `¡Holaa! Somos ${brideName} & ${groomName} 💍 y ya pagamos nuestra invitación digital. ` +
-    'Quedó publicada ✨' +
-    (previewUrl ? ` Nuestro sitio: ${previewUrl}` : '');
-
-  const handleChannel = async (channelKey) => {
-    // Evento de conversión real para Meta Ads: se dispara justo cuando el
-    // usuario de verdad inicia el contacto, no antes (ver analyticsEvents.js).
-    trackContactClick({ channel: channelKey, templateSlug });
-
-    let url;
-    if (channelKey === 'whatsapp') {
-      url = `https://wa.me/${WEDYA_WHATSAPP}?text=${encodeURIComponent(prefilledMessage)}`;
-    } else {
-      // Instagram y TikTok no permiten precargar el mensaje: lo copiamos
-      try {
-        await navigator.clipboard.writeText(prefilledMessage);
-        setCopied(true);
-      } catch {
-        // clipboard puede fallar sin https; el usuario aún puede escribir a mano
-      }
-      url =
-        channelKey === 'instagram'
-          ? `https://ig.me/m/${WEDYA_INSTAGRAM}`
-          : `https://www.tiktok.com/@${WEDYA_TIKTOK}`;
-    }
-    window.open(url, '_blank', 'noopener');
-  };
-
-  return (
-    <div
-      className="editor-layout__contact-overlay"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="editor-layout__contact-dialog" role="dialog" aria-modal="true">
-        <button
-          type="button"
-          className="editor-layout__contact-close"
-          aria-label="Cerrar"
-          onClick={onClose}
-        >
-          ×
-        </button>
-
-        <p className="editor-layout__contact-title">¡Su invitación ya está publicada! 🤍</p>
-        <p className="editor-layout__contact-text">
-          Déjennos un mensaje con sus nombres por si quieren coordinar algún
-          ajuste. Mientras tanto, acá tienen todo listo:
-        </p>
-
-        {previewUrl && (
-          <p className="editor-layout__contact-preview">
-            Su sitio:{' '}
-            <a href={previewUrl} target="_blank" rel="noreferrer noopener">
-              {previewUrl}
-            </a>
-          </p>
-        )}
-
-        {sheetUrl && (
-          <p className="editor-layout__contact-preview">
-            Hoja de confirmaciones (RSVP):{' '}
-            <a href={sheetUrl} target="_blank" rel="noreferrer noopener">
-              ver hoja de cálculo
-            </a>
-          </p>
-        )}
-
-        <div className="editor-layout__contact-channels">
-          <button
-            type="button"
-            className="editor-layout__contact-channel-btn"
-            onClick={() => handleChannel('whatsapp')}
-          >
-            WhatsApp
-          </button>
-          <button
-            type="button"
-            className="editor-layout__contact-channel-btn"
-            onClick={() => handleChannel('instagram')}
-          >
-            Instagram
-          </button>
-          <button
-            type="button"
-            className="editor-layout__contact-channel-btn"
-            onClick={() => handleChannel('tiktok')}
-          >
-            TikTok
-          </button>
-        </div>
-
-        {copied && (
-          <p className="editor-layout__contact-copied-note">
-            Mensaje copiado — solo pégalo en el chat 😉
-          </p>
-        )}
-      </div>
+      <span className="editor-layout__contact-icon" aria-hidden="true">🤍</span>
+      <PublishedInfo
+        title="¡Su invitación ya está publicada!"
+        previewUrl={previewUrl}
+        sheetUrl={sheetUrl}
+        editLink={editLink}
+      />
     </div>
-  );
-};
+  </div>
+);
 
 ContactDialog.propTypes = {
-  brideName:    PropTypes.string,
-  groomName:    PropTypes.string,
-  templateSlug: PropTypes.string,
-  previewUrl:   PropTypes.string,
-  sheetUrl:     PropTypes.string,
-  onClose:      PropTypes.func.isRequired,
+  previewUrl: PropTypes.string,
+  sheetUrl:   PropTypes.string,
+  editLink:   PropTypes.string,
+  onClose:    PropTypes.func.isRequired,
 };
 ContactDialog.defaultProps = {
-  brideName:    '',
-  groomName:    '',
-  sheetUrl:     '',
-  templateSlug: '',
-  previewUrl:   '',
+  sheetUrl:   '',
+  previewUrl: '',
+  editLink:   '',
 };
 
 // Renders the preview once the template module is loaded
@@ -279,17 +191,22 @@ MobilePreviewFrame.propTypes = {
 };
 MobilePreviewFrame.defaultProps = { sectionRequest: null };
 
-const EditorLayout = ({ templateSlug }) => {
+const EditorLayout = ({ templateSlug, published }) => {
   const [showPreview, setShowPreview]       = useState(false);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
-  const [activeSection, setActiveSection]   = useState('hero');
-  const [submitted, setSubmitted]           = useState(false);
+  // Si se llega desde un link ?draft= de una boda YA publicada, arranca
+  // directo en el step "Publicar" — ahí es donde vive PublishedInfo.
+  const [activeSection, setActiveSection]   = useState(published ? 'publicar' : 'hero');
+  const [submitted, setSubmitted]           = useState(Boolean(published));
   const [showContactDialog, setShowContactDialog] = useState(false);
-  const [previewUrl, setPreviewUrl]         = useState('');
-  const [sheetUrl, setSheetUrl]             = useState('');
+  const [previewUrl, setPreviewUrl]         = useState(published?.previewUrl ?? '');
+  const [sheetUrl, setSheetUrl]             = useState(published?.sheetUrl ?? '');
+  const [editLink, setEditLink]             = useState(published?.editLink ?? '');
   const [navScrolled, setNavScrolled]       = useState(false);
   const [templateModule, setTemplateModule] = useState(null);
-  const [previewMode, setPreviewMode]       = useState('desktop'); // 'desktop' | 'mobile'
+  // Arranca en modo Celular incluso en escritorio: la mayoría de invitados
+  // abren la invitación desde el teléfono, así que es la vista más fiel.
+  const [previewMode, setPreviewMode]       = useState('mobile'); // 'desktop' | 'mobile'
   // Último salto de sección pedido desde el panel — objeto nuevo por click,
   // consumido por el iframe del modo Celular (ver MobilePreviewFrame).
   const [sectionRequest, setSectionRequest] = useState(null);
@@ -440,11 +357,9 @@ const EditorLayout = ({ templateSlug }) => {
 
       {showContactDialog && (
         <ContactDialog
-          brideName={data.brideName}
-          groomName={data.groomName}
-          templateSlug={slug}
           previewUrl={previewUrl}
           sheetUrl={sheetUrl}
+          editLink={editLink}
           onClose={() => setShowContactDialog(false)}
         />
       )}
@@ -455,11 +370,21 @@ const EditorLayout = ({ templateSlug }) => {
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
           palettePresets={templateModule?.PRESET_PALETTES ?? []}
-          onSubmitSuccess={(published) => {
+          // Boda ya publicada (submitted=true): el step "Publicar" siempre
+          // muestra PublishedInfo (links + copiar) con un botón "Guardar
+          // cambios" debajo — nunca vuelve a pedir pago, sin importar si
+          // editó algo o no.
+          publishedInfo={submitted ? { previewUrl, sheetUrl, editLink } : null}
+          onSubmitSuccess={(result) => {
+            // Si ya estaba "submitted" (venía de una boda activa que se
+            // editó), no reabrimos el dialog de bienvenida post-pago — solo
+            // se refresca la info del step Publicar en silencio.
+            const wasAlreadyPublished = submitted;
             setSubmitted(true);
-            setPreviewUrl(published?.previewUrl ?? '');
-            setSheetUrl(published?.sheetUrl ?? '');
-            setShowContactDialog(true);
+            setPreviewUrl(result?.previewUrl ?? '');
+            setSheetUrl(result?.sheetUrl ?? '');
+            if (result?.editLink) setEditLink(result.editLink);
+            if (!wasAlreadyPublished) setShowContactDialog(true);
           }}
         />
       </aside>
@@ -469,9 +394,15 @@ const EditorLayout = ({ templateSlug }) => {
 
 EditorLayout.propTypes = {
   templateSlug: PropTypes.string,
+  published: PropTypes.shape({
+    previewUrl: PropTypes.string,
+    sheetUrl:   PropTypes.string,
+    editLink:   PropTypes.string,
+  }),
 };
 EditorLayout.defaultProps = {
   templateSlug: DEFAULT_TEMPLATE,
+  published: null,
 };
 
 export default EditorLayout;

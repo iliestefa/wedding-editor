@@ -23,23 +23,82 @@
     text-align: center;
   }
 
-  &__price {
+  &__processing {
     display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    text-align: center;
   }
 
-  &__price-regular {
+  // Oculta los botones de PayPal SIN desmontarlos (altura 0, no display:none
+  // brusco): el SDK necesita sus iframes vivos para terminar la captura.
+  &__paypal-hidden {
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  &__paypal-note {
+    font-size: 0.75rem;
+    color: #a88b78;
+    text-align: center;
+    margin: 0 0 0.5rem;
+  }
+
+  &__spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(184, 154, 106, 0.25);
+    border-top-color: #b89a6a;
+    border-radius: 50%;
+    animation: editor-submit-spin 0.8s linear infinite;
+  }
+
+  &__processing-text {
     font-size: 0.85rem;
-    color: #a8998a;
-    text-decoration: line-through;
+    font-weight: 600;
+    color: #4a3728;
+    margin: 0;
   }
 
-  &__price-offer {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: #6b4f2e;
+  &__processing-hint {
+    font-size: 0.72rem;
+    color: #a88b78;
+    margin: 0;
   }
+
+  &__saved-msg {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6f8f6a;
+    text-align: center;
+    margin: 0;
+    padding: 0.5rem 0;
+  }
+
+  &__update-btn {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #fdf8f3;
+    background: #b89a6a;
+    border: none;
+    border-radius: 6px;
+    padding: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.18s;
+
+    &:hover {
+      background: #c9a97e;
+    }
+  }
+}
+
+@keyframes editor-submit-spin {
+  to { transform: rotate(360deg); }
 }

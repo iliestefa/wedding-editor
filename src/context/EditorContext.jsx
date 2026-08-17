@@ -220,12 +220,15 @@ const editorReducer = (state, action) => {
   }
 };
 
-export const EditorProvider = ({ templateSlug, children }) => {
+export const EditorProvider = ({ templateSlug, remoteDraft, children }) => {
   const [data, dispatch] = useReducer(
     editorReducer,
     templateSlug,
     (slug) => {
       const defaults = buildInitialState(slug);
+      // Un borrador remoto (link "continuar editando") pisa el autoguardado
+      // local: es lo que la pareja pidió retomar explícitamente.
+      if (remoteDraft?.data) return { ...defaults, ...remoteDraft.data };
       const saved = loadSavedData(slug);
       return saved ? { ...defaults, ...saved } : defaults;
     },
@@ -314,9 +317,15 @@ export const EditorProvider = ({ templateSlug, children }) => {
 
 EditorProvider.propTypes = {
   templateSlug: PropTypes.string,
+  remoteDraft:  PropTypes.shape({
+    slug:         PropTypes.string,
+    templateSlug: PropTypes.string,
+    data:         PropTypes.object,
+    email:        PropTypes.string,
+  }),
   children:     PropTypes.node.isRequired,
 };
-EditorProvider.defaultProps = { templateSlug: 'soho' };
+EditorProvider.defaultProps = { templateSlug: 'soho', remoteDraft: null };
 
 export const useEditor = () => {
   const ctx = useContext(EditorContext);

@@ -2,22 +2,93 @@ import emailjs from "@emailjs/browser";
 import {
   EMAILJS_SERVICE_ID,
   EMAILJS_TEMPLATE_ID,
+  EMAILJS_DRAFT_TEMPLATE_ID,
   EMAILJS_PUBLIC_KEY,
   WEDDINGS_API,
 } from "../constants/editorConstants";
+
+// ─── Borradores ("Guardar y continuar luego") ────────────────────────────────
+
+// Guarda (o actualiza) el borrador en el engine. Con identity {slug, token}
+// actualiza ese mismo registro; si el engine ya no lo encuentra (borrado,
+// publicado…), reintenta creando uno nuevo para no trabar a la pareja.
+export const saveDraftToWeddingsApi = async (
+  weddingData,
+  templateSlug,
+  { slug = null, token = null, email = null } = {},
+) => {
+  if (!WEDDINGS_API) throw new Error("El guardado no está configurado.");
+
+  const post = async (payload) => {
+    const res = await fetch(`${WEDDINGS_API}/api/invitations`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    return res.json().catch(() => null);
+  };
+
+  const base = { templateSlug, data: weddingData, email };
+  let result = await post(slug && token ? { ...base, slug, token } : base);
+  if (!result?.ok && slug && token) {
+    result = await post(base); // identidad vieja inválida → borrador nuevo
+  }
+  if (!result?.ok) {
+    throw new Error(result?.error || "No se pudo guardar el borrador.");
+  }
+  return { slug: result.slug, draftToken: result.draftToken };
+};
+
+// Consulta el estado de una invitación por el link "continuar editando"
+// (?draft=slug.token) — sirve tanto si sigue como borrador (status inactive,
+// para cargar sus datos en el editor) como si ya fue publicada (status
+// active, con publicUrl/sheetUrl listos para mostrar directo sin editor).
+export const fetchStatusFromWeddingsApi = async (slug, token) => {
+  if (!WEDDINGS_API || !slug || !token) return null;
+  try {
+    const res = await fetch(
+      `${WEDDINGS_API}/api/invitations/status?slug=${encodeURIComponent(slug)}&token=${encodeURIComponent(token)}`,
+    );
+    const result = await res.json();
+    return result?.ok ? result : null;
+  } catch {
+    return null;
+  }
+};
+
+// Email a la pareja con su link para retomar. Requiere un template propio de
+// EmailJS (VITE_EMAILJS_DRAFT_TEMPLATE_ID) — sin él, se omite en silencio y
+// el link solo se muestra en pantalla.
+export const sendDraftLinkEmail = async ({ email, coupleNames, draftLink }) => {
+  if (!EMAILJS_SERVICE_ID || !EMAILJS_DRAFT_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+    return false;
+  }
+  await emailjs.send(
+    EMAILJS_SERVICE_ID,
+    EMAILJS_DRAFT_TEMPLATE_ID,
+    { to_email: email, couple_names: coupleNames, draft_link: draftLink },
+    EMAILJS_PUBLIC_KEY,
+  );
+  return true;
+};
 
 // Confirma el pago (orderId de PayPal ya aprobado por el pagador) y publica
 // la invitación: el engine verifica el pago contra PayPal server-to-server,
 // y si es válido guarda + activa la boda + arma la hoja de RSVP. A diferencia
 // del guardado viejo (borrador sin pagar), acá SÍ propagamos el error — si el
 // pago no se puede verificar, el editor debe saberlo y avisarle a la pareja.
-export const publishToWeddingsApi = async (weddingData, templateSlug, orderId) => {
+export const publishToWeddingsApi = async (
+  weddingData,
+  templateSlug,
+  orderId,
+  { draftSlug = null, draftToken = null } = {},
+) => {
   if (!WEDDINGS_API) throw new Error("El servicio de publicación no está configurado.");
 
   const res = await fetch(`${WEDDINGS_API}/api/invitations/publish`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ templateSlug, data: weddingData, orderId }),
+    body: JSON.stringify({ templateSlug, data: weddingData, orderId, draftSlug, draftToken }),
   });
   const result = await res.json().catch(() => null);
   if (!result?.ok) {
@@ -27,9 +98,27 @@ export const publishToWeddingsApi = async (weddingData, templateSlug, orderId) =
     slug: result.slug,
     previewUrl: result.previewUrl,
     sheetUrl: result.sheetUrl,
+    editToken: result.editToken,
     payerName: result.payerName,
     payerEmail: result.payerEmail,
   };
+};
+
+// Actualiza una invitación YA PUBLICADA (sin volver a cobrar) — usa el mismo
+// slug+token que ya demuestran que es la pareja dueña.
+export const updateWeddingApi = async (weddingData, { slug, token }) => {
+  if (!WEDDINGS_API) throw new Error("El servicio de actualización no está configurado.");
+
+  const res = await fetch(`${WEDDINGS_API}/api/invitations/update`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ slug, token, data: weddingData }),
+  });
+  const result = await res.json().catch(() => null);
+  if (!result?.ok) {
+    throw new Error(result?.error || "No se pudo actualizar la invitación.");
+  }
+  return { slug: result.slug, previewUrl: result.previewUrl, sheetUrl: result.sheetUrl };
 };
 
 // Identificador único del cliente: "Sofía" + "Alejandro" → "sofiayalejandro".

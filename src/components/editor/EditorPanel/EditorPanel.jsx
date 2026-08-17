@@ -1,12 +1,26 @@
 import PropTypes from 'prop-types';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useEditor } from '../../../context/EditorContext';
 import { trackPaletteSelect } from '../../../utils/analyticsEvents';
 import EditorField from '../EditorField/EditorField';
 import EditorImageField from '../EditorImageField/EditorImageField';
 import EditorSubmit from '../EditorSubmit/EditorSubmit';
 import { mapsLinkToEmbedSrc } from '../../../utils/mapsUtils';
+import {
+  PUBLISH_PRICE_USD,
+  PUBLISH_PRICE_REGULAR_USD,
+  WEDYA_WHATSAPP,
+  WEDYA_INSTAGRAM,
+  WEDYA_TIKTOK,
+} from '../../../constants/editorConstants';
+import { saveDraftToWeddingsApi, sendDraftLinkEmail, updateWeddingApi } from '../../../services/editorService';
+import { loadDraftIdentity, saveDraftIdentity } from '../../../services/draftIdentity';
+import { WhatsAppIcon, InstagramIcon, TikTokIcon } from '../SocialIcons';
+import PublishedInfo from '../PublishedInfo';
 import './EditorPanel.scss';
+
+const PUBLISH_DISCOUNT_USD = Math.round(Number(PUBLISH_PRICE_REGULAR_USD) - Number(PUBLISH_PRICE_USD));
 
 const SECTIONS_SOHO = [
   { id: 'hero',       label: 'Portada' },
@@ -168,7 +182,162 @@ const CUSTOM_PALETTE_FIELDS = [
 ];
 
 // ── Main panel ──────────────────────────────────────────────────────────────
-const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess, palettePresets }) => {
+// ── Diálogo "Guardar y continuar luego" ─────────────────────────────────────
+// Guarda el borrador en el engine, muestra el link para retomar (en cualquier
+// dispositivo) y se lo manda también por correo a la pareja.
+// Guarda (o actualiza) el borrador y arma el link para retomar. Compartida
+// entre el diálogo (primera vez, pide email) y el guardado silencioso
+// (ya hay email conocido — entró desde un link o ya guardó antes).
+const performSaveDraft = async (data, templateSlug, identity, email) => {
+  const saved = await saveDraftToWeddingsApi(data, templateSlug, {
+    slug: identity?.slug ?? null,
+    token: identity?.token ?? null,
+    email,
+  });
+  saveDraftIdentity(templateSlug, { slug: saved.slug, token: saved.draftToken, email });
+
+  const draftLink =
+    `${window.location.origin}${import.meta.env.BASE_URL}` +
+    `?template=${templateSlug}&draft=${saved.slug}.${saved.draftToken}`;
+
+  return { draftLink };
+};
+
+// `initialLink`: cuando el guardado ya ocurrió (modo silencioso, sin pedir
+// correo de nuevo), el diálogo abre directo en la vista de éxito mostrando
+// el link para copiarlo.
+const SaveDraftDialog = ({ onClose, initialLink }) => {
+  const { data, templateSlug } = useEditor();
+  const identity = loadDraftIdentity(templateSlug);
+  const [email, setEmail] = useState(identity?.email ?? '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [link, setLink] = useState(initialLink ?? '');
+  const [emailSent, setEmailSent] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleSave = async () => {
+    const trimmed = email.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setError('Escribe un correo válido para enviarte el enlace.');
+      return;
+    }
+    setError('');
+    setSaving(true);
+    try {
+      const { draftLink } = await performSaveDraft(data, templateSlug, identity, trimmed);
+      setLink(draftLink);
+
+      const sent = await sendDraftLinkEmail({
+        email: trimmed,
+        coupleNames: `${data.brideName} & ${data.groomName}`,
+        draftLink,
+      }).catch(() => false);
+      setEmailSent(sent);
+    } catch (err) {
+      setError(err?.message || 'No se pudo guardar. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+    } catch {
+      // sin clipboard (http, permisos) — el link queda visible para copiar a mano
+    }
+  };
+
+  // Portal a <body>: el panel del editor tiene transform (animación de
+  // colapso), lo que atraparía este overlay `fixed` dentro del panel en vez
+  // de cubrir toda la pantalla.
+  return createPortal(
+    <div
+      className="editor-panel__draft-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="editor-panel__draft-dialog" role="dialog" aria-modal="true">
+        <button
+          type="button"
+          className="editor-panel__draft-close"
+          aria-label="Cerrar"
+          onClick={onClose}
+        >
+          ×
+        </button>
+
+        {!link ? (
+          <>
+            <p className="editor-panel__draft-title">Guardar y continuar luego</p>
+            <p className="editor-panel__draft-text">
+              Te enviamos un enlace a tu correo para que retomes tu invitación
+              donde la dejaste, desde cualquier dispositivo.
+            </p>
+            <input
+              type="email"
+              className="editor-panel__draft-input"
+              placeholder="tu@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+            />
+            {error && <p className="editor-panel__draft-error">{error}</p>}
+            <button
+              type="button"
+              className="editor-panel__draft-save-btn"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? 'Guardando…' : 'Guardar mi progreso'}
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="editor-panel__draft-success-icon" aria-hidden="true">🤍</span>
+            <p className="editor-panel__draft-title">¡Tu progreso está a salvo!</p>
+            <p className="editor-panel__draft-text">
+              {emailSent
+                ? 'Te enviamos el enlace a tu correo — ábrelo cuando quieras, desde cualquier dispositivo, y sigue justo donde te quedaste.'
+                : 'Guarda este enlace: ábrelo cuando quieras, desde cualquier dispositivo, y sigue justo donde te quedaste.'}
+            </p>
+            <div className="editor-panel__draft-link-box">{link}</div>
+            <div className="editor-panel__draft-actions">
+              <button
+                type="button"
+                className="editor-panel__draft-save-btn"
+                onClick={() => { window.location.href = link; }}
+              >
+                Seguir editando
+              </button>
+              <button
+                type="button"
+                className="editor-panel__draft-copy-btn"
+                onClick={handleCopy}
+              >
+                {copied ? 'Copiado ✓' : 'Copiar enlace'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>,
+    document.body,
+  );
+};
+
+SaveDraftDialog.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  initialLink: PropTypes.string,
+};
+SaveDraftDialog.defaultProps = {
+  initialLink: '',
+};
+
+const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess, publishedInfo, palettePresets }) => {
   const {
     data,
     templateSlug,
@@ -186,6 +355,66 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess, paletteP
   const sections = isElegant ? SECTIONS_ELEGANT : SECTIONS_SOHO;
   const bodyRef = useRef(null);
   const tabsRef = useRef(null);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  // Link del último guardado silencioso: el diálogo abre directo en la
+  // vista de éxito mostrándolo (sin volver a pedir el correo).
+  const [savedDraftLink, setSavedDraftLink] = useState('');
+  // 'idle' | 'saving' | 'saved' | 'error' — feedback del guardado silencioso
+  // (cuando ya conocemos el email: venía de un link de borrador, o ya guardó
+  // antes en este dispositivo). Con email conocido no hace falta pedirlo.
+  const [saveStatus, setSaveStatus] = useState('idle');
+
+  const handleSaveClick = async () => {
+    const identity = loadDraftIdentity(templateSlug);
+    // El guardado directo (sin pedir correo) es SOLO para quien entró por su
+    // link de borrador (?draft=...): ahí el correo ya se dio al crearlo. En
+    // el editor normal siempre pasa por el diálogo (correo → guardar → URL),
+    // aunque este navegador tenga una identidad guardada de antes.
+    const cameFromDraftLink = new URLSearchParams(window.location.search).has('draft');
+    if (!cameFromDraftLink || !identity?.email) {
+      setSavedDraftLink('');
+      setShowSaveDialog(true);
+      return;
+    }
+    setSaveStatus('saving');
+    try {
+      const { draftLink } = await performSaveDraft(data, templateSlug, identity, identity.email);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2500);
+      // Muestra el link guardado — sin esto la pareja no tiene cómo verlo
+      // de nuevo si no lo anotó la primera vez.
+      setSavedDraftLink(draftLink);
+      setShowSaveDialog(true);
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 2500);
+    }
+  };
+
+  // Boda ya publicada: el botón fijo del footer guarda los cambios directo
+  // (endpoint /update, sin pago) desde cualquier step — mismo feedback
+  // inline que el guardado de borradores.
+  const handleUpdateClick = async () => {
+    const identity = loadDraftIdentity(templateSlug);
+    if (!identity?.slug || !identity?.token) {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 2500);
+      return;
+    }
+    setSaveStatus('saving');
+    try {
+      const updated = await updateWeddingApi(data, identity);
+      // Refresca las URLs en EditorLayout (ej. la hoja de RSVP aparece o
+      // desaparece si cambió el tipo de confirmación) — con la boda ya
+      // publicada esto no reabre ningún dialog.
+      onSubmitSuccess?.(updated);
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2500);
+    } catch {
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 2500);
+    }
+  };
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: 0, behavior: 'instant' });
@@ -930,11 +1159,37 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess, paletteP
         {/* ── Publicar ── */}
         {activeSection === 'publicar' && (
           <div className="editor-panel__section">
-            <p className="editor-panel__publish-hint">
-              Realiza el pago para generar tu página. En cuanto se confirme,
-              tu invitación queda publicada al instante.
-            </p>
-            <EditorSubmit onSuccess={onSubmitSuccess} />
+            {publishedInfo ? (
+              <PublishedInfo
+                title="¡Su invitación ya está publicada!"
+                previewUrl={publishedInfo.previewUrl}
+                sheetUrl={publishedInfo.sheetUrl}
+                editLink={publishedInfo.editLink}
+              >
+                <EditorSubmit onSuccess={onSubmitSuccess} isRepublish />
+              </PublishedInfo>
+            ) : (
+              <>
+                <div className="editor-panel__publish-offer">
+                  <span className="editor-panel__publish-badge">
+                    Ahorra ${PUBLISH_DISCOUNT_USD} publicando hoy
+                  </span>
+                  <div className="editor-panel__publish-prices">
+                    <span className="editor-panel__publish-price-regular">
+                      ${PUBLISH_PRICE_REGULAR_USD}
+                    </span>
+                    <span className="editor-panel__publish-price-offer">
+                      ${PUBLISH_PRICE_USD}
+                    </span>
+                  </div>
+                  <p className="editor-panel__publish-hint">
+                    Paga ahora y asegura el descuento — tu invitación queda
+                    publicada al instante en cuanto se confirme el pago.
+                  </p>
+                </div>
+                <EditorSubmit onSuccess={onSubmitSuccess} isRepublish={false} />
+              </>
+            )}
           </div>
         )}
 
@@ -946,6 +1201,91 @@ const EditorPanel = ({ activeSection, onSectionChange, onSubmitSuccess, paletteP
 
         {activeSection && navButtons}
       </div>
+
+      {/* ── Footer fijo, según el estado de la boda:
+          · Sin pagar → "Publicar mi invitación" (navega al step Publicar);
+            en el propio step Publicar: "Guardar luego" + "Dudas".
+          · Ya pagada → "Guardar cambios" directo (endpoint /update, sin
+            pago) en todos los steps; en el step Publicar no se repite nada
+            porque PublishedInfo + su botón ya viven ahí. ── */}
+      {(activeSection !== 'publicar' || !publishedInfo) && (
+        <footer className="editor-panel__footer">
+          {activeSection !== 'publicar' ? (
+            publishedInfo ? (
+              <button
+                type="button"
+                className="editor-panel__publish-cta"
+                onClick={handleUpdateClick}
+                disabled={saveStatus === 'saving'}
+              >
+                {saveStatus === 'saving' && 'Guardando…'}
+                {saveStatus === 'saved' && 'Guardado ✓'}
+                {saveStatus === 'error' && 'No se pudo guardar'}
+                {saveStatus === 'idle' && 'Guardar cambios'}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="editor-panel__publish-cta"
+                onClick={() => onSectionChange('publicar')}
+              >
+                Publicar mi invitación
+              </button>
+            )
+          ) : (
+            <div className="editor-panel__footer-row">
+              <button
+                type="button"
+                className="editor-panel__save-draft-link"
+                onClick={handleSaveClick}
+                disabled={saveStatus === 'saving'}
+              >
+                {saveStatus === 'saving' && 'Guardando…'}
+                {saveStatus === 'saved' && 'Guardado ✓'}
+                {saveStatus === 'error' && 'No se pudo guardar'}
+                {saveStatus === 'idle' && 'Guardar y continuar luego'}
+              </button>
+              <div className="editor-panel__contact">
+                <span className="editor-panel__contact-text">¿Dudas?</span>
+                <a
+                  href={`https://wa.me/${WEDYA_WHATSAPP}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="editor-panel__contact-icon"
+                  aria-label="WhatsApp"
+                >
+                  <WhatsAppIcon />
+                </a>
+                <a
+                  href={`https://ig.me/m/${WEDYA_INSTAGRAM}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="editor-panel__contact-icon"
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon />
+                </a>
+                <a
+                  href={`https://www.tiktok.com/@${WEDYA_TIKTOK}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="editor-panel__contact-icon"
+                  aria-label="TikTok"
+                >
+                  <TikTokIcon />
+                </a>
+              </div>
+            </div>
+          )}
+        </footer>
+      )}
+
+      {showSaveDialog && (
+        <SaveDraftDialog
+          initialLink={savedDraftLink}
+          onClose={() => setShowSaveDialog(false)}
+        />
+      )}
     </aside>
   );
 };
@@ -954,6 +1294,11 @@ EditorPanel.propTypes = {
   activeSection:   PropTypes.string,
   onSectionChange: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func,
+  publishedInfo:   PropTypes.shape({
+    previewUrl: PropTypes.string,
+    sheetUrl:   PropTypes.string,
+    editLink:   PropTypes.string,
+  }),
   palettePresets:  PropTypes.arrayOf(PropTypes.shape({
     id:     PropTypes.string.isRequired,
     label:  PropTypes.string.isRequired,
@@ -966,6 +1311,7 @@ EditorPanel.propTypes = {
 EditorPanel.defaultProps = {
   activeSection:   null,
   onSubmitSuccess: null,
+  publishedInfo:   null,
   palettePresets:  [],
 };
 

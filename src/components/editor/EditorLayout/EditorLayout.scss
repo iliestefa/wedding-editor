@@ -280,67 +280,12 @@ $bar-border: rgba(184, 154, 106, 0.2);
   }
 }
 
-.editor-layout__contact-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem;
-  color: #4a3728;
-  margin: 0 0 0.5rem;
+.editor-layout__contact-icon {
+  display: block;
+  font-size: 2.2rem;
+  line-height: 1;
   text-align: center;
-}
-
-.editor-layout__contact-text {
-  font-size: 0.82rem;
-  font-weight: 300;
-  line-height: 1.6;
-  color: #a88b78;
-  margin: 0 0 1.25rem;
-  text-align: center;
-}
-
-.editor-layout__contact-preview {
-  font-size: 0.82rem;
-  text-align: center;
-  margin: 0 0 1.25rem;
-  color: #4a3728;
-
-  a {
-    color: #b89a6a;
-    font-weight: 700;
-  }
-}
-
-.editor-layout__contact-channels {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.editor-layout__contact-channel-btn {
-  font-family: inherit;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #fdf8f3;
-  background: #b89a6a;
-  border: none;
-  border-radius: 5px;
-  padding: 0.75rem;
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: background-color 0.18s;
-
-  &:hover {
-    background: #c9a97e;
-  }
-}
-
-.editor-layout__contact-copied-note {
-  font-size: 0.75rem;
-  font-weight: 300;
-  color: #a88b78;
-  text-align: center;
-  margin: 0.75rem 0 0;
+  margin-bottom: 0.75rem;
 }
 
 // ── Active section highlight ───────────────────────────────────────

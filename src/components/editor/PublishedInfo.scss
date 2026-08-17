@@ -1,0 +1,131 @@
+.published-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  text-align: left;
+
+  &__title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: #4a3728;
+    text-align: center;
+    margin: 0 0 0.35rem;
+  }
+
+  // ── Tarjeta única con todos los links ───────────────────────────────────────
+  &__card {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(184, 154, 106, 0.25);
+    border-radius: 10px;
+    padding: 0.35rem 0.9rem;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.65rem 0;
+
+    & + & {
+      border-top: 1px solid rgba(184, 154, 106, 0.15);
+    }
+  }
+
+  &__row-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  &__row-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #a88b78;
+  }
+
+  &__row-link {
+    font-size: 0.75rem;
+    color: #4a3728;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__icon-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #8a7960;
+    cursor: pointer;
+    transition: background-color 0.18s, color 0.18s;
+
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    &:hover {
+      background: rgba(184, 154, 106, 0.12);
+      color: #4a3728;
+    }
+  }
+
+  &__group-title {
+    font-size: 0.72rem;
+    color: #a88b78;
+    line-height: 1.5;
+    margin: 0.15rem 0 -0.35rem;
+  }
+
+  // ── Contacto: una sola línea de texto con iconos inline ─────────────────────
+  &__contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    color: #a88b78;
+    line-height: 1.5;
+    text-align: center;
+    margin: 0;
+  }
+
+  &__contact-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    color: #b89a6a;
+    transition: background-color 0.18s, color 0.18s;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    &:hover {
+      background: rgba(184, 154, 106, 0.14);
+      color: #4a3728;
+    }
+  }
+}
