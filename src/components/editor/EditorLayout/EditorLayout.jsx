@@ -194,9 +194,14 @@ MobilePreviewFrame.defaultProps = { sectionRequest: null };
 const EditorLayout = ({ templateSlug, published }) => {
   const [showPreview, setShowPreview]       = useState(false);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
-  // Si se llega desde un link ?draft= de una boda YA publicada, arranca
-  // directo en el step "Publicar" — ahí es donde vive PublishedInfo.
-  const [activeSection, setActiveSection]   = useState(published ? 'publicar' : 'hero');
+  // Arranca en "Publicar" si la boda ya está publicada (ahí vive
+  // PublishedInfo) o si el link lo pide explícitamente (&section=publicar —
+  // lo usa el aviso de pago de la invitación bloqueada).
+  const [activeSection, setActiveSection]   = useState(() => {
+    if (published) return 'publicar';
+    const wanted = new URLSearchParams(window.location.search).get('section');
+    return wanted === 'publicar' ? 'publicar' : 'hero';
+  });
   const [submitted, setSubmitted]           = useState(Boolean(published));
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [previewUrl, setPreviewUrl]         = useState(published?.previewUrl ?? '');
