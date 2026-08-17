@@ -2,6 +2,8 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useEditor } from '../../../context/EditorContext';
 import { TEMPLATES, DEFAULT_TEMPLATE } from '../../../constants/templateRegistry';
+import { PUBLISH_PRICE_USD } from '../../../constants/editorConstants';
+import { trackInitiateCheckout } from '../../../utils/analyticsEvents';
 import EditorPanel from '../EditorPanel/EditorPanel';
 import PublishedInfo from '../PublishedInfo';
 import './EditorLayout.scss';
@@ -228,6 +230,19 @@ const EditorLayout = ({ templateSlug, published }) => {
   useEffect(() => {
     TEMPLATES[slug].load().then(setTemplateModule);
   }, [slug]);
+
+  // InitiateCheckout: llegó al step Publicar con el precio a la vista (boda
+  // sin pagar) — una sola vez por sesión, aunque entre y salga del step.
+  const checkoutTrackedRef = useRef(false);
+  useEffect(() => {
+    if (activeSection !== 'publicar' || submitted || checkoutTrackedRef.current) return;
+    checkoutTrackedRef.current = true;
+    trackInitiateCheckout({
+      value: Number(PUBLISH_PRICE_USD),
+      currency: 'USD',
+      templateSlug: slug,
+    });
+  }, [activeSection, submitted, slug]);
 
   // Avisa antes de cerrar/recargar si hay cambios sin enviar — el texto
   // del diálogo lo controla el navegador, no se puede personalizar.

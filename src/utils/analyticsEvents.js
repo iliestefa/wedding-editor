@@ -50,6 +50,37 @@ export const trackLead = ({ templateSlug = '' } = {}) => {
   }
 };
 
+// CHECKOUT INICIADO: la pareja llegó al step Publicar con el precio a la
+// vista (boda aún sin pagar). Mide el drop-off entre "vio el precio" y
+// "pagó", y arma la audiencia de retargeting más caliente. Una vez por
+// sesión — el guard vive en quien lo llama.
+export const trackInitiateCheckout = ({
+  value = 0,
+  currency = 'USD',
+  templateSlug = '',
+} = {}) => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'begin_checkout', {
+      value,
+      currency,
+      items: [
+        {
+          item_name: `invitacion_${templateSlug || 'sin_etiquetar'}`,
+          price: value,
+          quantity: 1,
+        },
+      ],
+    });
+  }
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'InitiateCheckout', {
+      value,
+      currency,
+      content_name: templateSlug || 'sin_etiquetar',
+    });
+  }
+};
+
 // Evento de personalización: la novia eligió una paleta de colores (un preset
 // o la opción personalizada). Sirve para medir qué paletas gustan más y si la
 // feature se usa — no es conversión, solo interés/engagement.
