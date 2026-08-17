@@ -36,6 +36,20 @@ export const trackPurchase = ({
   }
 };
 
+// LEAD: la pareja dejó su correo al guardar el borrador — primer dato de
+// contacto real del embudo (la conversión final es trackPurchase). Se
+// dispara solo en la captura inicial del correo, no en cada re-guardado.
+export const trackLead = ({ templateSlug = '' } = {}) => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'generate_lead', {
+      template: templateSlug || 'sin_etiquetar',
+    });
+  }
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'Lead');
+  }
+};
+
 // Evento de personalización: la novia eligió una paleta de colores (un preset
 // o la opción personalizada). Sirve para medir qué paletas gustan más y si la
 // feature se usa — no es conversión, solo interés/engagement.

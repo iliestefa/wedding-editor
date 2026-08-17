@@ -365,7 +365,17 @@ const EditorLayout = ({ templateSlug, published }) => {
           previewUrl={previewUrl}
           sheetUrl={sheetUrl}
           editLink={editLink}
-          onClose={() => setShowContactDialog(false)}
+          onClose={() => {
+            setShowContactDialog(false);
+            // Al cerrar (de cualquier forma), la sesión pasa a la URL del
+            // draft del editor — así refrescar/volver mantiene el contexto
+            // de la boda. Si ya está en esa URL, solo se cierra.
+            if (editLink) {
+              const target = new URL(editLink).searchParams.get('draft');
+              const current = new URLSearchParams(window.location.search).get('draft');
+              if (target && target !== current) window.location.href = editLink;
+            }
+          }}
         />
       )}
 

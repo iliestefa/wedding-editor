@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useEditor } from '../../../context/EditorContext';
-import { trackPaletteSelect } from '../../../utils/analyticsEvents';
+import { trackPaletteSelect, trackLead } from '../../../utils/analyticsEvents';
 import EditorField from '../EditorField/EditorField';
 import EditorImageField from '../EditorImageField/EditorImageField';
 import EditorSubmit from '../EditorSubmit/EditorSubmit';
@@ -227,6 +227,8 @@ const SaveDraftDialog = ({ onClose, initialLink }) => {
     try {
       const { draftLink } = await performSaveDraft(data, templateSlug, identity, trimmed);
       setLink(draftLink);
+      // Lead: acá es donde la pareja deja su correo por primera vez
+      trackLead({ templateSlug });
 
       const sent = await sendDraftLinkEmail({
         email: trimmed,
@@ -250,6 +252,21 @@ const SaveDraftDialog = ({ onClose, initialLink }) => {
     }
   };
 
+  // Cerrar con el progreso ya guardado redirige a la URL del borrador: así
+  // la sesión queda "anclada" a su link (refrescar no pierde nada). Si ya
+  // está en esa URL (entró por su link), solo se cierra.
+  const handleClose = () => {
+    if (link) {
+      const target = new URL(link).searchParams.get('draft');
+      const current = new URLSearchParams(window.location.search).get('draft');
+      if (target && target !== current) {
+        window.location.href = link;
+        return;
+      }
+    }
+    onClose();
+  };
+
   // Portal a <body>: el panel del editor tiene transform (animación de
   // colapso), lo que atraparía este overlay `fixed` dentro del panel en vez
   // de cubrir toda la pantalla.
@@ -257,7 +274,7 @@ const SaveDraftDialog = ({ onClose, initialLink }) => {
     <div
       className="editor-panel__draft-overlay"
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (e.target === e.currentTarget) handleClose();
       }}
     >
       <div className="editor-panel__draft-dialog" role="dialog" aria-modal="true">
@@ -265,7 +282,7 @@ const SaveDraftDialog = ({ onClose, initialLink }) => {
           type="button"
           className="editor-panel__draft-close"
           aria-label="Cerrar"
-          onClick={onClose}
+          onClick={handleClose}
         >
           ×
         </button>
