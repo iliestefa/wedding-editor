@@ -209,9 +209,13 @@ const EditorLayout = ({ templateSlug, published }) => {
   const [editLink, setEditLink]             = useState(published?.editLink ?? '');
   const [navScrolled, setNavScrolled]       = useState(false);
   const [templateModule, setTemplateModule] = useState(null);
-  // Arranca en modo Celular incluso en escritorio: la mayoría de invitados
-  // abren la invitación desde el teléfono, así que es la vista más fiel.
-  const [previewMode, setPreviewMode]       = useState('mobile'); // 'desktop' | 'mobile'
+  // En escritorio arranca en modo Celular (el mockup con iframe simula el
+  // ancho de teléfono — es la vista más fiel a cómo verán la invitación).
+  // En un celular REAL no: ahí la vista directa ya es la móvil nativa, y
+  // meter el mockup sería un teléfono dentro del teléfono.
+  const [previewMode, setPreviewMode]       = useState(() =>
+    window.matchMedia('(max-width: 900px)').matches ? 'desktop' : 'mobile',
+  ); // 'desktop' | 'mobile'
   // Último salto de sección pedido desde el panel — objeto nuevo por click,
   // consumido por el iframe del modo Celular (ver MobilePreviewFrame).
   const [sectionRequest, setSectionRequest] = useState(null);
