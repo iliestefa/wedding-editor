@@ -36,7 +36,11 @@ export const UPLOAD_KEY      = import.meta.env.VITE_UPLOAD_KEY      ?? '';
 // Client ID público de la app "Live" en developer.paypal.com — no es secreto,
 // viaja en el bundle del navegador (el SDK de PayPal lo requiere así).
 export const PAYPAL_CLIENT_ID = import.meta.env.VITE_PAYPAL_CLIENT_ID ?? '';
-export const PUBLISH_PRICE_USD = '65.00';
+// ⚠️ TEMPORAL: $1 para probar el flujo de pago Live sin pagar comisión sobre
+// $65. Debe coincidir exacto con PUBLISH_PRICE_USD en engine/src/routes/
+// invitations.js (el backend valida el monto, no confía en el frontend).
+// Volver a '65.00' en ambos lados antes de anunciar el editor.
+export const PUBLISH_PRICE_USD = '1.00';
 export const PUBLISH_PRICE_REGULAR_USD = '75.00';
 
 // ─── Analytics ───────────────────────────────────────────────────────────────
