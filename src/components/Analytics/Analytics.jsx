@@ -15,8 +15,11 @@ const Analytics = () => {
       document.head.appendChild(gaScript);
 
       window.dataLayer = window.dataLayer || [];
-      window.gtag = function gtag(...args) {
-        window.dataLayer.push(args);
+      // gtag.js solo procesa comandos si recibe el objeto Arguments real;
+      // con rest params (...args) se pushea un Array y lo ignora en silencio.
+      window.gtag = function gtag() {
+        // eslint-disable-next-line prefer-rest-params
+        window.dataLayer.push(arguments);
       };
       window.gtag('js', new Date());
       window.gtag('config', GA4_ID);
